@@ -1,33 +1,60 @@
-########################################################################################################################
-# Input variables
-########################################################################################################################
+#######################################################################
+# Generic
+#######################################################################
 
-variable "ibmcloud_api_key" {
+variable "prefix" {
+  description = "Prefix for name of all resource created by this example"
   type        = string
-  description = "The IBM Cloud API Key"
-  sensitive   = true
+  default     = "eso-example-basic"
 }
 
 variable "region" {
   type        = string
-  description = "Region to provision all resources created by this example"
+  description = "Region where resources will be created."
   default     = "us-south"
 }
 
-variable "prefix" {
+variable "ibmcloud_api_key" {
   type        = string
-  description = "Prefix to append to all resources created by this example"
-  default     = "basic"
+  description = "APIkey that's associated with the account to use, set via environment variable TF_VAR_ibmcloud_api_key or .tfvars file."
+  sensitive   = true
 }
 
 variable "resource_group" {
   type        = string
-  description = "The name of an existing resource group to provision resources in to. If not set a new resource group will be created using the prefix variable"
+  description = "An existing resource group name to use for this example, if unset a new resource group will be created"
   default     = null
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "resource_tags" {
   type        = list(string)
   description = "Optional list of tags to be added to created resources"
   default     = []
+}
+
+## Image-pull module
+variable "sm_iam_secret_name" {
+  type        = string
+  description = "Name of SM IAM secret (dynamic ServiceID API Key) to be created"
+  default     = "sm-iam-secret-puller" #tfsec:ignore:general-secrets-no-plaintext-exposure
+}
+
+variable "sm_service_plan" {
+  type        = string
+  description = "Secrets-Manager trial plan"
+  default     = "trial"
+}
+
+## ESO Module
+variable "existing_sm_instance_guid" {
+  type        = string
+  description = "Existing Secrets Manager GUID. If not provided a new instance will be provisioned"
+  default     = null
+}
+
+variable "existing_sm_instance_region" {
+  type        = string
+  description = "Existing Secrets Manager Region. Required if value is passed into var.existing_instance_guid."
+  default     = null
 }
