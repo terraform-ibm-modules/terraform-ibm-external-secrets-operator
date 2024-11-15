@@ -72,11 +72,11 @@ locals {
 
 # VPC creation
 module "vpc" {
-  source                    = "terraform-ibm-modules/vpc/ibm"
-  version                   = "1.2.0"
-  vpc_name                  = "${var.prefix}-vpc"
-  resource_group_id         = module.resource_group.resource_group_id
-  vpc_tags                  = []
+  source            = "terraform-ibm-modules/vpc/ibm"
+  version           = "1.1.2"
+  vpc_name          = "${var.prefix}-vpc"
+  resource_group_id = module.resource_group.resource_group_id
+  vpc_tags          = []
 }
 
 # OCP CLUSTER creation

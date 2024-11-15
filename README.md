@@ -12,11 +12,13 @@ This module automates the installation and configuration of the [External Secret
 <!-- BEGIN OVERVIEW HOOK -->
 ## Overview
 * [terraform-ibm-external-secrets-operator](#terraform-ibm-external-secrets-operator)
+* [Submodules](./modules)
+    * [eso-clusterstore](./modules/eso-clusterstore)
+    * [eso-external-secret](./modules/eso-external-secret)
+    * [eso-secretstore](./modules/eso-secretstore)
+    * [eso-trusted-profile](./modules/eso-trusted-profile)
 * [Examples](./examples)
     * [Basic Example](./examples/basic)
-    * [Example that uses trusted profiles (container authentication)](./examples/trusted-profiles-authentication)
-    * [Example to deploy the External Secret Operator and to create a different set of resources in terms of secrets, secret groups, stores and auth configurations](./examples/all-combined)
-    * [Example to deploy the External Secret Operator enrolled into RedHat Service Mesh](./examples/eso-enroll-into-servicemesh)
 * [Contributing](#contributing)
 <!-- END OVERVIEW HOOK -->
 
@@ -493,10 +495,7 @@ module "es_kubernetes_secret" {
 <!-- BEGIN EXAMPLES HOOK -->
 ## Examples
 
-- [ Example to deploy the External Secret Operator and to create a different set of resources in terms of secrets, secret groups, stores and auth configurations](examples/all-combined)
 - [ Basic Example](examples/basic)
-- [ Example to deploy the External Secret Operator enrolled into RedHat Service Mesh](examples/eso-enroll-into-servicemesh)
-- [ Example that uses trusted profiles (container authentication)](examples/trusted-profiles-authentication)
 <!-- END EXAMPLES HOOK -->
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
