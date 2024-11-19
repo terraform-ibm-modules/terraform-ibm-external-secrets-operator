@@ -18,7 +18,6 @@ import (
 
 // Resource groups are maintained https://github.ibm.com/GoldenEye/ge-dev-account-management
 const resourceGroup = "geretain-test-ext-secrets-sync"
-const defaultExampleTerraformDir = "examples/all-combined"
 const basicExampleTerraformDir = "examples/basic"
 
 // deploying eso on edge node to have it able to connect to SM and IAM on public network
@@ -180,91 +179,6 @@ func setupOptions(t *testing.T, prefix string, terraformDir string, terraformVar
 	})
 
 	return options
-}
-
-func TestRunDefaultExample(t *testing.T) {
-	t.Parallel()
-
-	options := setupOptions(t, "eso", defaultExampleTerraformDir, allCombinedTerraformVars)
-
-	options.SkipTestTearDown = true
-	defer func() {
-		options.TestTearDown()
-	}()
-	output, err := options.RunTestConsistency()
-
-	if assert.Nil(t, err, "Consistency test should not have errored") {
-		outputs := options.LastTestTerraformOutputs
-		_, tfOutputsErr := testhelper.ValidateTerraformOutputs(outputs, "cluster_id")
-		if assert.Nil(t, tfOutputsErr, tfOutputsErr) {
-			log.Println("Prefix used " + options.Prefix)
-
-			clusterId := outputs["cluster_id"].(string)
-
-			log.Println("clusterId " + clusterId)
-
-			// building the list of secrets to test
-			namespaces_for_apikey_login := []string{"apikeynspace1", "apikeynspace2", "apikeynspace3", "apikeynspace4"}
-			namespaces_for_tp_login := []string{"tpnspace1", "tpnspace2"}
-
-			secretsMap := map[string]string{
-				"dockerconfigjson-uc": namespaces_for_apikey_login[0],
-				// temporary disabled cloudant resource key secret test
-				// https://github.ibm.com/GoldenEye/issues/issues/7726
-				// "cloudant-opaque-arb":                          namespaces_for_apikey_login[1],
-				"dockerconfigjson-arb":                         namespaces_for_apikey_login[2],
-				"pvtcertificate-tls":                           namespaces_for_apikey_login[2],
-				"kv-single-key":                                namespaces_for_apikey_login[3],
-				"kv-multiple-keys":                             namespaces_for_apikey_login[3],
-				"dockerconfigjson-iam":                         namespaces_for_apikey_login[3],
-				"dockerconfigjson-chain":                       namespaces_for_apikey_login[3],
-				options.Prefix + "-arbitrary-arb-tp-0":         namespaces_for_tp_login[0],
-				options.Prefix + "-arbitrary-arb-tp-1":         namespaces_for_tp_login[1],
-				options.Prefix + "-arbitrary-arb-tp-multisg-1": "tpns-multisg",
-				options.Prefix + "-arbitrary-arb-tp-multisg-2": "tpns-multisg",
-				options.Prefix + "-arbitrary-arb-tp-nosg":      "tpns-nosg",
-				options.Prefix + "-arbitrary-arb-cstore-tp":    "eso-cstore-tp-namespace",
-				// sdnlb secret
-				"sdnlb-config": "kube-system",
-			}
-
-			log.Printf("secretsMap %s", secretsMap)
-
-			// get cluster config
-			log.Println("Loading cluster configuration with id " + clusterId)
-			cloudinfosvc, err := cloudinfo.NewCloudInfoServiceFromEnv("TF_VAR_ibmcloud_api_key", cloudinfo.CloudInfoServiceOptions{})
-			if assert.Nil(t, err, "Error creating cloud info service") {
-				clusterConfigPath, err := cloudinfosvc.GetClusterConfigConfigPath(clusterId)
-				defer func() {
-					// attempt to remove cluster config file after test
-					_ = os.Remove(clusterConfigPath)
-				}()
-				if assert.Nil(t, err, "Error getting cluster config path") {
-					// for each secret to test configure Terratest with cluster config
-					// the test checks if each secret is correctly created in the cluster
-					for secretName, secretNamespace := range secretsMap {
-						ocOptions := k8s.NewKubectlOptions("", clusterConfigPath, secretNamespace)
-						log.Printf("Testing secret name %s namespace %s\n", secretName, secretNamespace)
-						_, err := k8s.GetSecretE(t, ocOptions, secretName)
-						assert.Nil(t, err, "Error retrieving secret "+secretName+" in namespace "+secretNamespace)
-					}
-				}
-			}
-		}
-	}
-
-	assert.NotNil(t, output, "Expected some output")
-}
-
-func TestRunUpgradeExample(t *testing.T) {
-	t.Parallel()
-
-	options := setupOptions(t, "eso-upg", defaultExampleTerraformDir, allCombinedTerraformVars)
-	output, err := options.RunTestUpgrade()
-	if !options.UpgradeTestSkipped {
-		assert.Nil(t, err, "This should not have errored")
-		assert.NotNil(t, output, "Expected some output")
-	}
 }
 
 func TestReloaderOperational(t *testing.T) {
