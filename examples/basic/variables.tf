@@ -58,3 +58,9 @@ variable "existing_sm_instance_region" {
   description = "Existing Secrets Manager Region. Required if value is passed into var.existing_instance_guid."
   default     = null
 }
+
+variable "tags" {
+  description = "List of Tags for the ACL"
+  type        = list(string)
+  default     = null
+}

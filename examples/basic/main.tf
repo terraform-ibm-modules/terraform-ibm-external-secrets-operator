@@ -16,7 +16,7 @@ locals {
 
   sm_guid = var.existing_sm_instance_guid == null ? ibm_resource_instance.secrets_manager[0].guid : var.existing_sm_instance_guid
 
-
+  # https://github.ibm.com/GoldenEye/issues/issues/5268 - deployment region will match to sm_region as workaround
   sm_region           = var.existing_sm_instance_region == null ? var.region : var.existing_sm_instance_region
   sm_acct_id          = var.existing_sm_instance_guid == null ? module.iam_secrets_engine[0].acct_secret_group_id : module.secrets_manager_group_acct[0].secret_group_id
   es_namespace_apikey = "es-operator" # pragma: allowlist secret
@@ -40,52 +40,191 @@ module "resource_group" {
 ##################################################################
 
 locals {
-  cluster_vpc_subnets = {
-    default = [
-      {
-        id         = ibm_is_subnet.subnet_zone_1.id
-        cidr_block = ibm_is_subnet.subnet_zone_1.ipv4_cidr_block
-        zone       = ibm_is_subnet.subnet_zone_1.zone
-      }
-    ]
+
+     subnets = [
+    for subnet in module.vpc.vpc.subnets :
+    {
+      id         = subnet.id
+      zone       = subnet.zone
+      cidr_block = subnet.cidr_block
+    }
+  ]
+    cluster_vpc_subnets = {
+    private = local.subnets,
+    edge = local.subnets,
+    transit = local.subnets
   }
 
+  #  cluster_vpc_subnets = {
+  #   zone-1 = [
+  #     for zone in module.vpc.subnet_zone_list :
+  #     {
+  #       id         = zone.id
+  #       zone       = zone.zone
+  #       cidr_block = zone.cidr
+  #     }
+  #   ]
+  # }
+
   # OCP Configuration
-  worker_pools = [
+  # OCP Configuration
+  ocp_worker_pools = [
     {
-      subnet_prefix    = "default"
-      pool_name        = "default" # ibm_container_vpc_cluster automatically names default pool "default" (See https://github.com/IBM-Cloud/terraform-provider-ibm/issues/2849)
+      subnet_prefix    = "private"
+      pool_name        = "default"
       machine_type     = "bx2.4x16"
-      workers_per_zone = 2 # minimum of 2 is allowed when using single zone
+      workers_per_zone = 1
+      labels           = { "dedicated" : "private" }
+      operating_system = "REDHAT_8_64"
+    },
+    {
+      subnet_prefix    = "edge"
+      pool_name        = "edge"
+      machine_type     = "bx2.4x16"
+      workers_per_zone = 1
+      labels           = { "dedicated" : "edge" }
+      operating_system = "REDHAT_8_64"
+    },
+    {
+      subnet_prefix    = "transit"
+      pool_name        = "transit"
+      machine_type     = "bx2.4x16"
+      workers_per_zone = 1
+      labels           = { "dedicated" : "transit" }
       operating_system = "REDHAT_8_64"
     }
   ]
+
+
+  // subnets = [ for v in module.vpc.vpc.subnet : { id = v.subnet_ids} ]
+
+  }
+
+
+module "vpc" {
+  source            = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git?ref=update_submodules"
+  vpc_name          = "${var.prefix}-vpc"
+  resource_group_id = module.resource_group.resource_group_id
+  locations         = ["us-south-1", "us-south-2", "us-south-3"]
+  vpc_tags          = var.resource_tags
+  address_prefixes  = [
+    {
+      name     = "${var.prefix}-us-south-1"
+      location = "us-south-1"
+      ip_range = "10.10.10.0/24"
+    },
+    {
+      name     = "${var.prefix}-us-south-2"
+      location = "us-south-2"
+      ip_range = "10.10.20.0/24"
+    },
+    {
+      name     = "${var.prefix}-us-south-3"
+      location = "us-south-3"
+      ip_range = "10.10.30.0/24"
+    }
+  ]
+  subnet_name_prefix          = "${var.prefix}-subnet"
+  default_network_acl_name    = "${var.prefix}-nacl"
+  default_routing_table_name  = "${var.prefix}-routing-table"
+  default_security_group_name = "${var.prefix}-sg"
+  create_gateway              = true
+  public_gateway_name_prefix  = "${var.prefix}-pw"
+  number_of_addresses         = 16
+  
 }
 
-# VPC creation
-resource "ibm_is_vpc" "vpc" {
-  name                      = "${var.prefix}-vpc"
-  resource_group            = module.resource_group.resource_group_id
-  address_prefix_management = "auto"
-  tags                      = var.resource_tags
+module "security_group" {
+  source = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/security-group?ref=update_submodules"
+  create_security_group = true
+  name                  = "${var.prefix}-vpc-sg"
+  vpc_id                = module.vpc.vpc.vpc_id
+  resource_group_id     =  module.resource_group.resource_group_id
+  security_group_rules  = [
+    {
+      name      = "allow_all_inbound"
+      remote    = "0.0.0.0/0"
+      direction = "inbound"
+    }
+  ]
 }
-
-resource "ibm_is_public_gateway" "gateway" {
-  name           = "${var.prefix}-gateway-1"
-  vpc            = ibm_is_vpc.vpc.id
-  resource_group = module.resource_group.resource_group_id
-  zone           = "${var.region}-1"
+module "network_acl" {
+  source            = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/network-acl?ref=update_submodules"
+  name              = "${var.prefix}-vpc-acl"
+  vpc_id            = module.vpc.vpc.vpc_id
+  resource_group_id = module.resource_group.resource_group_id
+  rules             = [
+     {
+        name        = "iks-create-worker-nodes-inbound"
+        action      = "allow"
+        source      = "161.26.0.0/16"
+        destination = "0.0.0.0/0"
+        direction   = "inbound"
+      },
+      {
+        name        = "iks-nodes-to-master-inbound"
+        action      = "allow"
+        source      = "166.8.0.0/14"
+        destination = "0.0.0.0/0"
+        direction   = "inbound"
+      },
+      {
+        name        = "iks-create-worker-nodes-outbound"
+        action      = "allow"
+        source      = "0.0.0.0/0"
+        destination = "161.26.0.0/16"
+        direction   = "outbound"
+      },
+      {
+        name        = "iks-worker-to-master-outbound"
+        action      = "allow"
+        source      = "0.0.0.0/0"
+        destination = "166.8.0.0/14"
+        direction   = "outbound"
+      },
+      {
+        name        = "allow-all-https-inbound"
+        source      = "0.0.0.0/0"
+        action      = "allow"
+        destination = "0.0.0.0/0"
+        direction   = "inbound"
+        tcp = {
+          source_port_min = 443
+          source_port_max = 443
+          port_min        = 1
+          port_max        = 65535
+        }
+      },
+      {
+        name        = "allow-all-https-outbound"
+        source      = "0.0.0.0/0"
+        action      = "allow"
+        destination = "0.0.0.0/0"
+        direction   = "outbound"
+        tcp = {
+          source_port_min = 1
+          source_port_max = 65535
+          port_min        = 443
+          port_max        = 443
+        }
+      },
+      {
+        name        = "deny-all-outbound"
+        action      = "deny"
+        source      = "0.0.0.0/0"
+        destination = "0.0.0.0/0"
+        direction   = "outbound"
+      },
+      {
+        name        = "deny-all-inbound"
+        action      = "deny"
+        source      = "0.0.0.0/0"
+        destination = "0.0.0.0/0"
+        direction   = "inbound"
+      }
+    ]
+  tags              = var.tags
 }
-
-resource "ibm_is_subnet" "subnet_zone_1" {
-  name                     = "${var.prefix}-subnet-1"
-  vpc                      = ibm_is_vpc.vpc.id
-  resource_group           = module.resource_group.resource_group_id
-  zone                     = "${var.region}-1"
-  total_ipv4_address_count = 256
-  public_gateway           = ibm_is_public_gateway.gateway.id
-}
-
 
 # OCP CLUSTER creation
 module "ocp_base" {
@@ -95,9 +234,9 @@ module "ocp_base" {
   resource_group_id    = module.resource_group.resource_group_id
   region               = var.region
   force_delete_storage = true
-  vpc_id               = ibm_is_vpc.vpc.id
+  vpc_id               = module.vpc.vpc.vpc_id
   vpc_subnets          = local.cluster_vpc_subnets
-  worker_pools         = local.worker_pools
+  worker_pools         = local.ocp_worker_pools
   tags                 = []
   use_existing_cos     = false
   # outbound required by cluster proxy
