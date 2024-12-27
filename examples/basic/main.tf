@@ -41,7 +41,7 @@ module "resource_group" {
 
 locals {
 
-     subnets = [
+  subnets = [
     for subnet in module.vpc.vpc.subnets :
     {
       id         = subnet.id
@@ -49,25 +49,12 @@ locals {
       cidr_block = subnet.cidr_block
     }
   ]
-    cluster_vpc_subnets = {
+  cluster_vpc_subnets = {
     private = local.subnets,
-    edge = local.subnets,
+    edge    = local.subnets,
     transit = local.subnets
   }
 
-  #  cluster_vpc_subnets = {
-  #   zone-1 = [
-  #     for zone in module.vpc.subnet_zone_list :
-  #     {
-  #       id         = zone.id
-  #       zone       = zone.zone
-  #       cidr_block = zone.cidr
-  #     }
-  #   ]
-  # }
-
-  # OCP Configuration
-  # OCP Configuration
   ocp_worker_pools = [
     {
       subnet_prefix    = "private"
@@ -95,10 +82,7 @@ locals {
     }
   ]
 
-
-  // subnets = [ for v in module.vpc.vpc.subnet : { id = v.subnet_ids} ]
-
-  }
+}
 
 
 module "vpc" {
@@ -107,7 +91,7 @@ module "vpc" {
   resource_group_id = module.resource_group.resource_group_id
   locations         = ["us-south-1", "us-south-2", "us-south-3"]
   vpc_tags          = var.resource_tags
-  address_prefixes  = [
+  address_prefixes = [
     {
       name     = "${var.prefix}-us-south-1"
       location = "us-south-1"
@@ -131,16 +115,16 @@ module "vpc" {
   create_gateway              = true
   public_gateway_name_prefix  = "${var.prefix}-pw"
   number_of_addresses         = 16
-  
+
 }
 
 module "security_group" {
-  source = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/security-group?ref=update_submodules"
+  source                = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/security-group?ref=update_submodules"
   create_security_group = true
   name                  = "${var.prefix}-vpc-sg"
   vpc_id                = module.vpc.vpc.vpc_id
-  resource_group_id     =  module.resource_group.resource_group_id
-  security_group_rules  = [
+  resource_group_id     = module.resource_group.resource_group_id
+  security_group_rules = [
     {
       name      = "allow_all_inbound"
       remote    = "0.0.0.0/0"
@@ -148,82 +132,83 @@ module "security_group" {
     }
   ]
 }
+
 module "network_acl" {
   source            = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/network-acl?ref=update_submodules"
   name              = "${var.prefix}-vpc-acl"
   vpc_id            = module.vpc.vpc.vpc_id
   resource_group_id = module.resource_group.resource_group_id
-  rules             = [
-     {
-        name        = "iks-create-worker-nodes-inbound"
-        action      = "allow"
-        source      = "161.26.0.0/16"
-        destination = "0.0.0.0/0"
-        direction   = "inbound"
-      },
-      {
-        name        = "iks-nodes-to-master-inbound"
-        action      = "allow"
-        source      = "166.8.0.0/14"
-        destination = "0.0.0.0/0"
-        direction   = "inbound"
-      },
-      {
-        name        = "iks-create-worker-nodes-outbound"
-        action      = "allow"
-        source      = "0.0.0.0/0"
-        destination = "161.26.0.0/16"
-        direction   = "outbound"
-      },
-      {
-        name        = "iks-worker-to-master-outbound"
-        action      = "allow"
-        source      = "0.0.0.0/0"
-        destination = "166.8.0.0/14"
-        direction   = "outbound"
-      },
-      {
-        name        = "allow-all-https-inbound"
-        source      = "0.0.0.0/0"
-        action      = "allow"
-        destination = "0.0.0.0/0"
-        direction   = "inbound"
-        tcp = {
-          source_port_min = 443
-          source_port_max = 443
-          port_min        = 1
-          port_max        = 65535
-        }
-      },
-      {
-        name        = "allow-all-https-outbound"
-        source      = "0.0.0.0/0"
-        action      = "allow"
-        destination = "0.0.0.0/0"
-        direction   = "outbound"
-        tcp = {
-          source_port_min = 1
-          source_port_max = 65535
-          port_min        = 443
-          port_max        = 443
-        }
-      },
-      {
-        name        = "deny-all-outbound"
-        action      = "deny"
-        source      = "0.0.0.0/0"
-        destination = "0.0.0.0/0"
-        direction   = "outbound"
-      },
-      {
-        name        = "deny-all-inbound"
-        action      = "deny"
-        source      = "0.0.0.0/0"
-        destination = "0.0.0.0/0"
-        direction   = "inbound"
+  rules = [
+    {
+      name        = "iks-create-worker-nodes-inbound"
+      action      = "allow"
+      source      = "161.26.0.0/16"
+      destination = "0.0.0.0/0"
+      direction   = "inbound"
+    },
+    {
+      name        = "iks-nodes-to-master-inbound"
+      action      = "allow"
+      source      = "166.8.0.0/14"
+      destination = "0.0.0.0/0"
+      direction   = "inbound"
+    },
+    {
+      name        = "iks-create-worker-nodes-outbound"
+      action      = "allow"
+      source      = "0.0.0.0/0"
+      destination = "161.26.0.0/16"
+      direction   = "outbound"
+    },
+    {
+      name        = "iks-worker-to-master-outbound"
+      action      = "allow"
+      source      = "0.0.0.0/0"
+      destination = "166.8.0.0/14"
+      direction   = "outbound"
+    },
+    {
+      name        = "allow-all-https-inbound"
+      source      = "0.0.0.0/0"
+      action      = "allow"
+      destination = "0.0.0.0/0"
+      direction   = "inbound"
+      tcp = {
+        source_port_min = 443
+        source_port_max = 443
+        port_min        = 1
+        port_max        = 65535
       }
-    ]
-  tags              = var.tags
+    },
+    {
+      name        = "allow-all-https-outbound"
+      source      = "0.0.0.0/0"
+      action      = "allow"
+      destination = "0.0.0.0/0"
+      direction   = "outbound"
+      tcp = {
+        source_port_min = 1
+        source_port_max = 65535
+        port_min        = 443
+        port_max        = 443
+      }
+    },
+    {
+      name        = "deny-all-outbound"
+      action      = "deny"
+      source      = "0.0.0.0/0"
+      destination = "0.0.0.0/0"
+      direction   = "outbound"
+    },
+    {
+      name        = "deny-all-inbound"
+      action      = "deny"
+      source      = "0.0.0.0/0"
+      destination = "0.0.0.0/0"
+      direction   = "inbound"
+    }
+  ]
+  tags = var.tags
 }
 
 # OCP CLUSTER creation

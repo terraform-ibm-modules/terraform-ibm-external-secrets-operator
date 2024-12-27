@@ -7,11 +7,11 @@
 ## Install ESO
 
 locals {
-  eso_image_tag_digest = "v0.10.5-ubi@sha256:2d4583ff06dd9e186076cc11f2c4782f17e32da28fe18b1144d89806213d17cd" # datasource: icr.io/ibm-iac/external-secrets
-  eso_image_repo       = "icr.io/ibm-iac/external-secrets"
+  eso_image_tag_digest = var.eso_image_tag_digest
+  eso_image_repo       = var.eso_image_repo
 
-  reloader_image_tag_digest = "v1.1.0-ubi@sha256:d2adccbac4da35a8b31aa21bfbc44da47d8676a41b91fd8f3b192f386f72aa20" # datasource: icr.io/ibm-iac/reloader
-  reloader_image_repo       = "icr.io/ibm-iac/reloader"
+  reloader_image_tag_digest = var.reloader_image_tag_digest
+  reloader_image_repo       = var.reloader_image_repo
 }
 
 # creating namespace to deploy ESO into RedHat ServiceMesh

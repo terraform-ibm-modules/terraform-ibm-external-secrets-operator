@@ -8,5 +8,5 @@
 
 output "vpc" {
   description = "Configuration of newly created or existing VPC instace."
-  value       =  module.vpc
+  value       = module.vpc
 }

@@ -2,7 +2,6 @@
 package test
 
 import (
-	"log"
 	"os"
 	"testing"
 	"time"
@@ -12,7 +11,6 @@ import (
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/cloudinfo"
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/common"
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/testhelper"
-	"gopkg.in/yaml.v3"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -20,18 +18,9 @@ import (
 const resourceGroup = "geretain-test-ext-secrets-sync"
 const basicExampleTerraformDir = "examples/basic"
 
-// deploying eso on edge node to have it able to connect to SM and IAM on public network
-const esoWorkersSelector = "edge"
-
-// Define a struct with fields that match the structure of the YAML data
-const yamlLocation = "../common-dev-assets/common-go-assets/common-permanent-resources.yaml"
-
 type Config struct {
 	SmGuid   string `yaml:"secretsManagerGuid"`
-	SmCRN    string `yaml:"secretsManagerCRN"`
 	SmRegion string `yaml:"secretsManagerRegion"`
-	RgId     string `yaml:"resourceGroupTestPermanentId"`
-	CisName  string `yaml:"cisInstanceName"`
 
 	// secret ids for the secrets composing the imported certificate to create
 	ImpCertIntermediateSecretId string `yaml:"imported_certificate_intermediate_secret_id"`
@@ -50,83 +39,7 @@ type Config struct {
 }
 
 var smGuid string
-var smCRN string
 var smRegion string
-var rgId string
-var cisName string
-var impCertificateSmRegion string
-var impCertificateSmGuid string
-var impCertIntermediateSecretID string
-var impCertPublicSecretID string
-var impCertPrivateSecretID string
-var acmeLEPrivateKeySmGuid string
-var acmeLEPrivateKeySmRegion string
-var acmeLEPrivateKeySecretId string
-var sdnlbServiceIdName string
-
-// terraform vars for all-combined test (including Upgrade one)
-var allCombinedTerraformVars map[string]interface{}
-
-// TestMain will be run before any parallel tests, used to read data from yaml for use with tests
-func TestMain(m *testing.M) {
-	// Read the YAML file contents
-	data, err := os.ReadFile(yamlLocation)
-	if err != nil {
-		log.Fatal(err)
-	}
-	// Create a struct to hold the YAML data
-	var config Config
-	// Unmarshal the YAML data into the struct
-	err = yaml.Unmarshal(data, &config)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Parse the SM guid and region from data and setting all-combined test input values used in TestRunDefaultExample and TestRunUpgradeExample
-	smGuid = config.SmGuid
-	smCRN = config.SmCRN
-	smRegion = config.SmRegion
-	cisName = config.CisName
-	rgId = config.RgId
-	impCertIntermediateSecretID = config.ImpCertIntermediateSecretId
-	impCertPrivateSecretID = config.ImpCertPrivateSecretId
-	impCertPublicSecretID = config.ImpCertPublicSecretId
-	acmeLEPrivateKeySmGuid = config.AcmeLEPrivateKeySmGuid
-	acmeLEPrivateKeySmRegion = config.AcmeLEPrivateKeySmRegion
-	acmeLEPrivateKeySecretId = config.AcmeLEPrivateKeySecretId
-	impCertificateSmGuid = config.ImpCertificateSmGuid
-	impCertificateSmRegion = config.ImpCertificateSmRegion
-
-	sdnlbServiceIdName = config.SdnlbServiceidName
-	err = log.Output(1, "TestMain using sdnlbServiceIdName "+sdnlbServiceIdName)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	allCombinedTerraformVars = map[string]interface{}{
-		"existing_cis_instance_name":              cisName,
-		"existing_cis_instance_resource_group_id": rgId,
-		// imported certificate and public certificate creation management
-		"existing_sm_instance_crn":                    smCRN,
-		"existing_sm_instance_guid":                   smGuid,
-		"existing_sm_instance_region":                 smRegion,
-		"imported_certificate_sm_region":              impCertificateSmRegion,
-		"imported_certificate_sm_id":                  impCertificateSmGuid,
-		"imported_certificate_intermediate_secret_id": impCertIntermediateSecretID,
-		"imported_certificate_public_secret_id":       impCertPublicSecretID,
-		"imported_certificate_private_secret_id":      impCertPrivateSecretID,
-		"acme_letsencrypt_private_key_secret_id":      acmeLEPrivateKeySecretId,
-		"acme_letsencrypt_private_key_sm_id":          acmeLEPrivateKeySmGuid,
-		"acme_letsencrypt_private_key_sm_region":      acmeLEPrivateKeySmRegion,
-		"eso_deployment_nodes_configuration":          esoWorkersSelector,
-		// setting skip_iam_authorization_policy to true because using the existing secrets manager instance and the policy already exists
-		"skip_iam_authorization_policy": true,
-		"existing_sdnlb_serviceid_name": sdnlbServiceIdName,
-		"service_endpoints":             "public",
-	}
-
-	os.Exit(m.Run())
-}
 
 var ignoreUpdates = []string{
 	"module.es_kubernetes_secret_usr_pass.helm_release.external_secrets_operator[0]",
