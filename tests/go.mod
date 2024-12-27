@@ -1,12 +1,11 @@
 module github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator
 
-go 1.22.2
+go 1.22.4
 
 require (
 	github.com/gruntwork-io/terratest v0.47.2
 	github.com/stretchr/testify v1.9.0
 	github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper v1.41.2
-	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/apimachinery v0.31.2
 )
 
@@ -23,7 +22,7 @@ require (
 	github.com/IBM/go-sdk-core/v5 v5.18.1 // indirect
 	github.com/IBM/platform-services-go-sdk v0.70.0 // indirect
 	github.com/IBM/project-go-sdk v0.3.6 // indirect
-	github.com/IBM/schematics-go-sdk v0.3.0 // indirect
+	github.com/IBM/schematics-go-sdk v0.4.0 // indirect
 	github.com/IBM/vpc-go-sdk v1.0.2 // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
 	github.com/ProtonMail/go-crypto v1.0.0 // indirect
@@ -125,7 +124,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.16.0 // indirect
 	golang.org/x/crypto v0.28.0 // indirect
 	golang.org/x/mod v0.17.0 // indirect
-	golang.org/x/net v0.26.0 // indirect
+	golang.org/x/net v0.30.0 // indirect
 	golang.org/x/oauth2 v0.10.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/sys v0.26.0 // indirect
@@ -144,6 +143,7 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/api v0.29.2 // indirect
 	k8s.io/client-go v0.29.2 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
