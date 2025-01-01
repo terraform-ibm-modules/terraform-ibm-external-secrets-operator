@@ -1,18 +1,12 @@
-########################################################################################################################
+##############################################################################
 # Outputs
-########################################################################################################################
+##############################################################################
+# output "cluster_id" {
+#   description = "ID of the cluster deployed"
+#   value       = module.ocp_base.cluster_id
+# }
 
-output "cos_instance_id" {
-  description = "COS instance id"
-  value       = ibm_resource_instance.cos_instance.id
-}
-
-output "resource_group_name" {
-  description = "Resource group name"
-  value       = module.resource_group.resource_group_name
-}
-
-output "resource_group_id" {
-  description = "Resource group ID"
-  value       = module.resource_group.resource_group_id
+output "vpc" {
+  description = "Configuration of newly created or existing VPC instace."
+  value       = module.vpc
 }
