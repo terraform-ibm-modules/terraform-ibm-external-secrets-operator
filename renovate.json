@@ -1,4 +1,22 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>terraform-ibm-modules/common-dev-assets:commonRenovateConfig"]
+  "extends": ["github>terraform-ibm-modules/common-dev-assets:commonRenovateConfig"],
+  "regexManagers": [
+    {
+      "fileMatch": ["\\.tf$"],
+      "matchStrings": [
+        "[\\w-]+_digest\\s*=\\s*\"(?<currentValue>[\\w.-]+)@(?<currentDigest>sha256:[a-f0-9]+)\""
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ],
+  "labels": ["renovate"],
+  "packageRules": [
+    {
+      "matchManagers": ["regex"],
+      "groupName": "Image Digest Updates",
+      "commitMessageExtra": "to latest digest",
+      "group": true
+    }
+  ]
 }
