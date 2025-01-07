@@ -299,7 +299,7 @@ module "secrets_manager_group_acct" {
 module "iam_secrets_engine" {
   count                                   = var.existing_sm_instance_guid == null ? 1 : 0
   source                                  = "terraform-ibm-modules/secrets-manager-iam-engine/ibm"
-  version                                 = "1.2.3"
+  version                                 = "1.2.6"
   region                                  = local.sm_region
   secrets_manager_guid                    = ibm_resource_instance.secrets_manager[0].guid
   iam_secret_generator_service_id_name    = "${var.prefix}-sid:0.0.1:${ibm_resource_instance.secrets_manager[0].name}-iam-secret-generator:automated:simple-service:secret-manager:"
@@ -364,7 +364,7 @@ module "external_secrets_operator" {
 ## Create dynamic Service ID API key and add to secret manager
 module "dynamic_serviceid_apikey1" {
   source  = "terraform-ibm-modules/iam-serviceid-apikey-secrets-manager/ibm"
-  version = "1.1.0"
+  version = "1.1.1"
   region  = local.sm_region
   #tfsec:ignore:general-secrets-no-plaintext-exposure
   sm_iam_secret_name        = "${var.prefix}-${var.sm_iam_secret_name}"
@@ -418,7 +418,7 @@ locals {
 # Create username_password secret and store in secret manager
 module "sm_userpass_secret" {
   source               = "terraform-ibm-modules/secrets-manager-secret/ibm"
-  version              = "1.3.2"
+  version              = "1.4.0"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   secret_group_id      = local.sm_acct_id

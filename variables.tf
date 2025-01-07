@@ -162,15 +162,3 @@ variable "eso_image_tag_digest" {
   description = "The tag or digest for the External Secrets Operator image. Provide a digest in the format `sha256:xxxxx...` for immutability or leave it as a tag version."
   default     = "v0.11.0-ubi@sha256:b5f685b86cf684020e863c6c2ed91e8a79cad68260d7149ddee073ece2573d6f"
 }
-
-variable "reloader_image_repo" {
-  type        = string
-  description = "The repository for the Stakater Reloader image. Default is `ghcr.io/stakater/reloader`."
-  default     = "ghcr.io/stakater/reloader"
-}
-
-variable "reloader_image_tag_digest" {
-  type        = string
-  description = "The tag or digest for the Stakater Reloader image. Provide a digest in the format `sha256:xxxxx...` for immutability or leave it as a tag version."
-  default     = "v1.2.0-ubi@sha256:375736e6690986559022cae504bebd8dfe14a37ac0305176f8826362c29732d6f"
-}

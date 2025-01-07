@@ -505,7 +505,7 @@ module "es_kubernetes_secret" {
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 2.11.0, < 3.0.0 |
 | <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | >= 2.16.1, < 3.0.0 |
 
@@ -538,8 +538,6 @@ module "es_kubernetes_secret" {
 | <a name="input_reloader_deployed"></a> [reloader\_deployed](#input\_reloader\_deployed) | Whether to deploy reloader or not https://github.com/stakater/Reloader | `bool` | `true` | no |
 | <a name="input_reloader_ignore_configmaps"></a> [reloader\_ignore\_configmaps](#input\_reloader\_ignore\_configmaps) | Whether to ignore configmap changes or not | `bool` | `false` | no |
 | <a name="input_reloader_ignore_secrets"></a> [reloader\_ignore\_secrets](#input\_reloader\_ignore\_secrets) | Whether to ignore secret changes or not | `bool` | `false` | no |
-| <a name="input_reloader_image_repo"></a> [reloader\_image\_repo](#input\_reloader\_image\_repo) | The repository for the Stakater Reloader image. Default is `ghcr.io/stakater/reloader`. | `string` | `"ghcr.io/stakater/reloader"` | no |
-| <a name="input_reloader_image_tag_digest"></a> [reloader\_image\_tag\_digest](#input\_reloader\_image\_tag\_digest) | The tag or digest for the Stakater Reloader image. Provide a digest in the format `sha256:xxxxx...` for immutability or leave it as a tag version. | `string` | `"v1.2.0-ubi@sha256:375736e6690986559022cae504bebd8dfe14a37ac0305176f8826362c29732d6f"` | no |
 | <a name="input_reloader_is_argo_rollouts"></a> [reloader\_is\_argo\_rollouts](#input\_reloader\_is\_argo\_rollouts) | Enable Argo Rollouts | `bool` | `false` | no |
 | <a name="input_reloader_is_openshift"></a> [reloader\_is\_openshift](#input\_reloader\_is\_openshift) | Enable OpenShift DeploymentConfigs | `bool` | `true` | no |
 | <a name="input_reloader_log_format"></a> [reloader\_log\_format](#input\_reloader\_log\_format) | The log format to use for reloader. Possible values are `json` or `text`. Default value is `json` | `string` | `"text"` | no |
