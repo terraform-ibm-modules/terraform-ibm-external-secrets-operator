@@ -38,88 +38,31 @@ module "resource_group" {
 ##################################################################
 # Create VPC, public gateway and subnets
 ##################################################################
-  # cidr_zone_combinations = flatten([
-  #   for cidr in local.vpc_cidr_bases : [
-  #     for zone in var.zones : {
-  #       cidr_base = cidr
-  #       zone      = zone
-  #     }
-  #   ]
-  # ])
-
-  #  subnets = [
-  #   for subnet in module.vpc.subnets :
-  #   {
-  #     id         = subnet.id
-  #     zone       = subnet.zone
-  #     cidr_block = subnet.cidr_block
-  #   }
-  # ]
-  #   cluster_vpc_subnets = {
-  #   private = local.subnets,
-  #   edge = local.subnets,
-  #   transit = local.subnets
-  # }
 locals {
 
-  subnets = flatten([
-    for k, v in module.zone_subnet_addrs :[
-      for network in v.networks : {
-        zone = k
-        cidr = network.cidr_block
-      }
-      # {
-      #   zone = k
-      #   cidrs = v.networks
-      # }
-      # for zone in cidr.networks : {
-      #   cidr = zone.cidr_block
+  vpc_cidr_bases = {
+    private = "192.168.0.0/20",
+    transit = "192.168.16.0/20",
+    edge    = "192.168.32.0/20"
+  }
 
-      # }
+  subnet_prefix = flatten([
+    for k, v in module.zone_subnet_addrs : [
+      for zone, cidr in v.network_cidr_blocks : {
+        cidr       = cidr
+        label      = k
+        zone       = zone
+        zone_index = split("-", zone)[1]
+      }
     ]
   ])
-}
-
-
-
-  # cidr_blocks     = ["192.168.0.0/20", "192.168.16.0/20", "192.168.32.0/20"]
-
-  # ocp_worker_pools = [
-  #   {
-  #     subnet_prefix    = "private"
-  #     pool_name        = "default"
-  #     machine_type     = "bx2.4x16"
-  #     workers_per_zone = 1
-  #     labels           = { "dedicated" : "private" }
-  #     operating_system = "REDHAT_8_64"
-  #   },
-  #   {
-  #     subnet_prefix    = "edge"
-  #     pool_name        = "edge"
-  #     machine_type     = "bx2.4x16"
-  #     workers_per_zone = 1
-  #     labels           = { "dedicated" : "edge" }
-  #     operating_system = "REDHAT_8_64"
-  #   },
-  #   {
-  #     subnet_prefix    = "transit"
-  #     pool_name        = "transit"
-  #     machine_type     = "bx2.4x16"
-  #     workers_per_zone = 1
-  #     labels           = { "dedicated" : "transit" }
-  #     operating_system = "REDHAT_8_64"
-  #   }
-  # ]
-
-output "subnets" {
-  value = local.subnets
 }
 
 resource "null_resource" "subnet_mappings" {
   count = length(var.zones)
 
   triggers = {
-    name     = "zone-${var.zones[count.index]}"
+    name     = "${var.region}-${var.zones[count.index]}"
     new_bits = 2
   }
 }
@@ -133,16 +76,44 @@ module "zone_subnet_addrs" {
   networks = null_resource.subnet_mappings[*].triggers
 }
 
-# output "zone_subnet_addrs" {
-#   value = module.zone_subnet_addrs
-# }
+
+
+# cidr_blocks     = ["192.168.0.0/20", "192.168.16.0/20", "192.168.32.0/20"]
+
+# ocp_worker_pools = [
+#   {
+#     subnet_prefix    = "private"
+#     pool_name        = "default"
+#     machine_type     = "bx2.4x16"
+#     workers_per_zone = 1
+#     labels           = { "dedicated" : "private" }
+#     operating_system = "REDHAT_8_64"
+#   },
+#   {
+#     subnet_prefix    = "edge"
+#     pool_name        = "edge"
+#     machine_type     = "bx2.4x16"
+#     workers_per_zone = 1
+#     labels           = { "dedicated" : "edge" }
+#     operating_system = "REDHAT_8_64"
+#   },
+#   {
+#     subnet_prefix    = "transit"
+#     pool_name        = "transit"
+#     machine_type     = "bx2.4x16"
+#     workers_per_zone = 1
+#     labels           = { "dedicated" : "transit" }
+#     operating_system = "REDHAT_8_64"
+#   }
+# ]
+
 
 module "vpc" {
-  source            = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git?ref=v1.5.0"
-  vpc_name          = "${var.prefix}-vpc"
-  resource_group_id = module.resource_group.resource_group_id
-  locations         = []
-  vpc_tags          = var.resource_tags
+  source                      = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git?ref=v1.5.0"
+  vpc_name                    = "${var.prefix}-vpc"
+  resource_group_id           = module.resource_group.resource_group_id
+  locations                   = []
+  vpc_tags                    = var.resource_tags
   subnet_name_prefix          = "${var.prefix}-subnet"
   default_network_acl_name    = "${var.prefix}-nacl"
   default_routing_table_name  = "${var.prefix}-routing-table"
@@ -150,19 +121,39 @@ module "vpc" {
   create_gateway              = true
   public_gateway_name_prefix  = "${var.prefix}-pw"
   number_of_addresses         = 16
-
+  auto_assign_address_prefix  = false
 }
 
-# module "address_prefix"{
-#   source                = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/vpc-address-prefix"
-#   count = local.subnets
-# }
+module "subnet_prefix" {
+  source   = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/vpc-address-prefix"
+  count    = length(local.subnet_prefix)
+  name     = "${var.prefix}-z-${local.subnet_prefix[count.index].label}-${split("-", local.subnet_prefix[count.index].zone)[2]}"
+  location = local.subnet_prefix[count.index].zone
+  vpc_id   = module.vpc.vpc.vpc_id
+  ip_range = local.subnet_prefix[count.index].cidr
+}
 
-# module "subnets" {
-#   source                = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/subnet"
-#   count = local.subnets
 
-# }
+module "subnets" {
+  depends_on     = [module.subnet_prefix]
+  source         = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/subnet"
+  count          = length(local.subnet_prefix)
+  location       = local.subnet_prefix[count.index].zone
+  vpc_id         = module.vpc.vpc.vpc_id
+  ip_range       = local.subnet_prefix[count.index].cidr
+  name           = "${var.prefix}-subnet-${local.subnet_prefix[count.index].label}-${split("-", local.subnet_prefix[count.index].zone)[2]}"
+  public_gateway = local.subnet_prefix[count.index].label == "edge" ? module.public_gateways[split("-", local.subnet_prefix[count.index].zone)[2] - 1].public_gateway_id : null
+}
+
+module "public_gateways" {
+  source            = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/public-gateway"
+  count             = length(var.zones)
+  vpc_id            = module.vpc.vpc.vpc_id
+  location          = "${var.region}-${var.zones[count.index]}"
+  name              = "${var.prefix}-vpc-gateway-${var.zones[count.index]}"
+  resource_group_id = module.resource_group.resource_group_id
+  tags              = var.tags
+}
 
 # module "security_group" {
 #   source                = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/security-group?ref=update_submodules"
