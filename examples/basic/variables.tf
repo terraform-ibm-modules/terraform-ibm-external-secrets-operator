@@ -64,3 +64,25 @@ variable "tags" {
   type        = list(string)
   default     = null
 }
+
+variable "zones" {
+  description = "List of zones"
+  type        = list(string)
+  default     = ["1", "2", "3"]
+}
+
+variable "cidr_bases" {
+  description = "A list of base CIDR blocks for each network zone"
+  type        = map(string)
+  default = {
+    private = "192.168.0.0/20",
+    transit = "192.168.16.0/20",
+    edge    = "192.168.32.0/20"
+  }
+}
+
+variable "new_bits" {
+  description = "Number of additional address bits to use for numbering the new networks"
+  type        = number
+  default     = 2
+}
