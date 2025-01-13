@@ -41,13 +41,6 @@ module "resource_group" {
 
 locals {
 
-
-  vpc_cidr_bases = {
-    private = "192.168.0.0/20",
-    transit = "192.168.16.0/20",
-    edge    = "192.168.32.0/20"
-  }
-
   subnet_prefix = flatten([
     for k, v in module.zone_subnet_addrs : [
       for zone, cidr in v.network_cidr_blocks : {
@@ -72,34 +65,16 @@ locals {
   ]
 
   subnets = {
-    edge    = [for subnet in local.merged_subnets : { id = subnet.subnet_id, cidr_block = subnet.subnet_ipv4_cidr, zone = subnet.zone } if subnet.label == "edge"],
-    private = [for subnet in local.merged_subnets : { id = subnet.subnet_id, cidr_block = subnet.subnet_ipv4_cidr, zone = subnet.zone } if subnet.label == "private"],
-    transit = [for subnet in local.merged_subnets : { id = subnet.subnet_id, cidr_block = subnet.subnet_ipv4_cidr, zone = subnet.zone } if subnet.label == "transit"]
+    default = [for subnet in local.merged_subnets : { id = subnet.subnet_id, cidr_block = subnet.subnet_ipv4_cidr, zone = subnet.zone } if subnet.label == "default"],
   }
 
   ocp_worker_pools = [
     {
-      subnet_prefix    = "private"
+      subnet_prefix    = "default"
       pool_name        = "default"
       machine_type     = "bx2.4x16"
       workers_per_zone = 1
-      labels           = { "dedicated" : "private" }
-      operating_system = "REDHAT_8_64"
-    },
-    {
-      subnet_prefix    = "edge"
-      pool_name        = "edge"
-      machine_type     = "bx2.4x16"
-      workers_per_zone = 1
-      labels           = { "dedicated" : "edge" }
-      operating_system = "REDHAT_8_64"
-    },
-    {
-      subnet_prefix    = "transit"
-      pool_name        = "transit"
-      machine_type     = "bx2.4x16"
-      workers_per_zone = 1
-      labels           = { "dedicated" : "transit" }
+      labels           = { "dedicated" : "default" }
       operating_system = "REDHAT_8_64"
     }
   ]
@@ -159,7 +134,7 @@ module "subnets" {
   vpc_id                     = module.vpc.vpc.vpc_id
   ip_range                   = local.subnet_prefix[count.index].cidr
   name                       = "${var.prefix}-subnet-${local.subnet_prefix[count.index].label}-${split("-", local.subnet_prefix[count.index].zone)[2]}"
-  public_gateway             = local.subnet_prefix[count.index].label == "edge" ? module.public_gateways[split("-", local.subnet_prefix[count.index].zone)[2] - 1].public_gateway_id : null
+  public_gateway             = local.subnet_prefix[count.index].label == "default" ? module.public_gateways[split("-", local.subnet_prefix[count.index].zone)[2] - 1].public_gateway_id : null
   subnet_access_control_list = module.network_acl.network_acl_id
 }
 
@@ -245,9 +220,9 @@ module "ocp_base" {
   disable_outbound_traffic_protection = true
 }
 
-##############################################################################
+#############################################################################
 # Init cluster config for helm and kubernetes providers
-##############################################################################
+#############################################################################
 
 data "ibm_container_cluster_config" "cluster_config" {
   cluster_name_id   = module.ocp_base.cluster_id
@@ -363,12 +338,12 @@ module "external_secrets_operator" {
   eso_cluster_nodes_configuration = {
     nodeSelector = {
       label = "dedicated"
-      value = "edge"
+      value = "default"
     }
     tolerations = {
       key      = "dedicated"
       operator = "Equal"
-      value    = "edge"
+      value    = "default"
       effect   = "NoExecute"
     }
   }

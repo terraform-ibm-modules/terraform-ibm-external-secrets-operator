@@ -7,11 +7,11 @@
 ## Install ESO
 
 locals {
-  eso_image_tag_digest = "v0.12.1-ubi@sha256:caff77c2aa933876205d0da3f6883a3e0313ced0a0f0ea49b1abeca4071d027a" # datasource: icr.io/ibm-iac/external-secrets
-  eso_image_repo       = "icr.io/ibm-iac/external-secrets"
+  eso_image_tag_digest = "v0.12.1-ubi@sha256:d38834043de0a4e4feeac8a08d0bc96b71ddd7fe1d4c8583ee3751badeaeb01d"
+  eso_image_repo       = "ghcr.io/external-secrets/external-secrets"
 
-  reloader_image_tag_digest = "v1.2.1-ubi@sha256:78d3b7269d00df1b9550584dba817299b5842c48038db1f1603255914033307f" # datasource: icr.io/ibm-iac/reloader
-  reloader_image_repo       = "icr.io/ibm-iac/reloader"
+  reloader_image_tag_digest = "v1.2.1-ubi@sha256:80a557100c6835c7e3c9842194250c9c4ca78f43200bc3a93a32e5b105ad11bb"
+  reloader_image_repo       = "ghcr.io/stakater/reloader"
 }
 
 # creating namespace to deploy ESO into RedHat ServiceMesh
@@ -182,9 +182,11 @@ resource "helm_release" "external_secrets_operator" {
 
   name      = "external-secrets"
   namespace = local.eso_namespace
-  chart     = "oci://icr.io/ibm-iac-charts/external-secrets"
-  version   = "0.12.1"
-  wait      = true
+  # chart     = "oci://icr.io/ibm-iac-charts/external-secrets"
+  chart      = "external-secrets"
+  version    = "0.12.1"
+  wait       = true
+  repository = "https://charts.external-secrets.io"
 
   set {
     name  = "image.repository"
@@ -230,8 +232,10 @@ resource "helm_release" "pod_reloader" {
   depends_on = [module.eso_namespace, data.kubernetes_namespace.existing_eso_namespace]
   count      = var.reloader_deployed == true ? 1 : 0
   name       = "reloader"
+  //chart      = "oci://icr.io/ibm-iac-charts/reloader"
+  chart      = "reloader"
   namespace  = local.eso_namespace
-  chart      = "oci://icr.io/ibm-iac-charts/reloader"
+  repository = "https://stakater.github.io/stakater-charts"
   version    = "1.2.0"
   wait       = true
 

@@ -75,9 +75,7 @@ variable "cidr_bases" {
   description = "A list of base CIDR blocks for each network zone"
   type        = map(string)
   default = {
-    private = "192.168.0.0/20",
-    transit = "192.168.16.0/20",
-    edge    = "192.168.32.0/20"
+    default = "192.168.32.0/20"
   }
 }
 

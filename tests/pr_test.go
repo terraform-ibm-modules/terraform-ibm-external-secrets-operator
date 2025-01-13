@@ -21,8 +21,8 @@ const resourceGroup = "geretain-test-ext-secrets-sync"
 const defaultExampleTerraformDir = "examples/all-combined"
 const basicExampleTerraformDir = "examples/basic"
 
-// deploying eso on edge node to have it able to connect to SM and IAM on public network
-const esoWorkersSelector = "edge"
+// deploying eso on default node to have it able to connect to SM and IAM on public network
+const esoWorkersSelector = "default"
 
 // Define a struct with fields that match the structure of the YAML data
 const yamlLocation = "../common-dev-assets/common-go-assets/common-permanent-resources.yaml"

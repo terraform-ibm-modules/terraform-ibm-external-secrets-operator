@@ -19,12 +19,6 @@ locals {
   # sDNLB entitled account API key - if null the ibmcloud_api_key will be used
   sdnlb_ibmcloud_api_key = var.sdnlb_ibmcloud_api_key == null ? var.ibmcloud_api_key : var.sdnlb_ibmcloud_api_key
 
-  vpc_cidr_bases = {
-    private = "192.168.0.0/20",
-    transit = "192.168.16.0/20",
-    edge    = "192.168.32.0/20"
-  }
-
   subnet_prefix = flatten([
     for k, v in module.zone_subnet_addrs : [
       for zone, cidr in v.network_cidr_blocks : {
@@ -37,49 +31,31 @@ locals {
   ])
 
 
-merged_subnets = [
-  for subnet in module.subnets : 
+  merged_subnets = [
+    for subnet in module.subnets :
     merge(
       subnet,
       {
-        label      = lookup([for sk in local.subnet_prefix : sk if sk.cidr == subnet.subnet_ipv4_cidr][0], "label", "")
-        zone       = lookup([for sk in local.subnet_prefix : sk if sk.cidr == subnet.subnet_ipv4_cidr][0], "zone", "")
+        label = lookup([for sk in local.subnet_prefix : sk if sk.cidr == subnet.subnet_ipv4_cidr][0], "label", "")
+        zone  = lookup([for sk in local.subnet_prefix : sk if sk.cidr == subnet.subnet_ipv4_cidr][0], "zone", "")
       }
     )
-]
+  ]
 
-subnets = {
-  edge = [for subnet in local.merged_subnets : {id = subnet.subnet_id, cidr_block = subnet.subnet_ipv4_cidr, zone = subnet.zone} if subnet.label == "edge"],
-  private = [for subnet in local.merged_subnets : {id = subnet.subnet_id, cidr_block = subnet.subnet_ipv4_cidr, zone = subnet.zone} if subnet.label == "private"],
-  transit = [for subnet in local.merged_subnets : {id = subnet.subnet_id, cidr_block = subnet.subnet_ipv4_cidr, zone = subnet.zone} if subnet.label == "transit"]
-}
+  subnets = {
+    default = [for subnet in local.merged_subnets : { id = subnet.subnet_id, cidr_block = subnet.subnet_ipv4_cidr, zone = subnet.zone } if subnet.label == "default"],
+  }
 
   ocp_worker_pools = [
-  {
-    subnet_prefix    = "private"
-    pool_name        = "default"
-    machine_type     = "bx2.4x16"
-    workers_per_zone = 1
-    labels           = { "dedicated" : "private" }
-    operating_system = "REDHAT_8_64"
-  },
-  {
-    subnet_prefix    = "edge"
-    pool_name        = "edge"
-    machine_type     = "bx2.4x16"
-    workers_per_zone = 1
-    labels           = { "dedicated" : "edge" }
-    operating_system = "REDHAT_8_64"
-  },
-  {
-    subnet_prefix    = "transit"
-    pool_name        = "transit"
-    machine_type     = "bx2.4x16"
-    workers_per_zone = 1
-    labels           = { "dedicated" : "transit" }
-    operating_system = "REDHAT_8_64"
-  }
-]
+    {
+      subnet_prefix    = "default"
+      pool_name        = "default"
+      machine_type     = "bx2.4x16"
+      workers_per_zone = 1
+      labels           = { "dedicated" : "default" }
+      operating_system = "REDHAT_8_64"
+    }
+  ]
 
 }
 
@@ -129,14 +105,14 @@ module "subnet_prefix" {
 
 
 module "subnets" {
-  depends_on     = [module.subnet_prefix]
-  source         = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/subnet?ref=v1.5.0"
-  count          = length(local.subnet_prefix)
-  location       = local.subnet_prefix[count.index].zone
-  vpc_id         = module.vpc.vpc.vpc_id
-  ip_range       = local.subnet_prefix[count.index].cidr
-  name           = "${var.prefix}-subnet-${local.subnet_prefix[count.index].label}-${split("-", local.subnet_prefix[count.index].zone)[2]}"
-  public_gateway = local.subnet_prefix[count.index].label == "edge" ? module.public_gateways[split("-", local.subnet_prefix[count.index].zone)[2] - 1].public_gateway_id : null
+  depends_on                 = [module.subnet_prefix]
+  source                     = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/subnet?ref=v1.5.0"
+  count                      = length(local.subnet_prefix)
+  location                   = local.subnet_prefix[count.index].zone
+  vpc_id                     = module.vpc.vpc.vpc_id
+  ip_range                   = local.subnet_prefix[count.index].cidr
+  name                       = "${var.prefix}-subnet-${local.subnet_prefix[count.index].label}-${split("-", local.subnet_prefix[count.index].zone)[2]}"
+  public_gateway             = local.subnet_prefix[count.index].label == "default" ? module.public_gateways[split("-", local.subnet_prefix[count.index].zone)[2] - 1].public_gateway_id : null
   subnet_access_control_list = module.network_acl.network_acl_id
 }
 
@@ -151,14 +127,14 @@ module "public_gateways" {
 }
 
 module "security_group" {
-  source            = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/security-group?ref=v1.5.0"
-  depends_on     = [module.vpc]
+  source                = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/security-group?ref=v1.5.0"
+  depends_on            = [module.vpc]
   create_security_group = false
   resource_group_id     = module.resource_group.resource_group_id
-  security_group = "${var.prefix}-sg"
+  security_group        = "${var.prefix}-sg"
   security_group_rules = [
     {
-      name = "allow_all_inbound"
+      name      = "allow_all_inbound"
       remote    = "0.0.0.0/0"
       direction = "inbound"
     }
@@ -345,100 +321,4 @@ resource "kubernetes_namespace" "apikey_namespaces" {
   depends_on = [
     time_sleep.wait_45_seconds
   ]
-}
-
-variable "zones" {
-  description = "List of zones"
-  type        = list(string)
-  default     = ["1", "2", "3"]
-}
-
-variable "cidr_bases" {
-  description = "A list of base CIDR blocks for each network zone"
-  type        = map(string)
-  default = {
-    private = "192.168.0.0/20",
-    transit = "192.168.16.0/20",
-    edge    = "192.168.32.0/20"
-  }
-}
-
-variable "new_bits" {
-  description = "Number of additional address bits to use for numbering the new networks"
-  type        = number
-  default     = 2
-}
-
-variable "acl_rules_list" {
-  description = "Access control list rule set per network zone"
-  default =  [
-      {
-        name        = "iks-create-worker-nodes-inbound"
-        action      = "allow"
-        source      = "161.26.0.0/16"
-        destination = "0.0.0.0/0"
-        direction   = "inbound"
-      },
-      {
-        name        = "iks-nodes-to-master-inbound"
-        action      = "allow"
-        source      = "166.8.0.0/14"
-        destination = "0.0.0.0/0"
-        direction   = "inbound"
-      },
-      {
-        name        = "iks-create-worker-nodes-outbound"
-        action      = "allow"
-        source      = "0.0.0.0/0"
-        destination = "161.26.0.0/16"
-        direction   = "outbound"
-      },
-      {
-        name        = "iks-worker-to-master-outbound"
-        action      = "allow"
-        source      = "0.0.0.0/0"
-        destination = "166.8.0.0/14"
-        direction   = "outbound"
-      },
-      {
-        name        = "allow-all-https-inbound"
-        source      = "0.0.0.0/0"
-        action      = "allow"
-        destination = "0.0.0.0/0"
-        direction   = "inbound"
-        tcp = {
-          source_port_min = 443
-          source_port_max = 443
-          port_min        = 1
-          port_max        = 65535
-        }
-      },
-      {
-        name        = "allow-all-https-outbound"
-        source      = "0.0.0.0/0"
-        action      = "allow"
-        destination = "0.0.0.0/0"
-        direction   = "outbound"
-        tcp = {
-          source_port_min = 1
-          source_port_max = 65535
-          port_min        = 443
-          port_max        = 443
-        }
-      },
-      {
-        name        = "deny-all-outbound"
-        action      = "deny"
-        source      = "0.0.0.0/0"
-        destination = "0.0.0.0/0"
-        direction   = "outbound"
-      },
-      {
-        name        = "deny-all-inbound"
-        action      = "deny"
-        source      = "0.0.0.0/0"
-        destination = "0.0.0.0/0"
-        direction   = "inbound"
-      }
-    ]
 }
