@@ -150,15 +150,3 @@ variable "reloader_custom_values" {
   type        = string
   default     = null
 }
-
-variable "eso_image_repo" {
-  type        = string
-  description = "The repository for the External Secrets Operator image. Default is `ghcr.io/external-secrets/external-secrets`."
-  default     = "ghcr.io/external-secrets/external-secrets"
-}
-
-variable "eso_image_tag_digest" {
-  type        = string
-  description = "The tag or digest for the External Secrets Operator image. Provide a digest in the format `sha256:xxxxx...` for immutability or leave it as a tag version."
-  default     = "v0.11.0-ubi@sha256:b5f685b86cf684020e863c6c2ed91e8a79cad68260d7149ddee073ece2573d6f"
-}

@@ -20,6 +20,7 @@ This module automates the installation and configuration of the [External Secret
 * [Examples](./examples)
     * [Basic Example](./examples/basic)
     * [Example that uses trusted profiles (container authentication)](./examples/trusted-profiles-authentication)
+    * [Example to deploy the External Secret Operator and to create a different set of resources in terms of secrets, secret groups, stores and auth configurations](./examples/all-combined)
 * [Contributing](#contributing)
 <!-- END OVERVIEW HOOK -->
 
@@ -496,6 +497,7 @@ module "es_kubernetes_secret" {
 <!-- BEGIN EXAMPLES HOOK -->
 ## Examples
 
+- [ Example to deploy the External Secret Operator and to create a different set of resources in terms of secrets, secret groups, stores and auth configurations](examples/all-combined)
 - [ Basic Example](examples/basic)
 - [ Example that uses trusted profiles (container authentication)](examples/trusted-profiles-authentication)
 <!-- END EXAMPLES HOOK -->
@@ -529,8 +531,6 @@ module "es_kubernetes_secret" {
 |------|-------------|------|---------|:--------:|
 | <a name="input_eso_cluster_nodes_configuration"></a> [eso\_cluster\_nodes\_configuration](#input\_eso\_cluster\_nodes\_configuration) | Configuration to use to customise ESO deployment on specific cluster nodes. Setting appropriate values will result in customising ESO helm release. Default value is null to keep ESO standard deployment. | <pre>object({<br/>    nodeSelector = object({<br/>      label = string<br/>      value = string<br/>    })<br/>    tolerations = object({<br/>      key      = string<br/>      operator = string<br/>      value    = string<br/>      effect   = string<br/>    })<br/>  })</pre> | `null` | no |
 | <a name="input_eso_enroll_in_servicemesh"></a> [eso\_enroll\_in\_servicemesh](#input\_eso\_enroll\_in\_servicemesh) | Flag to enroll ESO into istio servicemesh | `bool` | `false` | no |
-| <a name="input_eso_image_repo"></a> [eso\_image\_repo](#input\_eso\_image\_repo) | The repository for the External Secrets Operator image. Default is `ghcr.io/external-secrets/external-secrets`. | `string` | `"ghcr.io/external-secrets/external-secrets"` | no |
-| <a name="input_eso_image_tag_digest"></a> [eso\_image\_tag\_digest](#input\_eso\_image\_tag\_digest) | The tag or digest for the External Secrets Operator image. Provide a digest in the format `sha256:xxxxx...` for immutability or leave it as a tag version. | `string` | `"v0.11.0-ubi@sha256:b5f685b86cf684020e863c6c2ed91e8a79cad68260d7149ddee073ece2573d6f"` | no |
 | <a name="input_eso_namespace"></a> [eso\_namespace](#input\_eso\_namespace) | Namespace to create and be used to install ESO components including helm releases. If eso\_store\_scope == cluster, this will also be used to deploy ClusterSecretStore/cluster\_store in it | `string` | `null` | no |
 | <a name="input_eso_pod_configuration"></a> [eso\_pod\_configuration](#input\_eso\_pod\_configuration) | Configuration to use to customise ESO deployment on specific pods. Setting appropriate values will result in customising ESO helm release. Default value is {} to keep ESO standard deployment. Ignore the key if not required. | <pre>object({<br/>    annotations = optional(object({<br/>      # The annotations for external secret controller pods.<br/>      external_secrets = optional(map(string), {})<br/>      # The annotations for external secret cert controller pods.<br/>      external_secrets_cert_controller = optional(map(string), {})<br/>      # The annotations for external secret controller pods.<br/>      external_secrets_webhook = optional(map(string), {})<br/>    }), {})<br/><br/>    labels = optional(object({<br/>      # The labels for external secret controller pods.<br/>      external_secrets = optional(map(string), {})<br/>      # The labels for external secret cert controller pods.<br/>      external_secrets_cert_controller = optional(map(string), {})<br/>      # The labels for external secret controller pods.<br/>      external_secrets_webhook = optional(map(string), {})<br/>    }), {})<br/>  })</pre> | `{}` | no |
 | <a name="input_existing_eso_namespace"></a> [existing\_eso\_namespace](#input\_existing\_eso\_namespace) | Existing Namespace to be used to install ESO components including helm releases. If eso\_store\_scope == cluster, this will also be used to deploy ClusterSecretStore/cluster\_store in it | `string` | `null` | no |

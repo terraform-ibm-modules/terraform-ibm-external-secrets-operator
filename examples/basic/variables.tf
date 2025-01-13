@@ -81,8 +81,91 @@ variable "cidr_bases" {
   }
 }
 
-variable "new_bits" {
-  description = "Number of additional address bits to use for numbering the new networks"
-  type        = number
-  default     = 2
+variable "acl_rules_list" {
+  description = "Access control list rule set per network zone"
+  type = list(
+    object({
+      name        = string
+      action      = string
+      source      = string
+      destination = string
+      direction   = string
+      tcp = optional(object({
+        source_port_min = number
+        source_port_max = number
+        port_min        = number
+        port_max        = number
+      }))
+    })
+  )
+  default = [
+    {
+      name        = "iks-create-worker-nodes-inbound"
+      action      = "allow"
+      source      = "161.26.0.0/16"
+      destination = "0.0.0.0/0"
+      direction   = "inbound"
+    },
+    {
+      name        = "iks-nodes-to-master-inbound"
+      action      = "allow"
+      source      = "166.8.0.0/14"
+      destination = "0.0.0.0/0"
+      direction   = "inbound"
+    },
+    {
+      name        = "iks-create-worker-nodes-outbound"
+      action      = "allow"
+      source      = "0.0.0.0/0"
+      destination = "161.26.0.0/16"
+      direction   = "outbound"
+    },
+    {
+      name        = "iks-worker-to-master-outbound"
+      action      = "allow"
+      source      = "0.0.0.0/0"
+      destination = "166.8.0.0/14"
+      direction   = "outbound"
+    },
+    {
+      name        = "allow-all-https-inbound"
+      source      = "0.0.0.0/0"
+      action      = "allow"
+      destination = "0.0.0.0/0"
+      direction   = "inbound"
+      tcp = {
+        source_port_min = 443
+        source_port_max = 443
+        port_min        = 1
+        port_max        = 65535
+      }
+    },
+    {
+      name        = "allow-all-https-outbound"
+      source      = "0.0.0.0/0"
+      action      = "allow"
+      destination = "0.0.0.0/0"
+      direction   = "outbound"
+      tcp = {
+        source_port_min = 1
+        source_port_max = 65535
+        port_min        = 443
+        port_max        = 443
+      }
+    },
+    {
+      name        = "deny-all-outbound"
+      action      = "deny"
+      source      = "0.0.0.0/0"
+      destination = "0.0.0.0/0"
+      direction   = "outbound"
+    },
+    {
+      name        = "deny-all-inbound"
+      action      = "deny"
+      source      = "0.0.0.0/0"
+      destination = "0.0.0.0/0"
+      direction   = "inbound"
+    }
+  ]
 }

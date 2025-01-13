@@ -7,10 +7,8 @@
 ## Install ESO
 
 locals {
-  eso_digest = "v0.11.0-ubi@sha256:b5f685b86cf684020e863c6c2ed91e8a79cad68260d7149ddee073ece2573d6f"
-
-  eso_image_tag_digest = var.eso_image_tag_digest != null || var.eso_image_tag_digest != "" ? var.eso_image_tag_digest : local.eso_digest
-  eso_image_repo       = var.eso_image_repo
+  eso_image_tag_digest = "v0.12.1-ubi@sha256:caff77c2aa933876205d0da3f6883a3e0313ced0a0f0ea49b1abeca4071d027a" # datasource: icr.io/ibm-iac/external-secrets
+  eso_image_repo       = "icr.io/ibm-iac/external-secrets"
 
   reloader_image_tag_digest = "v1.2.1-ubi@sha256:78d3b7269d00df1b9550584dba817299b5842c48038db1f1603255914033307f" # datasource: icr.io/ibm-iac/reloader
   reloader_image_repo       = "icr.io/ibm-iac/reloader"
@@ -182,12 +180,11 @@ EOF
 resource "helm_release" "external_secrets_operator" {
   depends_on = [module.eso_namespace, data.kubernetes_namespace.existing_eso_namespace]
 
-  name       = "external-secrets"
-  namespace  = local.eso_namespace
-  chart      = "external-secrets"
-  version    = "0.12.1"
-  wait       = true
-  repository = "https://charts.external-secrets.io"
+  name      = "external-secrets"
+  namespace = local.eso_namespace
+  chart     = "oci://icr.io/ibm-iac-charts/external-secrets"
+  version   = "0.12.1"
+  wait      = true
 
   set {
     name  = "image.repository"

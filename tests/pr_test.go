@@ -2,6 +2,7 @@
 package test
 
 import (
+	"log"
 	"os"
 	"testing"
 	"time"
@@ -11,16 +12,27 @@ import (
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/cloudinfo"
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/common"
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/testhelper"
+	"gopkg.in/yaml.v3"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // Resource groups are maintained https://github.ibm.com/GoldenEye/ge-dev-account-management
 const resourceGroup = "geretain-test-ext-secrets-sync"
+const defaultExampleTerraformDir = "examples/all-combined"
 const basicExampleTerraformDir = "examples/basic"
+
+// deploying eso on edge node to have it able to connect to SM and IAM on public network
+const esoWorkersSelector = "edge"
+
+// Define a struct with fields that match the structure of the YAML data
+const yamlLocation = "../common-dev-assets/common-go-assets/common-permanent-resources.yaml"
 
 type Config struct {
 	SmGuid   string `yaml:"secretsManagerGuid"`
+	SmCRN    string `yaml:"secretsManagerCRN"`
 	SmRegion string `yaml:"secretsManagerRegion"`
+	RgId     string `yaml:"resourceGroupTestPermanentId"`
+	CisName  string `yaml:"cisInstanceName"`
 
 	// secret ids for the secrets composing the imported certificate to create
 	ImpCertIntermediateSecretId string `yaml:"imported_certificate_intermediate_secret_id"`
@@ -39,7 +51,83 @@ type Config struct {
 }
 
 var smGuid string
+var smCRN string
 var smRegion string
+var rgId string
+var cisName string
+var impCertificateSmRegion string
+var impCertificateSmGuid string
+var impCertIntermediateSecretID string
+var impCertPublicSecretID string
+var impCertPrivateSecretID string
+var acmeLEPrivateKeySmGuid string
+var acmeLEPrivateKeySmRegion string
+var acmeLEPrivateKeySecretId string
+var sdnlbServiceIdName string
+
+// terraform vars for all-combined test (including Upgrade one)
+var allCombinedTerraformVars map[string]interface{}
+
+// TestMain will be run before any parallel tests, used to read data from yaml for use with tests
+func TestMain(m *testing.M) {
+	// Read the YAML file contents
+	data, err := os.ReadFile(yamlLocation)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// Create a struct to hold the YAML data
+	var config Config
+	// Unmarshal the YAML data into the struct
+	err = yaml.Unmarshal(data, &config)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Parse the SM guid and region from data and setting all-combined test input values used in TestRunDefaultExample and TestRunUpgradeExample
+	smGuid = config.SmGuid
+	smCRN = config.SmCRN
+	smRegion = config.SmRegion
+	cisName = config.CisName
+	rgId = config.RgId
+	impCertIntermediateSecretID = config.ImpCertIntermediateSecretId
+	impCertPrivateSecretID = config.ImpCertPrivateSecretId
+	impCertPublicSecretID = config.ImpCertPublicSecretId
+	acmeLEPrivateKeySmGuid = config.AcmeLEPrivateKeySmGuid
+	acmeLEPrivateKeySmRegion = config.AcmeLEPrivateKeySmRegion
+	acmeLEPrivateKeySecretId = config.AcmeLEPrivateKeySecretId
+	impCertificateSmGuid = config.ImpCertificateSmGuid
+	impCertificateSmRegion = config.ImpCertificateSmRegion
+
+	sdnlbServiceIdName = config.SdnlbServiceidName
+	err = log.Output(1, "TestMain using sdnlbServiceIdName "+sdnlbServiceIdName)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	allCombinedTerraformVars = map[string]interface{}{
+		"existing_cis_instance_name":              cisName,
+		"existing_cis_instance_resource_group_id": rgId,
+		// imported certificate and public certificate creation management
+		"existing_sm_instance_crn":                    smCRN,
+		"existing_sm_instance_guid":                   smGuid,
+		"existing_sm_instance_region":                 smRegion,
+		"imported_certificate_sm_region":              impCertificateSmRegion,
+		"imported_certificate_sm_id":                  impCertificateSmGuid,
+		"imported_certificate_intermediate_secret_id": impCertIntermediateSecretID,
+		"imported_certificate_public_secret_id":       impCertPublicSecretID,
+		"imported_certificate_private_secret_id":      impCertPrivateSecretID,
+		"acme_letsencrypt_private_key_secret_id":      acmeLEPrivateKeySecretId,
+		"acme_letsencrypt_private_key_sm_id":          acmeLEPrivateKeySmGuid,
+		"acme_letsencrypt_private_key_sm_region":      acmeLEPrivateKeySmRegion,
+		"eso_deployment_nodes_configuration":          esoWorkersSelector,
+		// setting skip_iam_authorization_policy to true because using the existing secrets manager instance and the policy already exists
+		"skip_iam_authorization_policy": true,
+		"existing_sdnlb_serviceid_name": sdnlbServiceIdName,
+		"service_endpoints":             "public",
+	}
+
+	os.Exit(m.Run())
+}
 
 var ignoreUpdates = []string{
 	"module.es_kubernetes_secret_usr_pass.helm_release.external_secrets_operator[0]",
@@ -92,6 +180,91 @@ func setupOptions(t *testing.T, prefix string, terraformDir string, terraformVar
 	})
 
 	return options
+}
+
+func TestRunDefaultExample(t *testing.T) {
+	t.Parallel()
+
+	options := setupOptions(t, "eso", defaultExampleTerraformDir, allCombinedTerraformVars)
+
+	options.SkipTestTearDown = true
+	defer func() {
+		options.TestTearDown()
+	}()
+	output, err := options.RunTestConsistency()
+
+	if assert.Nil(t, err, "Consistency test should not have errored") {
+		outputs := options.LastTestTerraformOutputs
+		_, tfOutputsErr := testhelper.ValidateTerraformOutputs(outputs, "cluster_id")
+		if assert.Nil(t, tfOutputsErr, tfOutputsErr) {
+			log.Println("Prefix used " + options.Prefix)
+
+			clusterId := outputs["cluster_id"].(string)
+
+			log.Println("clusterId " + clusterId)
+
+			// building the list of secrets to test
+			namespaces_for_apikey_login := []string{"apikeynspace1", "apikeynspace2", "apikeynspace3", "apikeynspace4"}
+			namespaces_for_tp_login := []string{"tpnspace1", "tpnspace2"}
+
+			secretsMap := map[string]string{
+				"dockerconfigjson-uc": namespaces_for_apikey_login[0],
+				// temporary disabled cloudant resource key secret test
+				// https://github.ibm.com/GoldenEye/issues/issues/7726
+				// "cloudant-opaque-arb":                          namespaces_for_apikey_login[1],
+				"dockerconfigjson-arb":                         namespaces_for_apikey_login[2],
+				"pvtcertificate-tls":                           namespaces_for_apikey_login[2],
+				"kv-single-key":                                namespaces_for_apikey_login[3],
+				"kv-multiple-keys":                             namespaces_for_apikey_login[3],
+				"dockerconfigjson-iam":                         namespaces_for_apikey_login[3],
+				"dockerconfigjson-chain":                       namespaces_for_apikey_login[3],
+				options.Prefix + "-arbitrary-arb-tp-0":         namespaces_for_tp_login[0],
+				options.Prefix + "-arbitrary-arb-tp-1":         namespaces_for_tp_login[1],
+				options.Prefix + "-arbitrary-arb-tp-multisg-1": "tpns-multisg",
+				options.Prefix + "-arbitrary-arb-tp-multisg-2": "tpns-multisg",
+				options.Prefix + "-arbitrary-arb-tp-nosg":      "tpns-nosg",
+				options.Prefix + "-arbitrary-arb-cstore-tp":    "eso-cstore-tp-namespace",
+				// sdnlb secret
+				"sdnlb-config": "kube-system",
+			}
+
+			log.Printf("secretsMap %s", secretsMap)
+
+			// get cluster config
+			log.Println("Loading cluster configuration with id " + clusterId)
+			cloudinfosvc, err := cloudinfo.NewCloudInfoServiceFromEnv("TF_VAR_ibmcloud_api_key", cloudinfo.CloudInfoServiceOptions{})
+			if assert.Nil(t, err, "Error creating cloud info service") {
+				clusterConfigPath, err := cloudinfosvc.GetClusterConfigConfigPath(clusterId)
+				defer func() {
+					// attempt to remove cluster config file after test
+					_ = os.Remove(clusterConfigPath)
+				}()
+				if assert.Nil(t, err, "Error getting cluster config path") {
+					// for each secret to test configure Terratest with cluster config
+					// the test checks if each secret is correctly created in the cluster
+					for secretName, secretNamespace := range secretsMap {
+						ocOptions := k8s.NewKubectlOptions("", clusterConfigPath, secretNamespace)
+						log.Printf("Testing secret name %s namespace %s\n", secretName, secretNamespace)
+						_, err := k8s.GetSecretE(t, ocOptions, secretName)
+						assert.Nil(t, err, "Error retrieving secret "+secretName+" in namespace "+secretNamespace)
+					}
+				}
+			}
+		}
+	}
+
+	assert.NotNil(t, output, "Expected some output")
+}
+
+func TestRunUpgradeExample(t *testing.T) {
+	t.Parallel()
+
+	options := setupOptions(t, "eso-upg", defaultExampleTerraformDir, allCombinedTerraformVars)
+	output, err := options.RunTestUpgrade()
+	if !options.UpgradeTestSkipped {
+		assert.Nil(t, err, "This should not have errored")
+		assert.NotNil(t, output, "Expected some output")
+	}
 }
 
 func TestReloaderOperational(t *testing.T) {
