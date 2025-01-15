@@ -59,12 +59,6 @@ variable "existing_sm_instance_region" {
   default     = null
 }
 
-variable "eso_deployment_nodes_configuration" {
-  type        = string
-  description = "Configuration to deploy ESO on specific cluster nodes. The value of this variable will be used for NodeSelector label value and tolerations configuration. If null standard ESO deployment is done on default workers pool."
-  default     = null
-}
-
 variable "zones" {
   description = "List of zones"
   type        = list(string)

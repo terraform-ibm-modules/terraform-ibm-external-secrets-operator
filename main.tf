@@ -180,9 +180,8 @@ EOF
 resource "helm_release" "external_secrets_operator" {
   depends_on = [module.eso_namespace, data.kubernetes_namespace.existing_eso_namespace]
 
-  name      = "external-secrets"
-  namespace = local.eso_namespace
-  # chart     = "oci://icr.io/ibm-iac-charts/external-secrets"
+  name       = "external-secrets"
+  namespace  = local.eso_namespace
   chart      = "external-secrets"
   version    = "0.12.1"
   wait       = true

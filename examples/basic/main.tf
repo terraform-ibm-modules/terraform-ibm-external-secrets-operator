@@ -334,15 +334,15 @@ module "external_secrets_operator" {
   source        = "../../"
   eso_namespace = local.eso_namespace
 
-  eso_cluster_nodes_configuration = var.eso_deployment_nodes_configuration == null ? null : {
+  eso_cluster_nodes_configuration = {
     nodeSelector = {
       label = "dedicated"
-      value = var.eso_deployment_nodes_configuration
+      value = "default"
     }
     tolerations = {
       key      = "dedicated"
       operator = "Equal"
-      value    = var.eso_deployment_nodes_configuration
+      value    = "default"
       effect   = "NoExecute"
     }
   }

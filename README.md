@@ -1,10 +1,10 @@
-## External Secrets Operator module
+## Terraform IBM External Secrets Operator module
 
-[![Certified](<https://img.shields.io/badge/Status-Certified%20(GA)-brightgreen?style=plastic>)](https://github.ibm.com/GoldenEye/documentation/blob/master/status.md)
-[![CI](https://img.shields.io/badge/CI-Toolchain%20Tekton%20Pipeline-3662FF?logo=ibm)](https://cloud.ibm.com/devops/toolchains/c3916535-165a-4275-9b1f-c58575839951?env_id=ibm:yp:us-south)
-[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+[![Graduated (Supported)](https://img.shields.io/badge/Status-Graduated%20(Supported)-brightgreen)](https://terraform-ibm-modules.github.io/documentation/#/badge-status)
+[![latest release](https://img.shields.io/github/v/release/terraform-ibm-modules/terraform-ibm-external-secrets-operator?logo=GitHub&sort=semver)](https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/releases/latest)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
-[![latest release](https://shields-server.m03l6u0cqkx.eu-de.codeengine.appdomain.cloud/github/v/release/GoldenEye/external-secrets-operator-module?logo=GitHub)](https://github.ibm.com/GoldenEye/external-secrets-operator-module/releases/latest)
+[![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://renovatebot.com/)
+[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
 This module automates the installation and configuration of the [External Secrets Operator](https://external-secrets.io/) in a cluster.
 
@@ -227,7 +227,7 @@ To configure a set of tenants to be configured in their proper namespace (to ach
 
 ```hcl
 module "external_secrets_operator" {
-  source            = "git::https://github.ibm.com/GoldenEye/external-secrets-operator-module.git?ref=<the version you need>"
+  source            = "https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator.git?ref=<the version you need>"
   eso_namespace     = var.eso_namespace # namespace to deploy ESO
   service_endpoints = var.service_endpoints # use public or private endpoints for IAM and Secrets Manager
   eso_cluster_nodes_configuration = <<the eso configuration for specific cluster nodes selection if needed - read above>>
@@ -244,7 +244,7 @@ module "eso_namespace_secretstore_1" {
   depends_on = [
     module.external_secrets_operator
   ]
-  source                      = "git::https://github.ibm.com/GoldenEye/external-secrets-operator-module.git//modules/eso-secretstore?ref=master"
+  source                      = "https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator.git//modules/eso-secretstore?ref=master"
   eso_authentication          = "api_key"
   region                      = local.sm_region # SM region
   sstore_namespace            = var.es_kubernetes_namespaces[2] # namespace to create the secret store
@@ -266,7 +266,7 @@ module "eso_namespace_secretstores" {
   depends_on = [
     module.external_secrets_operator
   ]
-  source                      = "git::https://github.ibm.com/GoldenEye/external-secrets-operator-module.git//modules/eso-secretstore?ref=master"
+  source                      = "https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator.git//modules/eso-secretstore?ref=master"
   eso_authentication          = "trusted_profile"
   region                      = local.sm_region # SM region
   sstore_namespace            = kubernetes_namespace.examples[count.index].metadata[0].name # namespace to create the secret store
@@ -475,7 +475,7 @@ NIST controls do not apply to this module.
 ```hcl
 # Replace "master" with a GIT release version to lock into a specific release
 module "es_kubernetes_secret" {
-  source                     = "git::https://github.ibm.com/GoldenEye/external-secrets-operator-module.git//modules/eso-external-secret?ref=master"
+  source                     = "https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator.git//modules/eso-external-secret?ref=master"
   es_kubernetes_secret_type = "dockerconfigjson"
   sm_secret_type = "iam_credentials"
   sm_secret_id = module.docker_config.serviceid_apikey_secret_id

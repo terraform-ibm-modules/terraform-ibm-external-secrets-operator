@@ -32,13 +32,9 @@ This end-to-end example performs the following actions
     - Deploys external secrets in designated namespaces
     - Creates a SecretStore (using API key authentication) to access secrets from designated namespace
   - Deploys a dockerconfigjson secret from a dynamic IAM secret to authenticate in container registry
-    - Creates ServiceID (imagePull) with IAM policies to read from container registry namespace
-    - Creates IAM Secrets Manager secret and dynamic API key that is associated with a imagePull Service ID
     - Deploys external secrets in designated namespaces
     - Creates a SecretStore(using API key authentication) to access secrets from designated namespace
   - Deploys a dockerconfigjson secret from a set of dynamic IAM secrets to authenticate in a set of container registries
-    - Creates a set of ServiceIDs (imagePull) with IAM policies to read from container registry namespace for each secret to create (`${var.prefix}-image-pull-service-id-chain-sec-1/2/3`)
-    - Creates a set of IAM Secrets Manager secrets and dynamic API key that are associated with the imagePull ServiceIDs created at the step above
     - Deploys external secrets resource in designated namespaces for the dockerjsonconfig secret building the secrets chain and using an existing secrets store
   - Creates and deploys a set of arbitrary secrets to cover the different use-cases for namespaced SecretStores
   - Creates and deploys a public certificate through CIS integration and public certificate engine module
@@ -46,7 +42,6 @@ This end-to-end example performs the following actions
   - Loads certificate components stored on Secrets Manager as arbitrary secrets and then use these to create and deploy an imported certificate with public and intermediate certificates and public certificate private key
   - Creates and deploys a key-value secret with single key-value couple
   - Creates and deploys a key-value secret with multiple key-value couples
-  - Creates a dynamic secret on Secrets Manager from the sDNLB entitled service ID and configures an ExternalSecret CRD on the cluster to create and synch the sDNLB secret with the expected format
 
 
 In order to create the intermediate certificate the following parameters are needed:
@@ -70,7 +65,7 @@ In the case all the mentioned parameters are left with their default **null** va
 The example is split into separated templates related with their specific scope:
 - main.tf for the VPC, cluster, VPE, ESO operator deployment and namespaces preliminary creation
 - clusterstore.tf for ESO ClusterSecretsStore configuration with API key authentication, including two different externalsecrets and secret types configuration (username/password and arbitrary)
-- secretstore.tf for ESO secretstore configuration with API key authentication and namespace isolation, including two different externalsecrets and secrets configuration (arbitrary and image pull API key secret using imagepull-apikey-secrets-manager-module)
+- secretstore.tf for ESO secretstore configuration with API key authentication and namespace isolation.
 - secretsmanager.tf for Secrets Manager instance configuration, along with IAM serviceID and API keys and secrets groups
 - kv.tf for key-value (single and multiple keys) secrets
 - publiccertificate.tf for public certificate management
