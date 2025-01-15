@@ -5,7 +5,7 @@
     {
       "fileMatch": ["\\.tf$"],
       "matchStrings": [
-        "[\\w-]+_digest\\s*=\\s*\"(?<currentValue>[\\w.-]+)@(?<currentDigest>sha256:[a-f0-9]+)\""
+        "[\\w-]+_image_tag_digest\\s*=\\s*\"(?<currentValue>[\\w.-]+)@(?<currentDigest>sha256:[a-f0-9]+)\"\\s*# datasource: (?<depName>[^\\s]+)"
       ],
       "datasourceTemplate": "docker"
     }
@@ -13,9 +13,15 @@
   "labels": ["renovate"],
   "packageRules": [
     {
-      "matchManagers": ["regex"],
-      "groupName": "Image Digest Updates",
-      "commitMessageExtra": "to latest digest",
+      "matchManagers": ["helmv3"],
+      "groupName": "Charts and Images",
+      "commitMessageExtra": "to latest",
+      "group": true
+    },
+    {
+      "matchDatasources": ["docker"],
+      "groupName": "Charts and Images",
+      "commitMessageExtra": "to latest",
       "group": true
     }
   ]

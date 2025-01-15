@@ -232,7 +232,6 @@ resource "helm_release" "pod_reloader" {
   depends_on = [module.eso_namespace, data.kubernetes_namespace.existing_eso_namespace]
   count      = var.reloader_deployed == true ? 1 : 0
   name       = "reloader"
-  //chart      = "oci://icr.io/ibm-iac-charts/reloader"
   chart      = "reloader"
   namespace  = local.eso_namespace
   repository = "https://stakater.github.io/stakater-charts"

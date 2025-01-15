@@ -90,7 +90,7 @@ resource "kubernetes_namespace" "examples" {
 module "sm_arbitrary_secrets" {
   count                = length(kubernetes_namespace.examples)
   source               = "terraform-ibm-modules/secrets-manager-secret/ibm"
-  version              = "1.3.2"
+  version              = "1.4.0"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   secret_group_id      = module.secrets_manager_groups[count.index].secret_group_id

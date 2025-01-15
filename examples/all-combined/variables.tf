@@ -45,12 +45,6 @@ variable "sm_service_plan" {
   description = "Secrets-Manager trial plan"
   default     = "trial"
 }
-variable "cr_namespace_name" {
-  type        = string
-  description = "Container registry namespace name to be configured in IAM policy."
-  default     = "cr-namespace"
-}
-
 
 ## ESO Module
 
@@ -258,10 +252,6 @@ variable "sdnlb_ibmcloud_api_key" {
   default     = null
 }
 
-variable "existing_sdnlb_serviceid_name" {
-  type        = string
-  description = "The service ID with access to provision the sDNLB. The example creates an API key for this service ID."
-}
 
 variable "zones" {
   description = "List of zones"
@@ -277,9 +267,32 @@ variable "cidr_bases" {
   }
 }
 
+
 variable "acl_rules_list" {
-  description = "Access control list rule set per network zone"
-  type        = list(object)
+  description = "List of rules that are to be attached to the Network ACL"
+  type = list(object({
+    name        = string
+    action      = string
+    source      = string
+    destination = string
+    direction   = string
+    icmp = optional(object({
+      code = number
+      type = number
+    }))
+    tcp = optional(object({
+      port_max        = number
+      port_min        = number
+      source_port_max = number
+      source_port_min = number
+    }))
+    udp = optional(object({
+      port_max        = number
+      port_min        = number
+      source_port_max = number
+      source_port_min = number
+    }))
+  }))
   default = [
     {
       name        = "iks-create-worker-nodes-inbound"

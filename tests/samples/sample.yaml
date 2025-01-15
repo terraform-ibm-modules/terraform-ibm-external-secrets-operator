@@ -32,7 +32,7 @@ spec:
         app: example-busybox
     spec:
       nodeSelector:
-        dedicated: default
+        dedicated: edge
       containers:
         - name: busybox-container
           image: busybox

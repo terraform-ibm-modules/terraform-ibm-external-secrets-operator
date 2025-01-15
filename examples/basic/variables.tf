@@ -59,9 +59,9 @@ variable "existing_sm_instance_region" {
   default     = null
 }
 
-variable "tags" {
-  description = "List of Tags for the ACL"
-  type        = list(string)
+variable "eso_deployment_nodes_configuration" {
+  type        = string
+  description = "Configuration to deploy ESO on specific cluster nodes. The value of this variable will be used for NodeSelector label value and tolerations configuration. If null standard ESO deployment is done on default workers pool."
   default     = null
 }
 
@@ -80,22 +80,30 @@ variable "cidr_bases" {
 }
 
 variable "acl_rules_list" {
-  description = "Access control list rule set per network zone"
-  type = list(
-    object({
-      name        = string
-      action      = string
-      source      = string
-      destination = string
-      direction   = string
-      tcp = optional(object({
-        source_port_min = number
-        source_port_max = number
-        port_min        = number
-        port_max        = number
-      }))
-    })
-  )
+  description = "List of rules that are to be attached to the Network ACL"
+  type = list(object({
+    name        = string
+    action      = string
+    source      = string
+    destination = string
+    direction   = string
+    icmp = optional(object({
+      code = number
+      type = number
+    }))
+    tcp = optional(object({
+      port_max        = number
+      port_min        = number
+      source_port_max = number
+      source_port_min = number
+    }))
+    udp = optional(object({
+      port_max        = number
+      port_min        = number
+      source_port_max = number
+      source_port_min = number
+    }))
+  }))
   default = [
     {
       name        = "iks-create-worker-nodes-inbound"

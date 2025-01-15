@@ -30,7 +30,7 @@ locals {
   # if service_endpoints is not private the crn for SM is not needed because of VPE creation is not needed
   sm_crn = var.existing_sm_instance_crn == null ? (var.service_endpoints == "private" ? ibm_resource_instance.secrets_manager[0].crn : "") : var.existing_sm_instance_crn
 
-  # https://github.ibm.com/GoldenEye/issues/issues/5268 - deployment region will match to sm_region as workaround
+
   sm_region  = var.existing_sm_instance_region == null ? var.region : var.existing_sm_instance_region
   sm_acct_id = var.existing_sm_instance_guid == null ? module.iam_secrets_engine[0].acct_secret_group_id : module.secrets_manager_group_acct[0].secret_group_id
 }

@@ -123,7 +123,6 @@ module "public_gateways" {
   location          = "${var.region}-${var.zones[count.index]}"
   name              = "${var.prefix}-vpc-gateway-${var.zones[count.index]}"
   resource_group_id = module.resource_group.resource_group_id
-  tags              = var.tags
 }
 
 module "security_group" {
@@ -172,12 +171,11 @@ locals {
 }
 
 module "network_acl" {
-  source            = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/network-acl"
+  source            = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/network-acl?ref=v1.5.0"
   name              = "${var.prefix}-vpc-acl"
   vpc_id            = module.vpc.vpc.vpc_id
   resource_group_id = module.resource_group.resource_group_id
   rules             = local.acl_rules
-  tags              = var.tags
 }
 
 # OCP CLUSTER creation
@@ -194,25 +192,10 @@ module "ocp_base" {
   tags                 = []
   use_existing_cos     = false
   # outbound required by cluster proxy
-  disable_outbound_traffic_protection = true
+  disable_outbound_traffic_protection  = true
+  import_default_worker_pool_on_create = false
 }
 
-# OCP CLUSTER creation
-module "ocp_base" {
-  source               = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  version              = "3.36.0"
-  cluster_name         = "${var.prefix}-cluster"
-  resource_group_id    = module.resource_group.resource_group_id
-  region               = var.region
-  force_delete_storage = true
-  vpc_id               = module.vpc.vpc_id
-  vpc_subnets          = module.vpc.subnets
-  worker_pools         = local.ocp_worker_pools
-  tags                 = []
-  use_existing_cos     = false
-  # outbound required by cluster proxy
-  disable_outbound_traffic_protection = true
-}
 
 ##############################################################################
 # Init cluster config for helm and kubernetes providers
@@ -249,9 +232,9 @@ module "vpes" {
   region   = var.region
   prefix   = "vpe"
   vpc_name = "${var.prefix}-vpc"
-  vpc_id   = module.vpc.vpc_id
+  vpc_id   = module.vpc.vpc.vpc_id
   subnet_zone_list = [
-    for index, subnet in module.vpc.subnets.transit : {
+    for index, subnet in local.subnets.default : {
       name           = "${local.sm_region}-${index}"
       zone           = subnet.zone
       id             = subnet.id

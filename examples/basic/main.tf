@@ -16,7 +16,7 @@ locals {
 
   sm_guid = var.existing_sm_instance_guid == null ? ibm_resource_instance.secrets_manager[0].guid : var.existing_sm_instance_guid
 
-  # https://github.ibm.com/GoldenEye/issues/issues/5268 - deployment region will match to sm_region as workaround
+
   sm_region           = var.existing_sm_instance_region == null ? var.region : var.existing_sm_instance_region
   sm_acct_id          = var.existing_sm_instance_guid == null ? module.iam_secrets_engine[0].acct_secret_group_id : module.secrets_manager_group_acct[0].secret_group_id
   es_namespace_apikey = "es-operator" # pragma: allowlist secret
@@ -145,7 +145,6 @@ module "public_gateways" {
   location          = "${var.region}-${var.zones[count.index]}"
   name              = "${var.prefix}-vpc-gateway-${var.zones[count.index]}"
   resource_group_id = module.resource_group.resource_group_id
-  tags              = var.tags
 }
 
 module "security_group" {
@@ -194,14 +193,12 @@ locals {
 }
 
 module "network_acl" {
-  source            = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/network-acl"
+  source            = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/network-acl?ref=v1.5.0"
   name              = "${var.prefix}-vpc-acl"
   vpc_id            = module.vpc.vpc.vpc_id
   resource_group_id = module.resource_group.resource_group_id
   rules             = local.acl_rules
-  tags              = var.tags
 }
-
 
 # OCP CLUSTER creation
 module "ocp_base" {
@@ -217,12 +214,14 @@ module "ocp_base" {
   tags                 = []
   use_existing_cos     = false
   # outbound required by cluster proxy
-  disable_outbound_traffic_protection = true
+  disable_outbound_traffic_protection  = true
+  import_default_worker_pool_on_create = false
 }
 
-#############################################################################
+
+##############################################################################
 # Init cluster config for helm and kubernetes providers
-#############################################################################
+##############################################################################
 
 data "ibm_container_cluster_config" "cluster_config" {
   cluster_name_id   = module.ocp_base.cluster_id
@@ -335,18 +334,19 @@ module "external_secrets_operator" {
   source        = "../../"
   eso_namespace = local.eso_namespace
 
-  eso_cluster_nodes_configuration = {
+  eso_cluster_nodes_configuration = var.eso_deployment_nodes_configuration == null ? null : {
     nodeSelector = {
       label = "dedicated"
-      value = "default"
+      value = var.eso_deployment_nodes_configuration
     }
     tolerations = {
       key      = "dedicated"
       operator = "Equal"
-      value    = "default"
+      value    = var.eso_deployment_nodes_configuration
       effect   = "NoExecute"
     }
   }
+
 
   depends_on = [
     kubernetes_namespace.apikey_namespace

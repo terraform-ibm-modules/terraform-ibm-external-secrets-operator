@@ -16,12 +16,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// Resource groups are maintained https://github.ibm.com/GoldenEye/ge-dev-account-management
 const resourceGroup = "geretain-test-ext-secrets-sync"
 const defaultExampleTerraformDir = "examples/all-combined"
 const basicExampleTerraformDir = "examples/basic"
 
-// deploying eso on default node to have it able to connect to SM and IAM on public network
+// deploying eso on edge node to have it able to connect to SM and IAM on public network
 const esoWorkersSelector = "default"
 
 // Define a struct with fields that match the structure of the YAML data
@@ -45,9 +44,6 @@ type Config struct {
 	AcmeLEPrivateKeySmGuid   string `yaml:"acme_letsencrypt_private_key_sm_id"`
 	AcmeLEPrivateKeySmRegion string `yaml:"acme_letsencrypt_private_key_sm_region"`
 	AcmeLEPrivateKeySecretId string `yaml:"acme_letsencrypt_private_key_secret_id"`
-
-	// sDNLB serviceID
-	SdnlbServiceidName string `yaml:"sdnlbServiceIdName"`
 }
 
 var smGuid string
@@ -63,7 +59,6 @@ var impCertPrivateSecretID string
 var acmeLEPrivateKeySmGuid string
 var acmeLEPrivateKeySmRegion string
 var acmeLEPrivateKeySecretId string
-var sdnlbServiceIdName string
 
 // terraform vars for all-combined test (including Upgrade one)
 var allCombinedTerraformVars map[string]interface{}
@@ -98,12 +93,6 @@ func TestMain(m *testing.M) {
 	impCertificateSmGuid = config.ImpCertificateSmGuid
 	impCertificateSmRegion = config.ImpCertificateSmRegion
 
-	sdnlbServiceIdName = config.SdnlbServiceidName
-	err = log.Output(1, "TestMain using sdnlbServiceIdName "+sdnlbServiceIdName)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	allCombinedTerraformVars = map[string]interface{}{
 		"existing_cis_instance_name":              cisName,
 		"existing_cis_instance_resource_group_id": rgId,
@@ -122,7 +111,6 @@ func TestMain(m *testing.M) {
 		"eso_deployment_nodes_configuration":          esoWorkersSelector,
 		// setting skip_iam_authorization_policy to true because using the existing secrets manager instance and the policy already exists
 		"skip_iam_authorization_policy": true,
-		"existing_sdnlb_serviceid_name": sdnlbServiceIdName,
 		"service_endpoints":             "public",
 	}
 
@@ -164,12 +152,6 @@ func setupOptions(t *testing.T, prefix string, terraformDir string, terraformVar
 		IgnoreUpdates: testhelper.Exemptions{
 			List: ignoreUpdates,
 		},
-		ImplicitDestroy: []string{
-			// workaround for the issue https://github.ibm.com/GoldenEye/issues/issues/10743
-			// when the issue is fixed on IKS, so the destruction of default workers pool is correctly managed on provider/clusters service the next two entries should be removed
-			"'module.ocp_base.ibm_container_vpc_worker_pool.autoscaling_pool[\"default\"]'",
-			"'module.ocp_base.ibm_container_vpc_worker_pool.pool[\"default\"]'",
-		},
 
 		IgnoreDestroys: testhelper.Exemptions{ // Ignore for consistency check
 			List: []string{
@@ -210,22 +192,16 @@ func TestRunDefaultExample(t *testing.T) {
 			secretsMap := map[string]string{
 				"dockerconfigjson-uc": namespaces_for_apikey_login[0],
 				// temporary disabled cloudant resource key secret test
-				// https://github.ibm.com/GoldenEye/issues/issues/7726
-				// "cloudant-opaque-arb":                          namespaces_for_apikey_login[1],
 				"dockerconfigjson-arb":                         namespaces_for_apikey_login[2],
 				"pvtcertificate-tls":                           namespaces_for_apikey_login[2],
 				"kv-single-key":                                namespaces_for_apikey_login[3],
 				"kv-multiple-keys":                             namespaces_for_apikey_login[3],
-				"dockerconfigjson-iam":                         namespaces_for_apikey_login[3],
-				"dockerconfigjson-chain":                       namespaces_for_apikey_login[3],
 				options.Prefix + "-arbitrary-arb-tp-0":         namespaces_for_tp_login[0],
 				options.Prefix + "-arbitrary-arb-tp-1":         namespaces_for_tp_login[1],
 				options.Prefix + "-arbitrary-arb-tp-multisg-1": "tpns-multisg",
 				options.Prefix + "-arbitrary-arb-tp-multisg-2": "tpns-multisg",
 				options.Prefix + "-arbitrary-arb-tp-nosg":      "tpns-nosg",
 				options.Prefix + "-arbitrary-arb-cstore-tp":    "eso-cstore-tp-namespace",
-				// sdnlb secret
-				"sdnlb-config": "kube-system",
 			}
 
 			log.Printf("secretsMap %s", secretsMap)

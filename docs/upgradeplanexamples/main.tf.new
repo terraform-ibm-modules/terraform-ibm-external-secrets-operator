@@ -1,0 +1,618 @@
+##############################################################################
+# Locals
+##############################################################################
+
+locals {
+  # general
+  validate_sm_region_cnd = var.existing_sm_instance_guid != null && var.existing_sm_instance_region == null
+  validate_sm_region_msg = "existing_sm_instance_region must also be set when value given for existing_sm_instance_guid."
+  # tflint-ignore: terraform_unused_declarations
+  validate_sm_region_chk = regex(
+    "^${local.validate_sm_region_msg}$",
+    (!local.validate_sm_region_cnd
+      ? local.validate_sm_region_msg
+  : ""))
+
+  sm_guid    = var.existing_sm_instance_guid == null ? ibm_resource_instance.secrets_manager[0].guid : var.existing_sm_instance_guid
+  sm_region  = var.existing_sm_instance_region == null ? var.region : var.existing_sm_instance_region
+  sm_acct_id = var.existing_sm_instance_guid == null ? module.iam_secrets_engine[0].acct_secret_group_id : module.secrets_manager_group_acct[0].secret_group_id
+
+  # artifactory-registry-secret
+  artifactory_apikey = sensitive("artifactory-payload-example")
+
+  # cr-registry-arbitrary-secret
+  imagepull_apikey = sensitive("imagepull-payload-example")
+}
+
+##################################################################
+# Resource Group
+##################################################################
+
+module "resource_group" {
+  source                                 = "terraform-ibm-modules/resource-group/ibm"
+  version                                = "1.1.5"
+  # if an existing resource group is not set (null) create a new one using prefix
+  resource_group_name          = var.resource_group == null ? "${var.prefix}-resource-group" : null
+  existing_resource_group_name = var.resource_group
+}
+
+##################################################################
+# Create VPC, public gateway and subnets
+##################################################################
+
+locals {
+
+  # VPC Configuration
+  acl_rules_map = {
+    private = concat(
+      module.acl_profile.base_acl,
+      module.acl_profile.https_acl,
+      module.acl_profile.deny_all_acl
+    )
+  }
+  vpc_cidr_bases = {
+    private = "192.168.0.0/20",
+    transit = "192.168.16.0/20",
+    edge    = "192.168.32.0/20"
+  }
+
+  # OCP Configuration
+  ocp_worker_pools = [
+    {
+      subnet_prefix    = "private"
+      pool_name        = "default"
+      machine_type     = "bx2.4x16"
+      workers_per_zone = 1
+      labels           = { "dedicated" : "private" }
+    },
+    {
+      subnet_prefix    = "edge"
+      pool_name        = "edge"
+      machine_type     = "bx2.4x16"
+      workers_per_zone = 1
+      labels           = { "dedicated" : "edge" }
+    },
+    {
+      subnet_prefix    = "transit"
+      pool_name        = "transit"
+      machine_type     = "bx2.4x16"
+      workers_per_zone = 1
+      labels           = { "dedicated" : "transit" }
+    }
+  ]
+}
+
+# VPC ACLs
+module "acl_profile" {
+  source = "git::https://github.ibm.com/GoldenEye/acl-profile-ocp.git?ref=1.3.1"
+}
+
+
+# VPC creation
+module "vpc" {
+  source                    = "git::https://github.ibm.com/GoldenEye/vpc-module.git?ref=6.3.3"
+  unique_name               = "${var.prefix}-vpc"
+  ibm_region                = local.sm_region
+  resource_group_id         = module.resource_group.resource_group_id
+  cidr_bases                = local.vpc_cidr_bases
+  acl_rules_map             = local.acl_rules_map
+  virtual_private_endpoints = {}
+  vpc_tags                  = []
+}
+
+# OCP CLUSTER creation
+module "ocp_base" {
+  source               = "terraform-ibm-modules/base-ocp-vpc/ibm"
+  version              = "3.18.1"
+  ibmcloud_api_key     = var.ibmcloud_api_key # pragma: allowlist secret
+  cluster_name         = "${var.prefix}-vpc"
+  resource_group_id    = module.resource_group.resource_group_id
+  region               = local.sm_region
+  force_delete_storage = true
+  vpc_id               = module.vpc.vpc_id
+  vpc_subnets          = module.vpc.subnets
+  worker_pools         = local.ocp_worker_pools
+  tags                 = []
+  use_existing_cos     = false
+}
+
+##############################################################################
+# Init cluster config for helm and kubernetes providers
+##############################################################################
+
+data "ibm_container_cluster_config" "cluster_config" {
+  cluster_name_id   = module.ocp_base.cluster_id
+  resource_group_id = module.resource_group.resource_group_id
+}
+
+# Wait time to allow cluster refreshes components after provisioning
+resource "time_sleep" "wait_45_seconds" {
+  depends_on      = [data.ibm_container_cluster_config.cluster_config]
+  create_duration = "45s"
+}
+
+# Create namespace
+resource "kubernetes_namespace" "cluster_namespaces" {
+  for_each = toset(var.es_kubernetes_namespaces)
+  metadata {
+    name = each.value
+  }
+  lifecycle {
+    ignore_changes = [
+      metadata[0].annotations,
+      metadata[0].labels
+    ]
+  }
+  depends_on = [
+    time_sleep.wait_45_seconds
+  ]
+}
+
+########################################
+# Secrets-Manager and IAM configuration
+########################################
+
+# IAM user policy, Secret Manager instance, Service ID for IAM engine, IAM service ID policies, associated Service ID API key stored in a secret object in account level secret-group and IAM engine configuration
+resource "ibm_resource_instance" "secrets_manager" {
+  count             = var.existing_sm_instance_guid == null ? 1 : 0
+  name              = "${var.prefix}-sm"
+  service           = "secrets-manager"
+  plan              = var.sm_service_plan
+  location          = local.sm_region
+  tags              = var.resource_tags
+  resource_group_id = module.resource_group.resource_group_id
+  timeouts {
+    create = "30m" # Extending provisioning time to 30 minutes
+  }
+}
+
+# Configure instance with IAM engine
+module "iam_secrets_engine" {
+  # providers = {
+  #   restapi.nocontent = restapi.nocontent
+  # }
+  count                                   = var.existing_sm_instance_guid == null ? 1 : 0
+  source                                  = "git::https://github.ibm.com/GoldenEye/secrets-manager-iam-engine-module.git?ref=2.0.6"
+  region                                  = local.sm_region
+  secrets_manager_guid                    = ibm_resource_instance.secrets_manager[0].guid
+  create_iam_user_policy                  = false
+  iam_secret_generator_service_id_name    = "${var.prefix}-sid:0.0.1:${ibm_resource_instance.secrets_manager[0].name}-iam-secret-generator:automated:simple-service:secret-manager:"
+  iam_secret_generator_apikey_name        = "${var.prefix}-iam-secret-generator-apikey"
+  new_secret_group_name                   = "${var.prefix}-account-secret-group"
+  iam_secret_generator_apikey_secret_name = "${var.prefix}-iam-secret-generator-apikey-secret"
+  iam_engine_name                         = "iam-engine"
+}
+
+# Creates secret group to place secrets
+module "secrets_manager_group" {
+  source                                 = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
+  version                                = "1.1.4"
+  # source                   = "git::https://github.ibm.com/GoldenEye/secrets-manager-secret-group-module.git?ref=2.0.1"
+  region                   = local.sm_region
+  secrets_manager_guid     = local.sm_guid
+  secret_group_name        = "${var.prefix}-secret-group"                   #checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
+  secret_group_description = "Secret-Group for storing account credentials" #tfsec:ignore:general-secrets-no-plaintext-exposure
+}
+
+# Additional Secrets-Manager Secret-Group for SERVICE level secrets
+module "secrets_manager_group_acct" {
+  source                                 = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
+  version                                = "1.1.4"
+  count                = var.existing_sm_instance_guid == null ? 0 : 1
+  # source               = "git::https://github.ibm.com/GoldenEye/secrets-manager-secret-group-module.git?ref=2.0.1"
+  region               = local.sm_region
+  secrets_manager_guid = local.sm_guid
+  #tfsec:ignore:general-secrets-no-plaintext-exposure
+  secret_group_name        = "${var.prefix}-account-secret-group"           #checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
+  secret_group_description = "Secret-Group for storing account credentials" #tfsec:ignore:general-secrets-no-plaintext-exposure
+  depends_on               = [module.iam_secrets_engine]
+}
+
+##################################################################
+# Create service-id, policy to pull secrets from secret manager
+##################################################################
+
+# Create service-id
+resource "ibm_iam_service_id" "secret_puller" {
+  name        = "sid:0.0.1:${var.prefix}-secret-puller:automated:simple-service:secret-manager:"
+  description = "ServiceID that can pull secrets from Secret Manager"
+}
+# Create policy to allow new service id to pull secrets from secrets manager
+resource "ibm_iam_service_policy" "secret_puller_policy" {
+  iam_service_id = ibm_iam_service_id.secret_puller.id
+  roles          = ["Viewer", "SecretsReader"]
+
+  resources {
+    service              = "secrets-manager"
+    resource_instance_id = local.sm_guid
+    resource_type        = "secret-group"
+    resource             = module.secrets_manager_group.secret_group_id
+  }
+}
+
+##################################################################
+# Artifactory-registry
+##################################################################
+
+# Creates username_password secrets and stores in secret manager
+module "sm_up_artifactory_secret" {
+  source               = "git::https://github.ibm.com/GoldenEye/secrets-manager-secret-module.git?ref=3.1.1"
+  region               = local.sm_region
+  secrets_manager_guid = local.sm_guid
+  secret_group_id      = module.secrets_manager_group.secret_group_id
+  #tfsec:ignore:general-secrets-no-plaintext-exposure
+  secret_name             = "${var.prefix}-artifactory-up-secret"                # checkov:skip=CKV_SECRET_6
+  secret_description      = "example secret in existing secret manager instance" #tfsec:ignore:general-secrets-no-plaintext-exposure # checkov:skip=CKV_SECRET_6
+  secret_payload_password = local.artifactory_apikey # pragma: allowlist secret
+  secret_type             = "username_password" #checkov:skip=CKV_SECRET_6
+  #tfsec:ignore:general-secrets-no-plaintext-exposure
+  secret_username                = "artifactory-user" # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
+  secret_user_pass_auto_rotation = false
+}
+
+# # Installing external secrets operator(ESO), cluster store and deploying external secret as dockerconfigson type
+# module "eso_operator_clusterstore_deployment" {
+#   source                      = "git::https://github.ibm.com/GoldenEye/external-secrets-operator-module.git?ref=1.7.0"
+#   depends_on = [
+#     kubernetes_namespace.cluster_namespaces
+#   ]
+#   es_kubernetes_secret_type = "dockerconfigjson"  #checkov:skip=CKV_SECRET_6 -> externalsecret
+#   sm_secret_type            = "username_password" #checkov:skip=CKV_SECRET_6 -> externalsecret
+#   sm_secret_id              = module.sm_up_artifactory_secret.secret_id # -> externalsecret
+#   eso_setup                 = true
+#   es_kubernetes_namespaces  = [var.es_kubernetes_namespaces[0]] # -> value to use in externalsecret
+#   secrets_manager_guid      = local.sm_guid # -> cluster store
+#   eso_generic_secret_name   = "generic-cluster-api-key" #checkov:skip=CKV_SECRET_6 # -> cluster store
+#   eso_store_name            = "cluster-store" # -> cluster store
+#   es_container_registry     = "wcp-my-team-docker-local.artifactory.swg-devops.com" # -> value to use in externalsecret
+#   region                    = local.sm_region # -> cluster store
+#   es_kubernetes_secret_name = "dockerconfigjson-uc" #checkov:skip=CKV_SECRET_6 # -> value to use in externalsecret
+#   es_helm_rls_name          = "es-docker-uc"  # -> value to use in externalsecret
+#   es_store_helm_rls_name    = "cluster-store"  # -> value to use in cluster store
+#   eso_authentication        = ["api_key"] # -> value to use in cluster store
+# }
+
+### from previous single to three modules (ESO + clusterstore + externalsecret)
+
+##################################################################
+# ESO deployment
+##################################################################
+
+module "eso_operator_deployment" {
+  depends_on = [
+    kubernetes_namespace.cluster_namespaces
+  ]
+  source            = "git::https://github.ibm.com/GoldenEye/external-secrets-operator-module.git?ref=task_4882_5006_5196"
+  existing_eso_namespace     = "external-secrets-operator" # default of previous module version while now it is not defaulted
+  service_endpoints = "public" # default of previous module version default
+
+  eso_cluster_nodes_configuration = var.eso_deployment_nodes_configuration == null ? null : {
+    nodeSelector = {
+      label = "dedicated"
+      value = var.eso_deployment_nodes_configuration
+    }
+    tolerations = {
+      key      = "dedicated"
+      operator = "Equal"
+      value    = var.eso_deployment_nodes_configuration
+      effect   = "NoExecute"
+    }
+  }
+
+}
+
+##################################################################
+# ESO ClusterStore creation with apikey authentication
+##################################################################
+
+module "eso_clusterstore_deployment" {
+  source                            = "git::https://github.ibm.com/GoldenEye/external-secrets-operator-module.git//eso-clusterstore?ref=task_4882_5006_5196"
+  eso_authentication                = "api_key"
+  clusterstore_secret_apikey        = data.ibm_sm_iam_credentials_secret.secret_puller_secret.api_key # pragma: allowlist secret
+  region                            = local.sm_region
+  clusterstore_helm_rls_name        = "cluster-store"
+  clusterstore_secret_name          = "generic-cluster-api-key" #checkov:skip=CKV_SECRET_6
+  clusterstore_name                 = "cluster-store"
+  clusterstore_secrets_manager_guid = local.sm_guid
+  eso_namespace                     = var.existing_eso_namespace
+  service_endpoints                 = var.service_endpoints
+  depends_on = [
+    module.eso_operator_deployment
+  ]
+}
+
+##################################################################
+# ExternalSecret for ESO in cluster scope and apikey auth
+##################################################################
+
+# Creation of ExternalSecret for cluster scope and deploying external secret as dockerconfigson type
+module "external_secret_dockerconfigson_usr_pass_deployment" {
+  depends_on                = [module.eso_clusterstore_deployment]
+  source                    = "git::https://github.ibm.com/GoldenEye/external-secrets-operator-module.git//eso-external-secret?ref=task_4882_5006_5196"
+  es_kubernetes_secret_type = "dockerconfigjson"  #checkov:skip=CKV_SECRET_6
+  sm_secret_type            = "username_password" #checkov:skip=CKV_SECRET_6
+  sm_secret_id              = module.sm_up_artifactory_secret.secret_id
+  # es_kubernetes_namespace   = var.es_kubernetes_namespaces[0]
+  es_kubernetes_namespace   = kubernetes_namespace.cluster_namespaces[var.es_kubernetes_namespaces[0]].metadata[0].name # to create explicit dependency
+  eso_store_name            = "cluster-store"
+  eso_store_scope           = "cluster"
+  es_container_registry     = "wcp-my-team-docker-local.artifactory.swg-devops.com"
+  es_kubernetes_secret_name = "dockerconfigjson-uc" #checkov:skip=CKV_SECRET_6
+  es_helm_rls_name          = "es-docker-uc"
+  es_helm_rls_namespace = var.existing_eso_namespace # to keep backward compatibility with previous version installing it in eso operator namespace
+}
+
+##################################################################
+# Cloudant-arbitrary-secret
+##################################################################
+
+##############################################################################
+# Basic cloudant instance + database
+##############################################################################
+
+module "cloudant" {
+  source            = "terraform-ibm-modules/cloudant/ibm"
+  version           = "1.1.7"
+  resource_group_id = module.resource_group.resource_group_id
+  instance_name     = "${var.prefix}-cloudant"
+  access_tags       = []
+  region            = var.region
+  tags              = var.resource_tags
+  database_config = [{
+    db          = "cloudant-db"
+    partitioned = false
+    shards      = 3
+  }]
+}
+
+data "ibm_cloudant" "instance" {
+  name              = module.cloudant.name
+  resource_group_id = module.resource_group.resource_group_id
+}
+
+resource "ibm_resource_key" "resource_key" {
+  name                 = "cd-resource-key"
+  role                 = "Manager"
+  resource_instance_id = data.ibm_cloudant.instance.id
+  timeouts {
+    create = "15m"
+    delete = "15m"
+  }
+}
+
+# Creates arbitrary secret and stores in secret manager
+module "sm_arbitrary_cloudant_secret" {
+  source               = "git::https://github.ibm.com/GoldenEye/secrets-manager-secret-module.git?ref=3.1.1"
+  region               = local.sm_region
+  secrets_manager_guid = local.sm_guid
+  secret_group_id      = module.secrets_manager_group.secret_group_id
+  secret_type          = "arbitrary"
+  #tfsec:ignore:general-secrets-no-plaintext-exposure
+  secret_name             = "${var.prefix}-cloudant-rk-secret"                   #checkov:skip=CKV_SECRET_6
+  secret_description      = "example secret in existing secret manager instance" #tfsec:ignore:general-secrets-no-plaintext-exposure
+  secret_payload_password = ibm_resource_key.resource_key.credentials["apikey"]
+}
+
+# # Deploying external secret as Opaque type using existing cluster store
+# module "eso_clusterstore_externalsecret_opaque_create" {
+#   depends_on = [
+#     module.eso_operator_clusterstore_deployment,
+#     kubernetes_namespace.cluster_namespaces
+#   ]
+#   source                      = "git::https://github.ibm.com/GoldenEye/external-secrets-operator-module.git?ref=1.7.0"
+#   es_kubernetes_secret_type     = "opaque" # -> externalsecret
+#   sm_secret_type                = "arbitrary" # -> externalsecret
+#   sm_secret_id                  = module.sm_arbitrary_cloudant_secret.secret_id # -> externalsecret
+#   eso_setup                     = false
+#   eso_store_setup               = false
+#   es_kubernetes_namespaces      = [var.es_kubernetes_namespaces[1]] # -> value to use in externalsecret
+#   eso_store_name                = "cluster-store" # -> value to use in externalsecret
+#   secrets_manager_guid          = local.sm_guid # -> cluster store
+#   region                        = local.sm_region # -> cluster store
+#   es_kubernetes_secret_data_key = "apikey" # -> value to use in externalsecret
+#   es_kubernetes_secret_name     = "cloudant-opaque-arb" #checkov:skip=CKV_SECRET_6 # -> value to use in externalsecret
+#   es_helm_rls_name              = "es-cloudant-arb" # -> value to use in externalsecret
+#   eso_authentication            = ["api_key"] # -> cluster store
+# }
+
+### from previous single to singe module eso-external-secret
+
+##################################################################
+# ExternalSecret for ESO in cluster scope and apikey auth
+##################################################################
+
+# Creates externalsecret using existing cluster store and configure the secret as Opaque type
+module "external_secret_opaque_arbitrary_deployment" {
+  depends_on                = [module.eso_clusterstore_deployment]
+  source                    = "git::https://github.ibm.com/GoldenEye/external-secrets-operator-module.git//eso-external-secret?ref=task_4882_5006_5196"
+  es_kubernetes_secret_type = "opaque"  #checkov:skip=CKV_SECRET_6
+  sm_secret_type            = "arbitrary" #checkov:skip=CKV_SECRET_6
+  sm_secret_id              = module.sm_arbitrary_cloudant_secret.secret_id
+  # es_kubernetes_namespace   = var.es_kubernetes_namespaces[1]
+  es_kubernetes_namespace   = kubernetes_namespace.cluster_namespaces[var.es_kubernetes_namespaces[1]].metadata[0].name # to create explicit dependency
+  eso_store_name            = "cluster-store"
+  eso_store_scope           = "cluster"
+  es_kubernetes_secret_data_key = "apikey"
+  es_kubernetes_secret_name = "cloudant-opaque-arb" #checkov:skip=CKV_SECRET_6
+  es_helm_rls_name          = "es-cloudant-arb"
+  es_helm_rls_namespace = var.existing_eso_namespace # to keep backward compatibility with previous version installing it in eso operator namespace
+}
+
+##################################################################
+# cr-registry-arbitrary-secret
+##################################################################
+
+# Creates arbitrary secret and stores in secret manager
+module "sm_arbitrary_imagepull_secret" {
+  source               = "git::https://github.ibm.com/GoldenEye/secrets-manager-secret-module.git?ref=3.1.1"
+  region               = local.sm_region
+  secrets_manager_guid = local.sm_guid
+  secret_group_id      = module.secrets_manager_group.secret_group_id
+  secret_type          = "arbitrary"
+  #tfsec:ignore:general-secrets-no-plaintext-exposure
+  secret_name             = "${var.prefix}-imagepull-apikey-secret"              #checkov:skip=CKV_SECRET_6
+  secret_description      = "example secret in existing secret manager instance" #tfsec:ignore:general-secrets-no-plaintext-exposure
+  secret_payload_password = local.imagepull_apikey # pragma: allowlist secret
+}
+
+# # Deploying external secret as dockerconfigson type using new namespace store
+# module "eso_secretstore_create_externalsecret_arbitrary_create" {
+#   depends_on = [
+#     module.eso_operator_clusterstore_deployment,
+#     kubernetes_namespace.cluster_namespaces
+#   ]
+#   source                      = "git::https://github.ibm.com/GoldenEye/external-secrets-operator-module.git?ref=1.7.0"
+#   es_kubernetes_secret_type   = "dockerconfigjson" #checkov:skip=CKV_SECRET_6 # -> externalsecret
+#   sm_secret_type              = "arbitrary" # -> externalsecret
+#   sm_secret_id                = module.sm_arbitrary_imagepull_secret.secret_id # -> externalsecret
+#   eso_setup                   = false
+#   eso_store_setup             = true
+#   eso_store_scope             = "namespace" # -> secretstore
+#   es_kubernetes_namespaces    = [var.es_kubernetes_namespaces[2]] # -> value to use in externalsecret
+#   es_container_registry_email = "terraform@ibm.com" # -> value to use in externalsecret
+#   eso_generic_secret_name     = "generic-${var.es_kubernetes_namespaces[2]}-api-key" # -> secretstore
+#   eso_store_name              = "${var.es_kubernetes_namespaces[2]}-store" # -> secretstore
+#   secrets_manager_guid        = local.sm_guid # -> secretstore
+#   region                      = local.sm_region # -> secretstore
+#   es_kubernetes_secret_name   = "dockerconfigjson-arb" #checkov:skip=CKV_SECRET_6  # -> value to use in externalsecret
+#   es_helm_rls_name            = "es-docker-arb"  # -> value to use in externalsecret
+#   es_store_helm_rls_name      = "store"  # -> value to use in externalsecret
+#   eso_authentication          = ["api_key"] # -> secretstore
+
+# }
+
+### from previous single to two modules eso-secretstore + eso-external-secret
+
+# Deploying external secret as dockerconfigson type using new namespace store
+# creation of Namespaced SecretStores with apikey authentication
+module "eso_namespacedstore_apikeyauth_dockerconfigson_deployment" {
+  depends_on                  = [module.eso_clusterstore_deployment]
+  source                      = "git::https://github.ibm.com/GoldenEye/external-secrets-operator-module.git//eso-secretstore?ref=task_4882_5006_5196"
+  eso_authentication          = "api_key"
+  region                      = local.sm_region
+  sstore_namespace            = kubernetes_namespace.cluster_namespaces[var.es_kubernetes_namespaces[2]].metadata[0].name
+  sstore_secrets_manager_guid = local.sm_guid
+  sstore_store_name           = "${var.es_kubernetes_namespaces[2]}-store"
+  sstore_secret_apikey        = data.ibm_sm_iam_credentials_secret.secret_puller_secret.api_key # pragma: allowlist secret
+  service_endpoints           = var.service_endpoints
+  sstore_helm_rls_name        = "store"
+  sstore_secret_name          = "generic-${var.es_kubernetes_namespaces[2]}-api-key"
+}
+
+# Deploying external secret as dockerconfigson type using new namespace store
+# Creates externalsecret using previously created namespaced store and configure the secret as arbitrary type
+module "external_secret_dockerconfigson_arbitrary_deployment" {
+  depends_on                = [module.eso_clusterstore_deployment]
+  source                    = "git::https://github.ibm.com/GoldenEye/external-secrets-operator-module.git//eso-external-secret?ref=task_4882_5006_5196"
+  es_kubernetes_secret_type = "dockerconfigjson"  #checkov:skip=CKV_SECRET_6
+  sm_secret_type            = "arbitrary" #checkov:skip=CKV_SECRET_6
+  sm_secret_id              = module.sm_arbitrary_imagepull_secret.secret_id
+  # es_kubernetes_namespace   = var.es_kubernetes_namespaces[2]
+  es_kubernetes_namespace   = kubernetes_namespace.cluster_namespaces[var.es_kubernetes_namespaces[2]].metadata[0].name # to create explicit dependency
+  eso_store_name            = "${var.es_kubernetes_namespaces[2]}-store"
+  eso_store_scope           = "namespace"
+  es_kubernetes_secret_name = "dockerconfigjson-arb" #checkov:skip=CKV_SECRET_6
+  es_container_registry_email = "terraform@ibm.com" # -> value to use in externalsecret
+  es_helm_rls_name          = "es-docker-arb"
+  es_helm_rls_namespace     = var.existing_eso_namespace # to keep backward compatibility with previous version installing it in eso operator namespace
+}
+
+##################################################################
+# cr-registry-same-account
+##################################################################
+
+# Create dynamic Service ID API key and add to secret manager
+module "dynamic_serviceid_apikey1" {
+  source = "git::https://github.ibm.com/GoldenEye/iam-serviceid-apikey-secrets-manager-module.git?ref=2.0.2"
+  region = local.sm_region
+  #tfsec:ignore:general-secrets-no-plaintext-exposure
+  sm_iam_secret_name        = "${var.prefix}-${var.sm_iam_secret_name}"
+  sm_iam_secret_description = "Example of dynamic IAM secret / apikey" #tfsec:ignore:general-secrets-no-plaintext-exposure
+  serviceid_id              = ibm_iam_service_id.secret_puller.id
+  secrets_manager_guid      = local.sm_guid
+  secret_group_id           = local.sm_acct_id
+  depends_on                = [module.iam_secrets_engine, ibm_iam_service_policy.secret_puller_policy, ibm_iam_service_id.secret_puller]
+}
+
+# Creates image pull secrets and stores in secret manager
+module "image_pull" {
+  source               = "git::https://github.ibm.com/GoldenEye/imagepull-apikey-secrets-manager-module.git?ref=1.1.2"
+  resource_group_id    = module.resource_group.resource_group_id
+  secrets_manager_guid = local.sm_guid
+  cr_namespace_name    = var.cr_namespace_name
+  region               = local.sm_region
+  #tfsec:ignore:general-secrets-no-plaintext-exposure
+  service_id_secret_name     = "${var.prefix}-image-pull-service-id"
+  service_id_secret_group_id = module.secrets_manager_group.secret_group_id
+  depends_on                 = [module.iam_secrets_engine, module.secrets_manager_group]
+}
+
+# Data source to get API Key from secret manager secret-puller-secret
+data "ibm_sm_iam_credentials_secret" "secret_puller_secret" {
+  instance_id = local.sm_guid
+  #checkov:skip=CKV_SECRET_6: does not require high entropy string as is static type
+  secret_id = module.dynamic_serviceid_apikey1.secret_id
+}
+
+# # Deploying external secret as dockerconfigson type (from image pull IAM dynamic credential/secret) using new namespace store
+# module "eso_secretstore_create_externalsecret_iamcredentials_create" {
+#   depends_on = [
+#     module.eso_operator_clusterstore_deployment,
+#     kubernetes_namespace.cluster_namespaces
+#   ]
+#   source                      = "git::https://github.ibm.com/GoldenEye/external-secrets-operator-module.git?ref=1.7.0"
+#   es_kubernetes_secret_type   = "dockerconfigjson" #checkov:skip=CKV_SECRET_6 -> externalsecret
+#   sm_secret_type              = "iam_credentials"  #tfsec:ignore:general-secrets-no-plaintext-exposure -> externalsecret
+#   sm_secret_id                = module.image_pull.serviceid_apikey_secret_id # -> externalsecret
+#   es_kubernetes_namespaces    = [var.es_kubernetes_namespaces[3]] # -> externalsecret
+#   eso_setup                   = false
+#   eso_store_setup             = true
+#   eso_store_scope             = "namespace" # -> secret store
+#   es_container_registry_email = "terraform@ibm.com"  # -> externalsecret
+#   es_refresh_interval         = var.es_refresh_interval # -> externalsecret
+#   eso_generic_secret_name     = "generic-${var.es_kubernetes_namespaces[3]}-api-key" # -> secret store
+#   eso_store_name              = "${var.es_kubernetes_namespaces[3]}-store" # -> secret store
+#   secrets_manager_guid        = local.sm_guid # -> secret store
+#   region                      = local.sm_region # -> secret store
+#   es_kubernetes_secret_name   = "dockerconfigjson-iam" #tfsec:ignore:general-secrets-no-plaintext-exposure #checkov:skip=CKV_SECRET_6 # -> externalsecret
+#   es_helm_rls_name            = "es-docker-iam" # -> externalsecret
+#   es_store_helm_rls_name      = "store"  # -> value to use in secret store
+#   eso_authentication          = ["api_key"]  # -> value to use in secret store
+# }
+
+### from previous single to two modules eso-secretstore + eso-external-secret
+
+# Deploying external secret as dockerconfigson type (from image pull IAM dynamic credential/secret) using new namespace store
+# creation of Namespaced SecretStores with apikey authentication
+module "eso_namespacedstore_apikeyauth_iamcredentials_deployment" {
+  depends_on                  = [module.eso_clusterstore_deployment]
+  source                      = "git::https://github.ibm.com/GoldenEye/external-secrets-operator-module.git//eso-secretstore?ref=task_4882_5006_5196"
+  eso_authentication          = "api_key"
+  region                      = local.sm_region
+  sstore_namespace            = kubernetes_namespace.cluster_namespaces[var.es_kubernetes_namespaces[3]].metadata[0].name
+  sstore_secrets_manager_guid = local.sm_guid
+  sstore_store_name           = "${var.es_kubernetes_namespaces[3]}-store"
+  sstore_secret_apikey        = data.ibm_sm_iam_credentials_secret.secret_puller_secret.api_key #tfsec:ignore:general-secrets-no-plaintext-exposure # pragma: allowlist secret -> secret store
+  service_endpoints           = var.service_endpoints
+  sstore_helm_rls_name        = "store"
+  sstore_secret_name     = "generic-${var.es_kubernetes_namespaces[3]}-api-key"
+}
+
+# Deploying external secret as dockerconfigson type using new namespace store
+# Creates externalsecret using previously created namespaced store and configure the secret as iam_credentials type
+module "external_secret_dockerconfigson_iamcredentials_deployment" {
+  depends_on                = [module.eso_clusterstore_deployment]
+  source                    = "git::https://github.ibm.com/GoldenEye/external-secrets-operator-module.git//eso-external-secret?ref=task_4882_5006_5196"
+  es_kubernetes_secret_type = "dockerconfigjson"  #checkov:skip=CKV_SECRET_6
+  sm_secret_type            = "iam_credentials" #checkov:skip=CKV_SECRET_6
+  sm_secret_id              = module.image_pull.serviceid_apikey_secret_id
+  # es_kubernetes_namespace   = var.es_kubernetes_namespaces[3]
+  es_kubernetes_namespace   = kubernetes_namespace.cluster_namespaces[var.es_kubernetes_namespaces[3]].metadata[0].name # to create explicit dependency
+  eso_store_name            = "${var.es_kubernetes_namespaces[3]}-store"
+  eso_store_scope           = "namespace"
+  es_kubernetes_secret_name = "dockerconfigjson-iam" #checkov:skip=CKV_SECRET_6
+  es_helm_rls_name          = "es-docker-iam"
+  es_container_registry_email = "terraform@ibm.com"
+  es_refresh_interval         = var.es_refresh_interval
+  es_helm_rls_namespace = var.existing_eso_namespace # to keep backward compatibility with previous version installing it in eso operator namespace
+}
