@@ -3,7 +3,7 @@ CRA_TARGETS:
   - CRA_TARGET: "examples/all-combined"
     CRA_IGNORE_RULES_FILE: "cra-tf-validate-ignore-rules.json"
     CRA_ENVIRONMENT_VARIABLES:  # An optional map of environment variables for CRA, where the key is the variable name and value is the value. Useful for providing TF_VARs.
-      TF_VAR_existing_cis_instance_name: "test_value_for_cis_instance_name"
+      TF_VAR_existing_cis_instance_name: "geretain-permanent-cis"
       TF_VAR_existing_cis_instance_resource_group_id:  "6deff3aad31a48b696cb1b173e54c41d" # pragma: allowlist secret
     # SCC_INSTANCE_ID: "" # The SCC instance ID to use to download profile for CRA scan. If not provided, a default global value will be used.
     # SCC_REGION: "" # The IBM Cloud region that the SCC instance is in. If not provided, a default global value will be used.
