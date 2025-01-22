@@ -20,9 +20,6 @@ const resourceGroup = "geretain-test-ext-secrets-sync"
 const defaultExampleTerraformDir = "examples/all-combined"
 const basicExampleTerraformDir = "examples/basic"
 
-// deploying eso on edge node to have it able to connect to SM and IAM on public network
-const esoWorkersSelector = "default"
-
 // Define a struct with fields that match the structure of the YAML data
 const yamlLocation = "../common-dev-assets/common-go-assets/common-permanent-resources.yaml"
 
@@ -108,7 +105,6 @@ func TestMain(m *testing.M) {
 		"acme_letsencrypt_private_key_secret_id":      acmeLEPrivateKeySecretId,
 		"acme_letsencrypt_private_key_sm_id":          acmeLEPrivateKeySmGuid,
 		"acme_letsencrypt_private_key_sm_region":      acmeLEPrivateKeySmRegion,
-		"eso_deployment_nodes_configuration":          esoWorkersSelector,
 		// setting skip_iam_authorization_policy to true because using the existing secrets manager instance and the policy already exists
 		"skip_iam_authorization_policy": true,
 		"service_endpoints":             "public",
