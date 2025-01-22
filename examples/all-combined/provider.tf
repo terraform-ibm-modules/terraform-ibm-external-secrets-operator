@@ -9,11 +9,7 @@ provider "ibm" {
   alias            = "ibm-sm"
 }
 
-provider "ibm" {
-  ibmcloud_api_key = local.sdnlb_ibmcloud_api_key
-  region           = var.region
-  alias            = "ibm-sdnlb"
-}
+
 
 provider "kubernetes" {
   host                   = data.ibm_container_cluster_config.cluster_config.host

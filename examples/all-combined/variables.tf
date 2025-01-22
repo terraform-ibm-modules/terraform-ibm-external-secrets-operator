@@ -33,6 +33,119 @@ variable "resource_tags" {
   default     = []
 }
 
+variable "zones" {
+  description = "List of zones"
+  type        = list(string)
+  default     = ["1", "2", "3"]
+}
+
+variable "cidr_bases" {
+  description = "A list of base CIDR blocks for each network zone"
+  type        = map(string)
+  default = {
+    default = "192.168.32.0/20"
+  }
+}
+
+
+variable "acl_rules_list" {
+  description = "List of rules that are to be attached to the Network ACL"
+  type = list(object({
+    name        = string
+    action      = string
+    source      = string
+    destination = string
+    direction   = string
+    icmp = optional(object({
+      code = number
+      type = number
+    }))
+    tcp = optional(object({
+      port_max        = number
+      port_min        = number
+      source_port_max = number
+      source_port_min = number
+    }))
+    udp = optional(object({
+      port_max        = number
+      port_min        = number
+      source_port_max = number
+      source_port_min = number
+    }))
+  }))
+  default = [
+    {
+      name        = "iks-create-worker-nodes-inbound"
+      action      = "allow"
+      source      = "161.26.0.0/16"
+      destination = "0.0.0.0/0"
+      direction   = "inbound"
+    },
+    {
+      name        = "iks-nodes-to-master-inbound"
+      action      = "allow"
+      source      = "166.8.0.0/14"
+      destination = "0.0.0.0/0"
+      direction   = "inbound"
+    },
+    {
+      name        = "iks-create-worker-nodes-outbound"
+      action      = "allow"
+      source      = "0.0.0.0/0"
+      destination = "161.26.0.0/16"
+      direction   = "outbound"
+    },
+    {
+      name        = "iks-worker-to-master-outbound"
+      action      = "allow"
+      source      = "0.0.0.0/0"
+      destination = "166.8.0.0/14"
+      direction   = "outbound"
+    },
+    {
+      name        = "allow-all-https-inbound"
+      source      = "0.0.0.0/0"
+      action      = "allow"
+      destination = "0.0.0.0/0"
+      direction   = "inbound"
+      tcp = {
+        source_port_min = 443
+        source_port_max = 443
+        port_min        = 1
+        port_max        = 65535
+      }
+    },
+    {
+      name        = "allow-all-https-outbound"
+      source      = "0.0.0.0/0"
+      action      = "allow"
+      destination = "0.0.0.0/0"
+      direction   = "outbound"
+      tcp = {
+        source_port_min = 1
+        source_port_max = 65535
+        port_min        = 443
+        port_max        = 443
+      }
+    },
+    {
+      name        = "deny-all-outbound"
+      action      = "deny"
+      source      = "0.0.0.0/0"
+      destination = "0.0.0.0/0"
+      direction   = "outbound"
+    },
+    {
+      name        = "deny-all-inbound"
+      action      = "deny"
+      source      = "0.0.0.0/0"
+      destination = "0.0.0.0/0"
+      direction   = "inbound"
+    }
+  ]
+}
+
+
 ## Image-pull module
 variable "sm_iam_secret_name" {
   type        = string
@@ -44,6 +157,12 @@ variable "sm_service_plan" {
   type        = string
   description = "Secrets-Manager trial plan"
   default     = "trial"
+}
+
+variable "cr_namespace_name" {
+  type        = string
+  description = "Container registry namespace name to be configured in IAM policy."
+  default     = "cr-namespace"
 }
 
 ## ESO Module
@@ -106,12 +225,6 @@ variable "service_endpoints" {
   type        = string
   description = "The service endpoint type to communicate with the provided secrets manager instance. Possible values are `public` or `private`. This also will set the iam endpoint for containerAuth when enabling Trusted Profile/CR based authentication."
   default     = "public"
-}
-
-variable "eso_deployment_nodes_configuration" {
-  type        = string
-  description = "Configuration to deploy ESO on specific cluster nodes. The value of this variable will be used for NodeSelector label value and tolerations configuration. If null standard ESO deployment is done on default workers pool."
-  default     = null
 }
 
 ## public certificate secret configuration
@@ -241,126 +354,4 @@ variable "pvt_certificate_template_name" {
   type        = string
   description = "Template name for the private certificate to create"
   default     = null
-}
-
-### sDNLB secret management
-
-variable "sdnlb_ibmcloud_api_key" {
-  type        = string
-  description = "APIkey that's associated with the account owning the sDNLB entitled serviceID. If null the ibmcloud_api_key will be used."
-  sensitive   = true
-  default     = null
-}
-
-
-variable "zones" {
-  description = "List of zones"
-  type        = list(string)
-  default     = ["1", "2", "3"]
-}
-
-variable "cidr_bases" {
-  description = "A list of base CIDR blocks for each network zone"
-  type        = map(string)
-  default = {
-    default = "192.168.32.0/20"
-  }
-}
-
-
-variable "acl_rules_list" {
-  description = "List of rules that are to be attached to the Network ACL"
-  type = list(object({
-    name        = string
-    action      = string
-    source      = string
-    destination = string
-    direction   = string
-    icmp = optional(object({
-      code = number
-      type = number
-    }))
-    tcp = optional(object({
-      port_max        = number
-      port_min        = number
-      source_port_max = number
-      source_port_min = number
-    }))
-    udp = optional(object({
-      port_max        = number
-      port_min        = number
-      source_port_max = number
-      source_port_min = number
-    }))
-  }))
-  default = [
-    {
-      name        = "iks-create-worker-nodes-inbound"
-      action      = "allow"
-      source      = "161.26.0.0/16"
-      destination = "0.0.0.0/0"
-      direction   = "inbound"
-    },
-    {
-      name        = "iks-nodes-to-master-inbound"
-      action      = "allow"
-      source      = "166.8.0.0/14"
-      destination = "0.0.0.0/0"
-      direction   = "inbound"
-    },
-    {
-      name        = "iks-create-worker-nodes-outbound"
-      action      = "allow"
-      source      = "0.0.0.0/0"
-      destination = "161.26.0.0/16"
-      direction   = "outbound"
-    },
-    {
-      name        = "iks-worker-to-master-outbound"
-      action      = "allow"
-      source      = "0.0.0.0/0"
-      destination = "166.8.0.0/14"
-      direction   = "outbound"
-    },
-    {
-      name        = "allow-all-https-inbound"
-      source      = "0.0.0.0/0"
-      action      = "allow"
-      destination = "0.0.0.0/0"
-      direction   = "inbound"
-      tcp = {
-        source_port_min = 443
-        source_port_max = 443
-        port_min        = 1
-        port_max        = 65535
-      }
-    },
-    {
-      name        = "allow-all-https-outbound"
-      source      = "0.0.0.0/0"
-      action      = "allow"
-      destination = "0.0.0.0/0"
-      direction   = "outbound"
-      tcp = {
-        source_port_min = 1
-        source_port_max = 65535
-        port_min        = 443
-        port_max        = 443
-      }
-    },
-    {
-      name        = "deny-all-outbound"
-      action      = "deny"
-      source      = "0.0.0.0/0"
-      destination = "0.0.0.0/0"
-      direction   = "outbound"
-    },
-    {
-      name        = "deny-all-inbound"
-      action      = "deny"
-      source      = "0.0.0.0/0"
-      destination = "0.0.0.0/0"
-      direction   = "inbound"
-    }
-  ]
 }

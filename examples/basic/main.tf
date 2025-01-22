@@ -333,21 +333,6 @@ resource "ibm_iam_service_policy" "secret_puller_policy" {
 module "external_secrets_operator" {
   source        = "../../"
   eso_namespace = local.eso_namespace
-
-  eso_cluster_nodes_configuration = {
-    nodeSelector = {
-      label = "dedicated"
-      value = "default"
-    }
-    tolerations = {
-      key      = "dedicated"
-      operator = "Equal"
-      value    = "default"
-      effect   = "NoExecute"
-    }
-  }
-
-
   depends_on = [
     kubernetes_namespace.apikey_namespace
   ]

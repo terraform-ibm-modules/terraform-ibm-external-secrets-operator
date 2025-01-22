@@ -16,8 +16,7 @@ module "resource_group" {
 
 locals {
 
-  # sDNLB entitled account API key - if null the ibmcloud_api_key will be used
-  sdnlb_ibmcloud_api_key = var.sdnlb_ibmcloud_api_key == null ? var.ibmcloud_api_key : var.sdnlb_ibmcloud_api_key
+
 
   subnet_prefix = flatten([
     for k, v in module.zone_subnet_addrs : [
@@ -265,20 +264,6 @@ module "vpes" {
 module "external_secrets_operator" {
   source        = "../../"
   eso_namespace = var.eso_namespace
-
-  eso_cluster_nodes_configuration = var.eso_deployment_nodes_configuration == null ? null : {
-    nodeSelector = {
-      label = "dedicated"
-      value = var.eso_deployment_nodes_configuration
-    }
-    tolerations = {
-      key      = "dedicated"
-      operator = "Equal"
-      value    = var.eso_deployment_nodes_configuration
-      effect   = "NoExecute"
-    }
-  }
-
   depends_on = [
     kubernetes_namespace.apikey_namespaces, kubernetes_namespace.tp_namespaces
   ]

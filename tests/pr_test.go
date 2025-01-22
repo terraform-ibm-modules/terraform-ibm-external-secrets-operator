@@ -196,6 +196,8 @@ func TestRunDefaultExample(t *testing.T) {
 				"pvtcertificate-tls":                           namespaces_for_apikey_login[2],
 				"kv-single-key":                                namespaces_for_apikey_login[3],
 				"kv-multiple-keys":                             namespaces_for_apikey_login[3],
+				"dockerconfigjson-iam":                         namespaces_for_apikey_login[3],
+				"dockerconfigjson-chain":                       namespaces_for_apikey_login[3],
 				options.Prefix + "-arbitrary-arb-tp-0":         namespaces_for_tp_login[0],
 				options.Prefix + "-arbitrary-arb-tp-1":         namespaces_for_tp_login[1],
 				options.Prefix + "-arbitrary-arb-tp-multisg-1": "tpns-multisg",

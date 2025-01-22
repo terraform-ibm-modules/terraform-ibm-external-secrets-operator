@@ -150,3 +150,27 @@ variable "reloader_custom_values" {
   type        = string
   default     = null
 }
+
+variable "eso_image_repo" {
+  type        = string
+  description = "The container image repository for External Secrets Operator (ESO). By default, the image is pulled from `ghcr.io/external-secrets/external-secrets`."
+  default     = "ghcr.io/external-secrets/external-secrets"
+}
+
+variable "eso_image_tag_digest" {
+  type        = string
+  description = "The tag digest of the ESO image to deploy. If not provided, a default value will be used."
+  default     = null
+}
+
+variable "reloader_image_repo" {
+  type        = string
+  description = "The container image repository for Reloader. By default, the image is pulled from `ghcr.io/stakater/reloader`."
+  default     = "ghcr.io/stakater/reloader"
+}
+
+variable "reloader_image_tag_digest" {
+  type        = string
+  description = "The tag digest of the Reloader image to deploy. If not provided, a default value will be used."
+  default     = null
+}

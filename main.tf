@@ -7,11 +7,21 @@
 ## Install ESO
 
 locals {
-  eso_image_tag_digest = "v0.12.1-ubi@sha256:d38834043de0a4e4feeac8a08d0bc96b71ddd7fe1d4c8583ee3751badeaeb01d"
-  eso_image_repo       = "ghcr.io/external-secrets/external-secrets"
 
-  reloader_image_tag_digest = "v1.2.1-ubi@sha256:80a557100c6835c7e3c9842194250c9c4ca78f43200bc3a93a32e5b105ad11bb"
-  reloader_image_repo       = "ghcr.io/stakater/reloader"
+  default_eso_image_repo       = "ghcr.io/external-secrets/external-secrets"
+  default_eso_image_tag_digest = "v0.12.1-ubi@sha256:d38834043de0a4e4feeac8a08d0bc96b71ddd7fe1d4c8583ee3751badeaeb01d" # datasource: ghcr.io/external-secrets/external-secrets
+
+
+  default_reloader_image_repo       = "ghcr.io/stakater/reloader"
+  default_reloader_image_tag_digest = "v1.2.1-ubi@sha256:80a557100c6835c7e3c9842194250c9c4ca78f43200bc3a93a32e5b105ad11bb" # datasource: ghcr.io/stakater/reloader
+
+  # Repo and digest for ESO
+  eso_image_repo       = var.eso_image_repo != null ? var.eso_image_repo : local.default_eso_image_repo
+  eso_image_tag_digest = var.eso_image_tag_digest != null ? var.eso_image_tag_digest : local.default_eso_image_tag_digest
+
+  # Repo and digest for Reloader
+  reloader_image_repo       = var.reloader_image_repo != null ? var.reloader_image_repo : local.default_reloader_image_repo
+  reloader_image_tag_digest = var.reloader_image_tag_digest != null ? var.reloader_image_tag_digest : local.default_reloader_image_tag_digest
 }
 
 # creating namespace to deploy ESO into RedHat ServiceMesh
@@ -177,15 +187,23 @@ certController:
 EOF
 }
 
+locals {
+  eso_chart_location = "https://charts.external-secrets.io"
+  eso_chart_version  = "0.12.1" # datasource: https://charts.external-secrets.io
+
+  reloader_chart_location = "https://stakater.github.io/stakater-charts"
+  reloader_chart_version  = "1.2.0" # datasource: https://stakater.github.io/stakater-charts
+}
+
 resource "helm_release" "external_secrets_operator" {
   depends_on = [module.eso_namespace, data.kubernetes_namespace.existing_eso_namespace]
 
   name       = "external-secrets"
   namespace  = local.eso_namespace
   chart      = "external-secrets"
-  version    = "0.12.1"
+  version    = local.eso_chart_version
   wait       = true
-  repository = "https://charts.external-secrets.io"
+  repository = local.eso_chart_location
 
   set {
     name  = "image.repository"
@@ -233,8 +251,8 @@ resource "helm_release" "pod_reloader" {
   name       = "reloader"
   chart      = "reloader"
   namespace  = local.eso_namespace
-  repository = "https://stakater.github.io/stakater-charts"
-  version    = "1.2.0"
+  repository = local.reloader_chart_location
+  version    = local.reloader_chart_version
   wait       = true
 
   # Set the deployment image name and tag
