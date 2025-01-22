@@ -90,7 +90,7 @@ module "external_secret_arbitrary_cr_registry" {
 
 # create image pull serviceID and secret and store in secrets manager
 module "image_pull" {
-  source               = "git::https://github.ibm.com/GoldenEye/imagepull-apikey-secrets-manager-module.git?ref=1.1.7"
+  source               = "../../modules/imagepull-apikey-secrets-manager-module"
   resource_group_id    = module.resource_group.resource_group_id
   secrets_manager_guid = local.sm_guid
   cr_namespace_name    = var.cr_namespace_name
