@@ -17,11 +17,11 @@ This module automates the installation and configuration of the [External Secret
     * [eso-external-secret](./modules/eso-external-secret)
     * [eso-secretstore](./modules/eso-secretstore)
     * [eso-trusted-profile](./modules/eso-trusted-profile)
-    * [imagepull-apikey-secrets-manager-module](./modules/imagepull-apikey-secrets-manager-module)
 * [Examples](./examples)
     * [Basic Example](./examples/basic)
     * [Example that uses trusted profiles (container authentication)](./examples/trusted-profiles-authentication)
     * [Example to deploy the External Secret Operator and to create a different set of resources in terms of secrets, secret groups, stores and auth configurations](./examples/all-combined)
+    * [ImagePull API key Secrets Manager](./examples/all-combined/imagepull-apikey-secrets-manager)
 * [Contributing](#contributing)
 <!-- END OVERVIEW HOOK -->
 
@@ -499,6 +499,7 @@ module "es_kubernetes_secret" {
 ## Examples
 
 - [ Example to deploy the External Secret Operator and to create a different set of resources in terms of secrets, secret groups, stores and auth configurations](examples/all-combined)
+- [ ImagePull API key Secrets Manager](examples/all-combined/imagepull-apikey-secrets-manager)
 - [ Basic Example](examples/basic)
 - [ Example that uses trusted profiles (container authentication)](examples/trusted-profiles-authentication)
 <!-- END EXAMPLES HOOK -->

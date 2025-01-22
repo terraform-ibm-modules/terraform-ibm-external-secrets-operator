@@ -90,7 +90,7 @@ module "external_secret_arbitrary_cr_registry" {
 
 # create image pull serviceID and secret and store in secrets manager
 module "image_pull" {
-  source               = "../../modules/imagepull-apikey-secrets-manager-module"
+  source               = "./imagepull-apikey-secrets-manager"
   resource_group_id    = module.resource_group.resource_group_id
   secrets_manager_guid = local.sm_guid
   cr_namespace_name    = var.cr_namespace_name
@@ -130,7 +130,7 @@ module "external_secret_secret_image_pull" {
 
 # create image pull serviceID and secret and store in secrets manager
 module "image_pull_chain_secret_1" {
-  source               = "../../modules/imagepull-apikey-secrets-manager-module"
+  source               = "./imagepull-apikey-secrets-manager"
   resource_group_id    = module.resource_group.resource_group_id
   secrets_manager_guid = local.sm_guid
   cr_namespace_name    = var.cr_namespace_name
@@ -146,7 +146,7 @@ module "image_pull_chain_secret_1" {
 
 # create image pull serviceID and secret and store in secrets manager
 module "image_pull_chain_secret_2" {
-  source               = "../../modules/imagepull-apikey-secrets-manager-module"
+  source               = "./imagepull-apikey-secrets-manager"
   resource_group_id    = module.resource_group.resource_group_id
   secrets_manager_guid = local.sm_guid
   cr_namespace_name    = var.cr_namespace_name
@@ -162,7 +162,7 @@ module "image_pull_chain_secret_2" {
 
 # create image pull serviceID and secret and store in secrets manager
 module "image_pull_chain_secret_3" {
-  source               = "../../modules/imagepull-apikey-secrets-manager-module"
+  source               = "./imagepull-apikey-secrets-manager"
   resource_group_id    = module.resource_group.resource_group_id
   secrets_manager_guid = local.sm_guid
   cr_namespace_name    = var.cr_namespace_name

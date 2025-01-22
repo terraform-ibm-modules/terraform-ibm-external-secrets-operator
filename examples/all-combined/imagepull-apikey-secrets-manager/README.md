@@ -1,4 +1,4 @@
-# ImagePull API key Secrets Manager module
+# ImagePull API key Secrets Manager
 
 This module generate and store a service ID API key in IBM Cloud Secrets Manager that can be used in an imagePullSecret for pulling images from an IBM Container Registry. For more information about image pull secrets, see Creating an image pull secret in "Setting up an image registry" in Cloud docs.
 
