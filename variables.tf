@@ -165,7 +165,7 @@ variable "eso_image_tag_digest" {
 
 variable "reloader_registry_namespace_image" {
   type        = string
-  description = "The container image repository for Reloader. By default, the image is pulled from `ghcr.io/stakater/reloader`."
+  description = "The Reloader image reference in the format of `[registry-url]/[namespace]/[image]`."
   default     = "ghcr.io/stakater/reloader"
 }
 
