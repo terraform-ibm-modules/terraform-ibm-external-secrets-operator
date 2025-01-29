@@ -153,7 +153,7 @@ variable "reloader_custom_values" {
 
 variable "eso_image_repo" {
   type        = string
-  description = "The container image repository for External Secrets Operator (ESO). By default, the image is pulled from `ghcr.io/external-secrets/external-secrets`."
+  description = "The External Secrets Operator image reference in the format of `[registry-url]/[namespace]/[image]`."
   default     = "ghcr.io/external-secrets/external-secrets"
 }
 
