@@ -4,8 +4,8 @@
 
 # private certificate common name, Certificate Authority common name and certificate template name definition
 locals {
-  pvt_cert_common_name          = var.pvt_cert_common_name == null ? "pvt-${var.prefix}.goldeneye.dev.cloud.ibm.com" : var.pvt_cert_common_name
-  pvt_root_ca_common_name       = var.pvt_root_ca_common_name == null ? "pvt-${var.prefix}.goldeneye.dev.cloud.ibm.com" : var.pvt_root_ca_common_name
+  pvt_cert_common_name          = var.pvt_cert_common_name == null ? "pvt-${var.prefix}.example.dev.cloud.cloud_provider.com" : var.pvt_cert_common_name
+  pvt_root_ca_common_name       = var.pvt_root_ca_common_name == null ? "pvt-${var.prefix}.example.dev.cloud.cloud_provider.com" : var.pvt_root_ca_common_name
   pvt_certificate_template_name = var.pvt_certificate_template_name != null ? var.pvt_certificate_template_name : "pvt-${var.prefix}-cert-template"
 }
 
@@ -15,10 +15,10 @@ module "secrets_manager_private_secret_engine" {
   version                   = "1.3.5"
   secrets_manager_guid      = local.sm_guid
   region                    = local.sm_region
-  root_ca_name              = var.pvt_ca_name != null ? var.pvt_ca_name : "pvt-${var.prefix}-goldeneye-root-ca"
+  root_ca_name              = var.pvt_ca_name != null ? var.pvt_ca_name : "pvt-${var.prefix}-project-root-ca"
   root_ca_common_name       = local.pvt_root_ca_common_name
   root_ca_max_ttl           = var.pvt_ca_max_ttl
-  intermediate_ca_name      = "pvt-${var.prefix}-goldeneye-intermediate-ca"
+  intermediate_ca_name      = "pvt-${var.prefix}-project-intermediate-ca"
   certificate_template_name = local.pvt_certificate_template_name
   providers = {
     ibm = ibm.ibm-sm

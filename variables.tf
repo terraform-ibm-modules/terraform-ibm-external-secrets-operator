@@ -151,16 +151,22 @@ variable "reloader_custom_values" {
   default     = null
 }
 
-variable "eso_image_repo" {
+# image registry and digest
+
+variable "eso_registry_namespace_image" {
   type        = string
   description = "The External Secrets Operator image reference in the format of `[registry-url]/[namespace]/[image]`."
   default     = "ghcr.io/external-secrets/external-secrets"
 }
 
-variable "eso_image_tag_digest" {
+variable "eso_image_digest" {
   type        = string
-  description = "The tag digest of the ESO image to deploy. If not provided, a default value will be used."
-  default     = null
+  description = "The image digest in the format sha256:xxxxx... for ESO image to deploy. If not provided, a default value will be used."
+  default     = "sha256:d38834043de0a4e4feeac8a08d0bc96b71ddd7fe1d4c8583ee3751badeaeb01d" # datasource: ghcr.io/external-secrets/external-secrets
+  validation {
+    condition     = var.eso_image_digest == null || can(regex("^sha256:", var.eso_image_digest))
+    error_message = "If provided, the value of eso_image_digest must start with 'sha256:'."
+  }
 }
 
 variable "reloader_registry_namespace_image" {
@@ -169,8 +175,38 @@ variable "reloader_registry_namespace_image" {
   default     = "ghcr.io/stakater/reloader"
 }
 
-variable "reloader_image_tag_digest" {
+variable "reloader_image_digest" {
   type        = string
-  description = "The tag digest of the Reloader image to deploy. If not provided, a default value will be used."
-  default     = null
+  description = "The image digest in the format sha256:xxxxx... the reloader image to deploy. If not provided, a default value will be used."
+  default     = "sha256:80a557100c6835c7e3c9842194250c9c4ca78f43200bc3a93a32e5b105ad11bb" # datasource: ghcr.io/stakater/reloader
+  validation {
+    condition     = var.reloader_image_digest == null || can(regex("^sha256:", var.reloader_image_digest))
+    error_message = "If provided, the value of reloader_image_digest must start with 'sha256:'."
+  }
+}
+
+# helms repo and charts
+
+variable "eso_chart_location" {
+  type        = string
+  description = "The location of the External Secrets Operator Helm chart."
+  default     = "https://charts.external-secrets.io"
+}
+
+variable "eso_chart_version" {
+  type        = string
+  description = "The version of the External Secrets Operator Helm chart."
+  default     = "0.12.1" # datasource: https://charts.external-secrets.io
+}
+
+variable "reloader_chart_location" {
+  type        = string
+  description = "The location of the Reloader Helm chart."
+  default     = "https://stakater.github.io/stakater-charts"
+}
+
+variable "reloader_chart_version" {
+  type        = string
+  description = "The version of the Reloader Helm chart."
+  default     = "1.2.0" # datasource: https://stakater.github.io/stakater-charts
 }

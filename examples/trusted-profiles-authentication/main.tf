@@ -175,7 +175,7 @@ module "external_secrets" {
   es_refresh_interval           = "5m"
   eso_store_name                = "${kubernetes_namespace.examples[count.index].metadata[0].name}-store" # each store created with the name of the namespace with "-store" as suffix
   es_container_registry         = "us.icr.io"
-  es_container_registry_email   = "goldeneye@us.ibm.com"
+  es_container_registry_email   = "user@company.com"
   es_helm_rls_name              = "es-${count.index}"
 }
 

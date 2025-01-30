@@ -5,7 +5,7 @@
     {
       "fileMatch": ["\\.tf$"],
       "matchStrings": [
-        "[\\w-]+_image_tag_digest\\s*=\\s*\"(?<currentValue>[\\w.-]+)@(?<currentDigest>sha256:[a-f0-9]+)\"\\s*# datasource: (?<depName>[^\\s]+)"
+        "[\\w-]+_image_digest\\s*=\\s*\"(?<currentValue>[\\w.-]+)@(?<currentDigest>sha256:[a-f0-9]+)\"\\s*# datasource: (?<depName>[^\\s]+)"
       ],
       "datasourceTemplate": "docker"
     },

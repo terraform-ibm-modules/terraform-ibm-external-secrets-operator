@@ -12,8 +12,8 @@ module "secrets_manager_public_cert_engine" {
   secrets_manager_guid                      = local.sm_guid
   region                                    = local.sm_region
   internet_services_crn                     = data.ibm_cis.cis_instance.id
-  ca_config_name                            = var.ca_name != null ? var.ca_name : "${var.prefix}-goldeneye-ca"
-  dns_config_name                           = var.dns_provider_name != null ? var.dns_provider_name : "${var.prefix}-goldeneye-dns"
+  ca_config_name                            = var.ca_name != null ? var.ca_name : "${var.prefix}-project-ca"
+  dns_config_name                           = var.dns_provider_name != null ? var.dns_provider_name : "${var.prefix}-project-dns"
   private_key_secrets_manager_instance_guid = var.acme_letsencrypt_private_key_sm_id
   private_key_secrets_manager_secret_id     = var.acme_letsencrypt_private_key_secret_id
   private_key_secrets_manager_region        = var.acme_letsencrypt_private_key_sm_region
@@ -27,7 +27,7 @@ module "secrets_manager_public_cert_engine" {
 
 # public certificate common name definition
 locals {
-  cert_common_name = var.cert_common_name == null ? "${var.prefix}-2.goldeneye.dev.cloud.ibm.com" : var.cert_common_name
+  cert_common_name = var.cert_common_name == null ? "${var.prefix}-2.project.dev.cloud.ibm.com" : var.cert_common_name
 }
 
 # public certificate creation
@@ -40,8 +40,8 @@ module "secrets_manager_public_certificate" {
   cert_description                  = "Certificate for ${local.cert_common_name}"
   cert_name                         = "${var.prefix}-sm-public-cert"
   cert_secrets_group_id             = module.secrets_manager_group.secret_group_id
-  secrets_manager_ca_name           = var.ca_name != null ? var.ca_name : "${var.prefix}-goldeneye-ca"
-  secrets_manager_dns_provider_name = var.dns_provider_name != null ? var.dns_provider_name : "${var.prefix}-goldeneye-dns"
+  secrets_manager_ca_name           = var.ca_name != null ? var.ca_name : "${var.prefix}-project-ca"
+  secrets_manager_dns_provider_name = var.dns_provider_name != null ? var.dns_provider_name : "${var.prefix}-project-dns"
   secrets_manager_guid              = local.sm_guid
   secrets_manager_region            = local.sm_region
   bundle_certs                      = var.public_certificate_bundle

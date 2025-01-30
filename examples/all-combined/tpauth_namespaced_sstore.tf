@@ -98,7 +98,7 @@ module "external_secret_tp" {
   es_refresh_interval           = "5m"
   eso_store_name                = "${var.es_namespaces_tp[count.index]}-store" # each store created with the name of the namespace with "-store" as suffix
   es_container_registry         = "us.icr.io"
-  es_container_registry_email   = "goldeneye@us.ibm.com"
+  es_container_registry_email   = "user@company.com"
   es_helm_rls_name              = "es-tp"
 }
 
@@ -223,7 +223,7 @@ module "external_secret_tp_multisg_1" {
   es_refresh_interval           = "5m"
   eso_store_name                = "${var.es_namespace_tp_multi_sg}-store" # each store created with the name of the namespace with "-store" as suffix
   es_container_registry         = "us.icr.io"
-  es_container_registry_email   = "goldeneye@us.ibm.com"
+  es_container_registry_email   = "user@company.com"
   es_helm_rls_name              = "es-tp-multisg-1"
 }
 
@@ -243,7 +243,7 @@ module "external_secret_tp_multisg_2" {
   es_refresh_interval           = "5m"
   eso_store_name                = "${var.es_namespace_tp_multi_sg}-store" # each store created with the name of the namespace with "-store" as suffix
   es_container_registry         = "us.icr.io"
-  es_container_registry_email   = "goldeneye@us.ibm.com"
+  es_container_registry_email   = "user@company.com"
   es_helm_rls_name              = "es-tp-multisg-2"
 }
 
@@ -339,6 +339,6 @@ module "external_secret_tp_nosg" {
   es_refresh_interval           = "5m"
   eso_store_name                = "${var.es_namespace_tp_no_sg}-store" # each store created with the name of the namespace with "-store" as suffix
   es_container_registry         = "us.icr.io"
-  es_container_registry_email   = "goldeneye@us.ibm.com"
+  es_container_registry_email   = "user@company.com"
   es_helm_rls_name              = "es-tp-nosg"
 }

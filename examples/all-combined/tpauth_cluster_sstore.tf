@@ -97,6 +97,6 @@ module "cstore_external_secret_tp" {
   es_refresh_interval           = "5m"
   eso_store_name                = local.cstore_store_name # each store created with the name of the namespace with "-store" as suffix
   es_container_registry         = "us.icr.io"
-  es_container_registry_email   = "goldeneye@us.ibm.com"
+  es_container_registry_email   = "user@company.com"
   es_helm_rls_name              = "es-tp"
 }

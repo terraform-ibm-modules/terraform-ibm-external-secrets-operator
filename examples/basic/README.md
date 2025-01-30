@@ -8,7 +8,7 @@ This module provides a basic example to deploy the External Secrets Operator alo
 
 - **VPC and Subnet Configuration**: Establishes a Virtual Private Cloud (VPC) with associated subnets, setting up network segmentation and ACL rules.
 
-- **OpenShift Cluster Provisioning**: Deploys an OpenShift (OCP) cluster, tailored for a cloud-native architecture with worker pools for private, transit, and edge network segments.
+- **OpenShift Cluster Provisioning**: Deploys an OpenShift (OCP) cluster, tailored for a cloud-native architecture with default worker pools .
 
 - **Secrets Manager Integration**:
   - Either utilizes an existing Secrets Manager instance or creates a new one.

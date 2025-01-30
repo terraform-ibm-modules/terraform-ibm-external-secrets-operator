@@ -4,25 +4,6 @@
 # Module for deploying External Secret Operator (ESO) and use it to create and synchronize Kubernetes secrets into clusters based on Secrets-Manager secrets.
 ##############################################################################
 
-## Install ESO
-
-locals {
-
-  default_eso_image_repo       = "ghcr.io/external-secrets/external-secrets"
-  default_eso_image_tag_digest = "v0.12.1-ubi@sha256:d38834043de0a4e4feeac8a08d0bc96b71ddd7fe1d4c8583ee3751badeaeb01d" # datasource: ghcr.io/external-secrets/external-secrets
-
-
-  default_reloader_image_repo       = "ghcr.io/stakater/reloader"
-  default_reloader_image_tag_digest = "v1.2.1-ubi@sha256:80a557100c6835c7e3c9842194250c9c4ca78f43200bc3a93a32e5b105ad11bb" # datasource: ghcr.io/stakater/reloader
-
-  # Repo and digest for ESO
-  eso_image_repo       = var.eso_image_repo != null ? var.eso_image_repo : local.default_eso_image_repo
-  eso_image_tag_digest = var.eso_image_tag_digest != null ? var.eso_image_tag_digest : local.default_eso_image_tag_digest
-
-  # Repo and digest for Reloader
-  reloader_image_repo       = var.reloader_image_repo != null ? var.reloader_image_repo : local.default_reloader_image_repo
-  reloader_image_tag_digest = var.reloader_image_tag_digest != null ? var.reloader_image_tag_digest : local.default_reloader_image_tag_digest
-}
 
 # creating namespace to deploy ESO into RedHat ServiceMesh
 module "eso_namespace" {
@@ -187,58 +168,50 @@ certController:
 EOF
 }
 
-locals {
-  eso_chart_location = "https://charts.external-secrets.io"
-  eso_chart_version  = "0.12.1" # datasource: https://charts.external-secrets.io
-
-  reloader_chart_location = "https://stakater.github.io/stakater-charts"
-  reloader_chart_version  = "1.2.0" # datasource: https://stakater.github.io/stakater-charts
-}
-
 resource "helm_release" "external_secrets_operator" {
   depends_on = [module.eso_namespace, data.kubernetes_namespace.existing_eso_namespace]
 
   name       = "external-secrets"
   namespace  = local.eso_namespace
   chart      = "external-secrets"
-  version    = local.eso_chart_version
+  version    = var.eso_chart_version
   wait       = true
-  repository = local.eso_chart_location
+  repository = var.eso_chart_location
 
   set {
     name  = "image.repository"
     type  = "string"
-    value = local.eso_image_repo
+    value = var.eso_registry_namespace_image
   }
 
   set {
     name  = "image.tag"
     type  = "string"
-    value = local.eso_image_tag_digest
+    value = var.eso_image_digest
   }
 
   set {
     name  = "webhook.image.repository"
     type  = "string"
-    value = local.eso_image_repo
+    value = var.eso_registry_namespace_image
   }
 
   set {
     name  = "webhook.image.tag"
     type  = "string"
-    value = local.eso_image_tag_digest
+    value = var.eso_image_digest
   }
 
   set {
     name  = "certController.image.repository"
     type  = "string"
-    value = local.eso_image_repo
+    value = var.eso_registry_namespace_image
   }
 
   set {
     name  = "certController.image.tag"
     type  = "string"
-    value = local.eso_image_tag_digest
+    value = var.eso_image_digest
   }
 
   # The following mounts are needed for the CRI based authentication with Trusted Profiles
@@ -251,21 +224,21 @@ resource "helm_release" "pod_reloader" {
   name       = "reloader"
   chart      = "reloader"
   namespace  = local.eso_namespace
-  repository = local.reloader_chart_location
-  version    = local.reloader_chart_version
+  repository = var.reloader_chart_location
+  version    = var.reloader_chart_version
   wait       = true
 
   # Set the deployment image name and tag
   set {
     name  = "reloader.deployment.image.name"
     type  = "string"
-    value = local.reloader_image_repo
+    value = var.reloader_registry_namespace_image
   }
 
   set {
     name  = "reloader.deployment.image.tag"
     type  = "string"
-    value = local.reloader_image_tag_digest
+    value = var.reloader_image_digest
   }
 
   # Set reload strategy

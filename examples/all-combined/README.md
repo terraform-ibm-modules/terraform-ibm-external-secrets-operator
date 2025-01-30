@@ -2,7 +2,7 @@
 
 This end-to-end example performs the following actions
 - Loads an existing resource group or creates a new one
-- Provisions a standard GoldenEye OCP infrastructure with VPC, COS instance and an OpenShift cluster
+- Provisions a OCP infrastructure with VPC, COS instance and an OpenShift cluster
 - Configures an hybrid ESO configuration with a set of different stores to cover use-cases
   - a ClusterSecretStore with API key authentication
   - a ClusterSecretStore with Trusted profile authentication
@@ -22,11 +22,6 @@ This end-to-end example performs the following actions
   - Deploys another dockerconfigjson secret for an artifactory registry
     - Deploys external secrets in designated namespace
     - Creates a ClusterSecretStore using Trusted Profile authentication to access secrets from designated namespace
-  - Deploys an opaque secret for Cloudant credentials (temporary disabled due to issue https://github.ibm.com/GoldenEye/issues/issues/7726)
-    - Creates Cloudant instance and resource key
-    - Creates arbitrary Secrets Manager secret to store resource key
-    - Deploys external secrets in designated namespace
-    - Uses existing ClusterSecretStore to access secrets from designated namespace
   - Deploys a dockerconfigjson secret from an arbitrary secret to authenticate in container registry
     - Creates arbitrary Secrets Manager secret to store existing API key
     - Deploys external secrets in designated namespaces
@@ -70,7 +65,7 @@ In the case all the mentioned parameters are left with their default **null** va
 The example is split into separated templates related with their specific scope:
 - main.tf for the VPC, cluster, VPE, ESO operator deployment and namespaces preliminary creation
 - clusterstore.tf for ESO ClusterSecretsStore configuration with API key authentication, including two different externalsecrets and secret types configuration (username/password and arbitrary)
-- secretstore.tf for ESO secretstore configuration with API key authentication and namespace isolation, including two different externalsecrets and secrets configuration (arbitrary and image pull API key secret using imagepull-apikey-secrets-manager-module)
+- secretstore.tf for ESO secretstore configuration with API key authentication and namespace isolation, including two different externalsecrets and secrets configuration (arbitrary and image pull API key secret using imagepull-apikey-secrets-manager)
 - secretsmanager.tf for Secrets Manager instance configuration, along with IAM serviceID and API keys and secrets groups
 - kv.tf for key-value (single and multiple keys) secrets
 - publiccertificate.tf for public certificate management
@@ -82,6 +77,6 @@ The example is split into separated templates related with their specific scope:
 
 ## Important note about input region and existing SecretManager region parameters
 
-Due to the https://github.ibm.com/GoldenEye/issues/issues/5268 the test is currently using the existing SecretManager region to deploy the VPC and the cluster if this value is not null. Instead if null it follows what set through `var.region`
+The test is currently using the existing SecretManager region to deploy the VPC and the cluster if this value is not null. Instead if null it follows what set through `var.region`
 
 This logic is achieved through the local `sm_region` variable that is then used to create resources.

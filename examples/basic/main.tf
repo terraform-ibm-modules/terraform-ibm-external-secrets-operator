@@ -101,7 +101,8 @@ module "zone_subnet_addrs" {
 }
 
 module "vpc" {
-  source                      = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git?ref=v1.5.0"
+  source                      = "terraform-ibm-modules/vpc/ibm"
+  version                     = "1.5.0"
   vpc_name                    = "${var.prefix}-vpc"
   resource_group_id           = module.resource_group.resource_group_id
   locations                   = []
@@ -117,7 +118,8 @@ module "vpc" {
 }
 
 module "subnet_prefix" {
-  source   = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/vpc-address-prefix?ref=v1.5.0"
+  source   = "terraform-ibm-modules/vpc/ibm//modules/vpc-address-prefix"
+  version  = "1.5.0"
   count    = length(local.subnet_prefix)
   name     = "${var.prefix}-z-${local.subnet_prefix[count.index].label}-${split("-", local.subnet_prefix[count.index].zone)[2]}"
   location = local.subnet_prefix[count.index].zone
@@ -128,7 +130,8 @@ module "subnet_prefix" {
 
 module "subnets" {
   depends_on                 = [module.subnet_prefix]
-  source                     = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/subnet?ref=v1.5.0"
+  source                     = "terraform-ibm-modules/vpc/ibm//modules/subnet"
+  version                    = "1.5.0"
   count                      = length(local.subnet_prefix)
   location                   = local.subnet_prefix[count.index].zone
   vpc_id                     = module.vpc.vpc.vpc_id
@@ -139,7 +142,8 @@ module "subnets" {
 }
 
 module "public_gateways" {
-  source            = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/public-gateway?ref=v1.5.0"
+  source            = "terraform-ibm-modules/vpc/ibm//modules/public-gateway"
+  version           = "1.5.0"
   count             = length(var.zones)
   vpc_id            = module.vpc.vpc.vpc_id
   location          = "${var.region}-${var.zones[count.index]}"
@@ -148,7 +152,8 @@ module "public_gateways" {
 }
 
 module "security_group" {
-  source                = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/security-group?ref=v1.5.0"
+  source                = "terraform-ibm-modules/vpc/ibm//modules/security-group"
+  version               = "1.5.0"
   depends_on            = [module.vpc]
   create_security_group = false
   resource_group_id     = module.resource_group.resource_group_id
@@ -193,7 +198,8 @@ locals {
 }
 
 module "network_acl" {
-  source            = "git::https://github.com/terraform-ibm-modules/terraform-ibm-vpc.git//modules/network-acl?ref=v1.5.0"
+  source            = "terraform-ibm-modules/vpc/ibm//modules/network-acl"
+  version           = "1.5.0"
   name              = "${var.prefix}-vpc-acl"
   vpc_id            = module.vpc.vpc.vpc_id
   resource_group_id = module.resource_group.resource_group_id
@@ -427,7 +433,7 @@ module "external_secret_usr_pass" {
   sm_secret_id              = module.sm_userpass_secret.secret_id
   es_kubernetes_namespace   = kubernetes_namespace.apikey_namespace.metadata[0].name
   eso_store_name            = "cluster-store"
-  es_container_registry     = "wcp-my-team-docker-local.artifactory.swg-devops.com"
+  es_container_registry     = "example-registry-local.artifactory.com"
   es_kubernetes_secret_name = "dockerconfigjson-uc" #checkov:skip=CKV_SECRET_6
   es_helm_rls_name          = "es-docker-uc"
   reloader_watching         = true
