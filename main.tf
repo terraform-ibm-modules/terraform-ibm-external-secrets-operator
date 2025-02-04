@@ -168,6 +168,10 @@ certController:
 EOF
 }
 
+locals {
+  eso_image_tag_digest = "v${var.eso_chart_version}-ubi@${var.eso_image_digest}"
+}
+
 resource "helm_release" "external_secrets_operator" {
   depends_on = [module.eso_namespace, data.kubernetes_namespace.existing_eso_namespace]
 
@@ -187,7 +191,7 @@ resource "helm_release" "external_secrets_operator" {
   set {
     name  = "image.tag"
     type  = "string"
-    value = var.eso_image_digest
+    value = local.eso_image_tag_digest
   }
 
   set {
@@ -199,7 +203,7 @@ resource "helm_release" "external_secrets_operator" {
   set {
     name  = "webhook.image.tag"
     type  = "string"
-    value = var.eso_image_digest
+    value = local.eso_image_tag_digest
   }
 
   set {
@@ -211,11 +215,15 @@ resource "helm_release" "external_secrets_operator" {
   set {
     name  = "certController.image.tag"
     type  = "string"
-    value = var.eso_image_digest
+    value = local.eso_image_tag_digest
   }
 
   # The following mounts are needed for the CRI based authentication with Trusted Profiles
   values = [local.eso_helm_release_values_cri, local.eso_helm_release_values_workerselector]
+}
+
+locals {
+  reloader_image_tag_digest = "v${var.reloader_chart_version}-ubi@${var.reloader_image_digest}"
 }
 
 resource "helm_release" "pod_reloader" {
@@ -238,7 +246,7 @@ resource "helm_release" "pod_reloader" {
   set {
     name  = "reloader.deployment.image.tag"
     type  = "string"
-    value = var.reloader_image_digest
+    value = local.reloader_image_tag_digest
   }
 
   # Set reload strategy
