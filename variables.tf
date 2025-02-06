@@ -1,4 +1,6 @@
-######## eso generic configurations
+############################################################################################################
+# EXTERNAL SECRETS CONFIGURATIONS
+############################################################################################################
 
 variable "eso_namespace" {
   description = "Namespace to create and be used to install ESO components including helm releases. If eso_store_scope == cluster, this will also be used to deploy ClusterSecretStore/cluster_store in it"
@@ -62,6 +64,45 @@ variable "eso_enroll_in_servicemesh" {
   type        = bool
   default     = false
 }
+
+# external secrets image and helm charts references
+
+variable "eso_image" {
+  type        = string
+  description = "The External Secrets Operator image in the format of `[registry-url]/[namespace]/[image]`."
+  default     = "ghcr.io/external-secrets/external-secrets"
+  nullable    = false
+}
+
+variable "eso_image_version" {
+  type        = string
+  description = "The version or digest for the external secrets image to deploy."
+  default     = "v0.12.1-ubi@sha256:e78b56f81db033bbb724cc06a07880ad4ee8390e08dca0f763dbed08ae411671" # datasource: ghcr.io/external-secrets/external-secrets
+  nullable    = false
+  validation {
+    condition     = can(regex("(^v\\d+\\.\\d+.\\d+(\\-\\w+)?(\\@sha256\\:\\w+){0,1})$", var.eso_image_version))
+    error_message = "The value of the external secrets image version must match classic version or the tag and sha256 image digest format"
+  }
+}
+
+variable "eso_chart_location" {
+  type        = string
+  description = "The location of the External Secrets Operator Helm chart."
+  default     = "https://charts.external-secrets.io"
+  nullable    = false
+}
+
+variable "eso_chart_version" {
+  type        = string
+  description = "The version of the External Secrets Operator Helm chart. Ensure that the chart version is compatible with the image version specified in eso_image_version."
+  # renovate: datasource=github-tags depName=external-secrets/external-secrets versioning="regex:^helm-chart-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$"
+  default  = "0.12.1"
+  nullable = false
+}
+
+############################################################################################################
+# RELOADER CONFIGURATIONS
+############################################################################################################
 
 # Reloader variables full documentation https://github.com/stakater/Reloader/tree/master#helm-charts
 variable "reloader_deployed" {
@@ -151,58 +192,23 @@ variable "reloader_custom_values" {
   default     = null
 }
 
-# external secrets image and helm charts references
-
-variable "eso_registry_namespace_image" {
-  type        = string
-  description = "The External Secrets Operator image registry in the format of `[registry-url]/[namespace]/[image]`."
-  default     = "ghcr.io/external-secrets/external-secrets"
-  nullable    = false
-}
-
-variable "eso_image_digest" {
-  type        = string
-  description = "The image sha256 digest for the external secrets image to deploy. If not provided, a default value will be used."
-  default     = "v0.12.1-ubi@sha256:e78b56f81db033bbb724cc06a07880ad4ee8390e08dca0f763dbed08ae411671" # datasource: ghcr.io/external-secrets/external-secrets
-  nullable    = false
-  validation {
-    condition     = can(regex("^v\\d+\\.\\d+.\\d+\\-\\w+\\@sha256:\\w+", var.eso_image_digest))
-    error_message = "The value of eso_image_digest must start with 'sha256:'."
-  }
-}
-
-variable "eso_chart_location" {
-  type        = string
-  description = "The location of the External Secrets Operator Helm chart."
-  default     = "https://charts.external-secrets.io"
-  nullable    = false
-}
-
-variable "eso_chart_version" {
-  type        = string
-  description = "The version of the External Secrets Operator Helm chart. Ensure that the chart version is compatible with the image version specified in eso_image_digest."
-  # renovate: datasource=github-tags depName=external-secrets/external-secrets versioning="regex:^helm-chart-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$"
-  default  = "0.12.1"
-  nullable = false
-}
-
 # reloader image and helm charts references
 
-variable "reloader_registry_namespace_image" {
+variable "reloader_image" {
   type        = string
-  description = "The reloader image registry in the format of `[registry-url]/[namespace]/[image]`."
+  description = "The reloader image in the format of `[registry-url]/[namespace]/[image]`."
   default     = "ghcr.io/stakater/reloader"
   nullable    = false
 }
 
-variable "reloader_image_digest" {
+variable "reloader_image_version" {
   type        = string
-  description = "The image sha256 digest for the reloader image to deploy."
+  description = "The version or digest for the reloader image to deploy."
   default     = "v1.2.1-ubi@sha256:20e42fdc757d91309aa8caad0fce97f2dc67be85f17e6fb3642844e583f7bc97" # datasource: ghcr.io/stakater/reloader
   nullable    = false
   validation {
-    condition     = can(regex("^v\\d+\\.\\d+.\\d+\\-\\w+\\@sha256:\\w+", var.reloader_image_digest))
-    error_message = "The value of reloader_image_digest must start with 'sha256:'."
+    condition     = can(regex("(^v\\d+\\.\\d+.\\d+(\\-\\w+)?(\\@sha256\\:\\w+){0,1})$", var.reloader_image_version))
+    error_message = "The value of the reloader image version must match classic version or the tag and sha256 image digest format"
   }
 }
 
@@ -215,7 +221,7 @@ variable "reloader_chart_location" {
 
 variable "reloader_chart_version" {
   type        = string
-  description = "The version of the Reloader Helm chart. Ensure that the chart version is compatible with the image version specified in reloader_image_digest."
+  description = "The version of the Reloader Helm chart. Ensure that the chart version is compatible with the image version specified in reloader_image_version."
   # renovate: datasource=github-releases depName=stakater/Reloader
   default  = "1.2.0"
   nullable = false
