@@ -25,10 +25,6 @@ This module automates the installation and configuration of the [External Secret
 * [Contributing](#contributing)
 <!-- END OVERVIEW HOOK -->
 
-## Compliance and security
-
-NIST controls do not apply to this module.
-
 <!-- Match this heading to the name of the root level module (the repo name) -->
 ## external-secrets-operator-module
 
@@ -125,7 +121,7 @@ The resulting helm release configuration, according to the `terraform plan` outp
 # module.external_secrets_operator.helm_release.external_secrets_operator[0] will be created
   + resource "helm_release" "external_secrets_operator" {
       + atomic                     = false
-      + chart      = "oci://icr.io/goldeneye_images/external-secrets"
+      + chart                      = "external-secrets"
       + cleanup_on_fail            = false
       + create_namespace           = false
       + dependency_update          = false
@@ -144,6 +140,7 @@ The resulting helm release configuration, according to the `terraform plan` outp
       + recreate_pods              = false
       + render_subchart_notes      = true
       + replace                    = false
+      + repository                 = "https://charts.external-secrets.io"
       + reset_values               = false
       + reuse_values               = false
       + skip_crds                  = false
@@ -228,7 +225,8 @@ To configure a set of tenants to be configured in their proper namespace (to ach
 
 ```hcl
 module "external_secrets_operator" {
-  source            = "https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator.git?ref=<the version you need>"
+  source               = "terraform-ibm-modules/external-secrets-operator/ibm"
+  version              = "1.0.0"
   eso_namespace     = var.eso_namespace # namespace to deploy ESO
   service_endpoints = var.service_endpoints # use public or private endpoints for IAM and Secrets Manager
   eso_cluster_nodes_configuration = <<the eso configuration for specific cluster nodes selection if needed - read above>>
@@ -245,7 +243,7 @@ module "eso_namespace_secretstore_1" {
   depends_on = [
     module.external_secrets_operator
   ]
-  source                      = "https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator.git//modules/eso-secretstore?ref=master"
+  source                      = "../modules/eso-secretstore"
   eso_authentication          = "api_key"
   region                      = local.sm_region # SM region
   sstore_namespace            = var.es_kubernetes_namespaces[2] # namespace to create the secret store
@@ -267,7 +265,7 @@ module "eso_namespace_secretstores" {
   depends_on = [
     module.external_secrets_operator
   ]
-  source                      = "https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator.git//modules/eso-secretstore?ref=master"
+  source                      = "../modules/eso-secretstore"
   eso_authentication          = "trusted_profile"
   region                      = local.sm_region # SM region
   sstore_namespace            = kubernetes_namespace.examples[count.index].metadata[0].name # namespace to create the secret store
@@ -468,15 +466,11 @@ data:
 
 </details>
 
-
-NIST controls do not apply to this module.
-
 ## Usage
 
 ```hcl
-# Replace "master" with a GIT release version to lock into a specific release
 module "es_kubernetes_secret" {
-  source                     = "https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator.git//modules/eso-external-secret?ref=master"
+  source                     = "../modules/eso-external-secret"
   es_kubernetes_secret_type = "dockerconfigjson"
   sm_secret_type = "iam_credentials"
   sm_secret_id = module.docker_config.serviceid_apikey_secret_id
@@ -494,15 +488,6 @@ module "es_kubernetes_secret" {
   es_helm_rls_name = "es-docker-iam"
 }
 ```
-
-<!-- BEGIN EXAMPLES HOOK -->
-## Examples
-
-- [ Example to deploy the External Secret Operator and to create a different set of resources in terms of secrets, secret groups, stores and auth configurations](examples/all-combined)
-- [ ImagePull API key Secrets Manager](examples/all-combined/imagepull-apikey-secrets-manager)
-- [ Basic Example](examples/basic)
-- [ Example that uses trusted profiles (container authentication)](examples/trusted-profiles-authentication)
-<!-- END EXAMPLES HOOK -->
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ### Requirements
@@ -532,28 +517,28 @@ module "es_kubernetes_secret" {
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_eso_chart_location"></a> [eso\_chart\_location](#input\_eso\_chart\_location) | The location of the External Secrets Operator Helm chart. | `string` | `"https://charts.external-secrets.io"` | no |
-| <a name="input_eso_chart_version"></a> [eso\_chart\_version](#input\_eso\_chart\_version) | The version of the External Secrets Operator Helm chart. | `string` | `"0.12.1"` | no |
+| <a name="input_eso_chart_version"></a> [eso\_chart\_version](#input\_eso\_chart\_version) | The version of the External Secrets Operator Helm chart. Ensure that the chart version is compatible with the image version specified in eso\_image\_digest. | `string` | `"0.12.1"` | no |
 | <a name="input_eso_cluster_nodes_configuration"></a> [eso\_cluster\_nodes\_configuration](#input\_eso\_cluster\_nodes\_configuration) | Configuration to use to customise ESO deployment on specific cluster nodes. Setting appropriate values will result in customising ESO helm release. Default value is null to keep ESO standard deployment. | <pre>object({<br/>    nodeSelector = object({<br/>      label = string<br/>      value = string<br/>    })<br/>    tolerations = object({<br/>      key      = string<br/>      operator = string<br/>      value    = string<br/>      effect   = string<br/>    })<br/>  })</pre> | `null` | no |
 | <a name="input_eso_enroll_in_servicemesh"></a> [eso\_enroll\_in\_servicemesh](#input\_eso\_enroll\_in\_servicemesh) | Flag to enroll ESO into istio servicemesh | `bool` | `false` | no |
-| <a name="input_eso_image_digest"></a> [eso\_image\_digest](#input\_eso\_image\_digest) | The image digest in the format sha256:xxxxx... for ESO image to deploy. If not provided, a default value will be used. | `string` | `"sha256:d38834043de0a4e4feeac8a08d0bc96b71ddd7fe1d4c8583ee3751badeaeb01d"` | no |
+| <a name="input_eso_image_digest"></a> [eso\_image\_digest](#input\_eso\_image\_digest) | The image sha256 digest for the external secrets image to deploy. If not provided, a default value will be used. | `string` | `"v0.12.1-ubi@sha256:e78b56f81db033bbb724cc06a07880ad4ee8390e08dca0f763dbed08ae411671"` | no |
 | <a name="input_eso_namespace"></a> [eso\_namespace](#input\_eso\_namespace) | Namespace to create and be used to install ESO components including helm releases. If eso\_store\_scope == cluster, this will also be used to deploy ClusterSecretStore/cluster\_store in it | `string` | `null` | no |
 | <a name="input_eso_pod_configuration"></a> [eso\_pod\_configuration](#input\_eso\_pod\_configuration) | Configuration to use to customise ESO deployment on specific pods. Setting appropriate values will result in customising ESO helm release. Default value is {} to keep ESO standard deployment. Ignore the key if not required. | <pre>object({<br/>    annotations = optional(object({<br/>      # The annotations for external secret controller pods.<br/>      external_secrets = optional(map(string), {})<br/>      # The annotations for external secret cert controller pods.<br/>      external_secrets_cert_controller = optional(map(string), {})<br/>      # The annotations for external secret controller pods.<br/>      external_secrets_webhook = optional(map(string), {})<br/>    }), {})<br/><br/>    labels = optional(object({<br/>      # The labels for external secret controller pods.<br/>      external_secrets = optional(map(string), {})<br/>      # The labels for external secret cert controller pods.<br/>      external_secrets_cert_controller = optional(map(string), {})<br/>      # The labels for external secret controller pods.<br/>      external_secrets_webhook = optional(map(string), {})<br/>    }), {})<br/>  })</pre> | `{}` | no |
-| <a name="input_eso_registry_namespace_image"></a> [eso\_registry\_namespace\_image](#input\_eso\_registry\_namespace\_image) | The External Secrets Operator image reference in the format of `[registry-url]/[namespace]/[image]`. | `string` | `"ghcr.io/external-secrets/external-secrets"` | no |
+| <a name="input_eso_registry_namespace_image"></a> [eso\_registry\_namespace\_image](#input\_eso\_registry\_namespace\_image) | The External Secrets Operator image registry in the format of `[registry-url]/[namespace]/[image]`. | `string` | `"ghcr.io/external-secrets/external-secrets"` | no |
 | <a name="input_existing_eso_namespace"></a> [existing\_eso\_namespace](#input\_existing\_eso\_namespace) | Existing Namespace to be used to install ESO components including helm releases. If eso\_store\_scope == cluster, this will also be used to deploy ClusterSecretStore/cluster\_store in it | `string` | `null` | no |
 | <a name="input_reloader_chart_location"></a> [reloader\_chart\_location](#input\_reloader\_chart\_location) | The location of the Reloader Helm chart. | `string` | `"https://stakater.github.io/stakater-charts"` | no |
-| <a name="input_reloader_chart_version"></a> [reloader\_chart\_version](#input\_reloader\_chart\_version) | The version of the Reloader Helm chart. | `string` | `"1.2.0"` | no |
+| <a name="input_reloader_chart_version"></a> [reloader\_chart\_version](#input\_reloader\_chart\_version) | The version of the Reloader Helm chart. Ensure that the chart version is compatible with the image version specified in reloader\_image\_digest. | `string` | `"1.2.0"` | no |
 | <a name="input_reloader_custom_values"></a> [reloader\_custom\_values](#input\_reloader\_custom\_values) | String containing custom values to be used for reloader helm chart. See https://github.com/stakater/Reloader/blob/master/deployments/kubernetes/chart/reloader/values.yaml | `string` | `null` | no |
 | <a name="input_reloader_deployed"></a> [reloader\_deployed](#input\_reloader\_deployed) | Whether to deploy reloader or not https://github.com/stakater/Reloader | `bool` | `true` | no |
 | <a name="input_reloader_ignore_configmaps"></a> [reloader\_ignore\_configmaps](#input\_reloader\_ignore\_configmaps) | Whether to ignore configmap changes or not | `bool` | `false` | no |
 | <a name="input_reloader_ignore_secrets"></a> [reloader\_ignore\_secrets](#input\_reloader\_ignore\_secrets) | Whether to ignore secret changes or not | `bool` | `false` | no |
-| <a name="input_reloader_image_digest"></a> [reloader\_image\_digest](#input\_reloader\_image\_digest) | The image digest in the format sha256:xxxxx... the reloader image to deploy. If not provided, a default value will be used. | `string` | `"sha256:80a557100c6835c7e3c9842194250c9c4ca78f43200bc3a93a32e5b105ad11bb"` | no |
+| <a name="input_reloader_image_digest"></a> [reloader\_image\_digest](#input\_reloader\_image\_digest) | The image sha256 digest for the reloader image to deploy. | `string` | `"v1.2.1-ubi@sha256:20e42fdc757d91309aa8caad0fce97f2dc67be85f17e6fb3642844e583f7bc97"` | no |
 | <a name="input_reloader_is_argo_rollouts"></a> [reloader\_is\_argo\_rollouts](#input\_reloader\_is\_argo\_rollouts) | Enable Argo Rollouts | `bool` | `false` | no |
 | <a name="input_reloader_is_openshift"></a> [reloader\_is\_openshift](#input\_reloader\_is\_openshift) | Enable OpenShift DeploymentConfigs | `bool` | `true` | no |
 | <a name="input_reloader_log_format"></a> [reloader\_log\_format](#input\_reloader\_log\_format) | The log format to use for reloader. Possible values are `json` or `text`. Default value is `json` | `string` | `"text"` | no |
 | <a name="input_reloader_namespaces_selector"></a> [reloader\_namespaces\_selector](#input\_reloader\_namespaces\_selector) | List of comma separated label selectors, if multiple are provided they are combined with the AND operator | `string` | `null` | no |
 | <a name="input_reloader_namespaces_to_ignore"></a> [reloader\_namespaces\_to\_ignore](#input\_reloader\_namespaces\_to\_ignore) | List of comma separated namespaces to ignore for reloader. If multiple are provided they are combined with the AND operator | `string` | `null` | no |
 | <a name="input_reloader_pod_monitor_metrics"></a> [reloader\_pod\_monitor\_metrics](#input\_reloader\_pod\_monitor\_metrics) | Enable to scrape Reloader's Prometheus metrics | `bool` | `false` | no |
-| <a name="input_reloader_registry_namespace_image"></a> [reloader\_registry\_namespace\_image](#input\_reloader\_registry\_namespace\_image) | The Reloader image reference in the format of `[registry-url]/[namespace]/[image]`. | `string` | `"ghcr.io/stakater/reloader"` | no |
+| <a name="input_reloader_registry_namespace_image"></a> [reloader\_registry\_namespace\_image](#input\_reloader\_registry\_namespace\_image) | The reloader image registry in the format of `[registry-url]/[namespace]/[image]`. | `string` | `"ghcr.io/stakater/reloader"` | no |
 | <a name="input_reloader_reload_on_create"></a> [reloader\_reload\_on\_create](#input\_reloader\_reload\_on\_create) | Enable reload on create events | `bool` | `true` | no |
 | <a name="input_reloader_reload_strategy"></a> [reloader\_reload\_strategy](#input\_reloader\_reload\_strategy) | The reload strategy to use for reloader. Possible values are `env-vars` or `annotations`. Default value is `annotations` | `string` | `"annotations"` | no |
 | <a name="input_reloader_resource_label_selector"></a> [reloader\_resource\_label\_selector](#input\_reloader\_resource\_label\_selector) | List of comma separated label selectors, if multiple are provided they are combined with the AND operator | `string` | `null` | no |
