@@ -196,7 +196,8 @@ variable "eso_chart_location" {
 variable "eso_chart_version" {
   type        = string
   description = "The version of the External Secrets Operator Helm chart."
-  default     = "0.12.1" # datasource: https://charts.external-secrets.io
+  # renovate: datasource=github-tags depName=external-secrets/external-secrets versioning="regex:^helm-chart-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$"
+  default     = "0.12.1"
 }
 
 variable "reloader_chart_location" {
