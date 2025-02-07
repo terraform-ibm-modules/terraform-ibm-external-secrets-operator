@@ -77,7 +77,7 @@ variable "eso_image" {
 variable "eso_image_version" {
   type        = string
   description = "The version or digest for the external secrets image to deploy."
-  default     = "v0.12.1-ubi@sha256:e78b56f81db033bbb724cc06a07880ad4ee8390e08dca0f763dbed08ae411671" # datasource: ghcr.io/external-secrets/external-secrets
+  default     = "v0.12.1-ubi@sha256:d38834043de0a4e4feeac8a08d0bc96b71ddd7fe1d4c8583ee3751badeaeb01d" # datasource: ghcr.io/external-secrets/external-secrets
   nullable    = false
   validation {
     condition     = can(regex("(^v\\d+\\.\\d+.\\d+(\\-\\w+)?(\\@sha256\\:\\w+){0,1})$", var.eso_image_version))
@@ -204,7 +204,7 @@ variable "reloader_image" {
 variable "reloader_image_version" {
   type        = string
   description = "The version or digest for the reloader image to deploy."
-  default     = "v1.2.1-ubi@sha256:20e42fdc757d91309aa8caad0fce97f2dc67be85f17e6fb3642844e583f7bc97" # datasource: ghcr.io/stakater/reloader
+  default     = "v1.2.1-ubi@sha256:80a557100c6835c7e3c9842194250c9c4ca78f43200bc3a93a32e5b105ad11bb" # datasource: ghcr.io/stakater/reloader
   nullable    = false
   validation {
     condition     = can(regex("(^v\\d+\\.\\d+.\\d+(\\-\\w+)?(\\@sha256\\:\\w+){0,1})$", var.reloader_image_version))

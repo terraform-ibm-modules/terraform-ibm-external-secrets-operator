@@ -1,27 +1,30 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["github>terraform-ibm-modules/common-dev-assets:commonRenovateConfig"],
-  "regexManagers": [
+  "customManagers": [
     {
-      "fileMatch": ["\\.tf$"],
+      "customType": "regex",
+      "description": "Update docker image digest to latest in variables.tf",
+      "fileMatch": ["variables.tf$"],
+      "datasourceTemplate": "docker",
       "matchStrings": [
-        "[\\w-]+_image_digest\\s*=\\s*\"(?<currentValue>[\\w.-]+)@(?<currentDigest>sha256:[a-f0-9]+)\"\\s*# datasource: (?<depName>[^\\s]+)"
-      ],
-      "datasourceTemplate": "docker"
+        "default\\s*=\\s*\"(?<currentValue>[\\w.-]+)@(?<currentDigest>sha256:[a-f0-9]+)\"\\s*# datasource: (?<depName>[^\\s]+)"
+      ]
     },
     {
-      "fileMatch": ["\\.tf$"],
+      "customType": "regex",
+      "description": "Update helm chart version to latest in variables.tf",
+      "fileMatch": ["variables.tf$"],
       "matchStrings": [
-        "[\\w-]+_chart_version\\s*=\\s*\"(?<currentValue>[\\w.-]+)\"\\s*# datasource: (?<depName>[^\\s]+)\\s*( versioning=(?<versioning>.*?))?\\s.*?"
+        "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*?default = \"(?<currentValue>.*)\"\\s"
       ],
-      "datasourceTemplate": "docker",
       "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
     }
   ],
   "labels": ["renovate"],
   "packageRules": [
     {
-      "matchManagers": ["helmv3"],
+      "matchPackageNames": ["external-secrets/external-secrets", "stakater/Reloader"],
       "groupName": "Charts and Images",
       "commitMessageExtra": "to latest",
       "group": true
