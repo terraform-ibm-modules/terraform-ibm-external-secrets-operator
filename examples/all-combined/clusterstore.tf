@@ -71,7 +71,7 @@ module "external_secret_usr_pass" {
   sm_secret_id              = module.sm_userpass_secret.secret_id
   es_kubernetes_namespace   = kubernetes_namespace.apikey_namespaces[0].metadata[0].name
   eso_store_name            = "cluster-store"
-  es_container_registry     = "wcp-my-team-docker-local.artifactory.swg-devops.com"
+  es_container_registry     = "example-registry-local.artifactory.com"
   es_kubernetes_secret_name = "dockerconfigjson-uc" #checkov:skip=CKV_SECRET_6
   es_helm_rls_name          = "es-docker-uc"
 }
