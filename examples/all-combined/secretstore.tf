@@ -180,7 +180,7 @@ module "external_secret_secret_image_pull_chain" {
   source                    = "../../modules/eso-external-secret"
   depends_on                = [module.eso_apikey_namespace_secretstore_2, ]
   eso_store_scope           = "namespace"
-  es_kubernetes_secret_type = "dockerconfigjson"
+  es_kubernetes_secret_type = "dockerconfigjson" # checkov:skip=CKV_SECRET_6
   sm_secret_type            = "iam_credentials"
   eso_store_name            = "${var.es_namespaces_apikey[3]}-store"
   es_kubernetes_secret_name = "dockerconfigjson-chain"
