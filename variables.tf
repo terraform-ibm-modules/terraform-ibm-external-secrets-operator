@@ -76,7 +76,7 @@ variable "eso_image" {
 
 variable "eso_image_version" {
   type        = string
-  description = "The version or digest for the external secrets image to deploy."
+  description = "The version or digest for the external secrets image to deploy. If changing the value, ensure it is compatible with the chart version set in eso_chart_version."
   default     = "v0.12.1-ubi@sha256:d38834043de0a4e4feeac8a08d0bc96b71ddd7fe1d4c8583ee3751badeaeb01d" # datasource: ghcr.io/external-secrets/external-secrets
   nullable    = false
   validation {
@@ -203,7 +203,7 @@ variable "reloader_image" {
 
 variable "reloader_image_version" {
   type        = string
-  description = "The version or digest for the reloader image to deploy."
+  description = "The version or digest for the reloader image to deploy. If changing the value, ensure it is compatible with the chart version set in reloader_chart_version."
   default     = "v1.2.1-ubi@sha256:80a557100c6835c7e3c9842194250c9c4ca78f43200bc3a93a32e5b105ad11bb" # datasource: ghcr.io/stakater/reloader
   nullable    = false
   validation {
@@ -223,6 +223,6 @@ variable "reloader_chart_version" {
   type        = string
   description = "The version of the Reloader Helm chart. Ensure that the chart version is compatible with the image version specified in reloader_image_version."
   # renovate: datasource=github-releases depName=stakater/Reloader
-  default  = "1.2.0"
+  default  = "1.2.1"
   nullable = false
 }
