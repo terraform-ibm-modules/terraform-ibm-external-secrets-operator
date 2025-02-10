@@ -27,7 +27,8 @@ module "secrets_manager_public_cert_engine" {
 
 # public certificate common name definition
 locals {
-  cert_common_name = var.cert_common_name == null ? "${var.prefix}-2.goldeneye.dev.cloud.ibm.com" : var.cert_common_name
+  # generating certificate common name
+  cert_common_name = "pub-${var.prefix}.${var.cert_common_name}"
 }
 
 # public certificate creation

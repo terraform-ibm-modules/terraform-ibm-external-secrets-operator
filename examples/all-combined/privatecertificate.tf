@@ -4,8 +4,9 @@
 
 # private certificate common name, Certificate Authority common name and certificate template name definition
 locals {
-  pvt_cert_common_name          = var.pvt_cert_common_name == null ? "pvt-${var.prefix}.goldeneye.dev.cloud.ibm.com" : var.pvt_cert_common_name
-  pvt_root_ca_common_name       = var.pvt_root_ca_common_name == null ? "pvt-${var.prefix}.goldeneye.dev.cloud.ibm.com" : var.pvt_root_ca_common_name
+  # generating certificate common name
+  pvt_cert_common_name          = "pvt-${var.prefix}.${var.pvt_cert_common_name}"
+  pvt_root_ca_common_name       = "pvt-${var.prefix}.${var.pvt_root_ca_common_name}"
   pvt_certificate_template_name = var.pvt_certificate_template_name != null ? var.pvt_certificate_template_name : "pvt-${var.prefix}-cert-template"
 }
 

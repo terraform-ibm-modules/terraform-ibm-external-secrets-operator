@@ -108,6 +108,10 @@ func TestMain(m *testing.M) {
 		// setting skip_iam_authorization_policy to true because using the existing secrets manager instance and the policy already exists
 		"skip_iam_authorization_policy": true,
 		"service_endpoints":             "public",
+		// setting CIS domain to be used in the test
+		"pvt_cert_common_name":    "goldeneye.dev.cloud.ibm.com",
+		"pvt_root_ca_common_name": "goldeneye.dev.cloud.ibm.com",
+		"cert_common_name":        "goldeneye.dev.cloud.ibm.com",
 	}
 
 	os.Exit(m.Run())

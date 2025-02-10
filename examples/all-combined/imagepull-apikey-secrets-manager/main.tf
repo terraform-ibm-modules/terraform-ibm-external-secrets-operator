@@ -50,7 +50,7 @@ module "dynamic_serviceid_apikey" {
   depends_on                        = [time_sleep.wait_30_seconds_for_creation]
 }
 
-## Wait 30 sec after APIKey is deleted to ensure proper processing (https://github.ibm.com/GoldenEye/issues/issues/2200)
+## Wait 30 sec after APIKey is deleted to ensure proper processing
 resource "time_sleep" "wait_30_seconds_for_destruction" {
   depends_on       = [module.dynamic_serviceid_apikey]
   destroy_duration = "30s"

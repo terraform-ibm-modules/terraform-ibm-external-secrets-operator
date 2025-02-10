@@ -235,9 +235,8 @@ variable "skip_iam_authorization_policy" {
 }
 
 variable "cert_common_name" {
-  description = "Public certificate common name. If null it will be set to [prefix value].project.dev.cloud.ibm.com"
+  description = "Public certificate common name"
   type        = string
-  default     = null
 }
 
 variable "ca_name" {
@@ -327,21 +326,19 @@ variable "existing_cis_instance_resource_group_id" {
 
 ### private certificate secret configuration
 variable "pvt_cert_common_name" {
-  description = "Private certificate common name. If null it will be set to pvt-[prefix value].goldeneye.dev.cloud.ibm.com"
+  description = "Private certificate common name"
   type        = string
-  default     = null
 }
 
 variable "pvt_ca_name" {
   type        = string
-  description = "Secret Managers certificate authority name. If null it will be set to pvt-[prefix value]-goldeneye-ca"
+  description = "Secret Managers certificate authority name. If null it will be set to pvt-[prefix]-project-root-ca"
   default     = null
 }
 
 variable "pvt_root_ca_common_name" {
   type        = string
-  description = "Root CA common name for the private certificate. If null it will be set to pvt-[prefix value].goldeneye.dev.cloud.ibm.com"
-  default     = null
+  description = "Root CA common name for the private certificate"
 }
 
 variable "pvt_ca_max_ttl" {
