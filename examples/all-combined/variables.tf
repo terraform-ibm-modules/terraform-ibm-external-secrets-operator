@@ -237,6 +237,7 @@ variable "skip_iam_authorization_policy" {
 variable "cert_common_name" {
   description = "Public certificate common name"
   type        = string
+  default     = "example.com"
 }
 
 variable "ca_name" {
@@ -328,6 +329,7 @@ variable "existing_cis_instance_resource_group_id" {
 variable "pvt_cert_common_name" {
   description = "Private certificate common name"
   type        = string
+  default     = "example.com"
 }
 
 variable "pvt_ca_name" {
@@ -339,6 +341,7 @@ variable "pvt_ca_name" {
 variable "pvt_root_ca_common_name" {
   type        = string
   description = "Root CA common name for the private certificate"
+  default     = "example.com"
 }
 
 variable "pvt_ca_max_ttl" {
