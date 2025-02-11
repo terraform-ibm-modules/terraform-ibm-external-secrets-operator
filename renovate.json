@@ -1,4 +1,39 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>terraform-ibm-modules/common-dev-assets:commonRenovateConfig"]
+  "extends": ["github>terraform-ibm-modules/common-dev-assets:commonRenovateConfig"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update docker image digest to latest in variables.tf",
+      "fileMatch": ["variables.tf$"],
+      "datasourceTemplate": "docker",
+      "matchStrings": [
+        "default\\s*=\\s*\"(?<currentValue>[\\w.-]+)@(?<currentDigest>sha256:[a-f0-9]+)\"\\s*# datasource: (?<depName>[^\\s]+)"
+      ]
+    },
+    {
+      "customType": "regex",
+      "description": "Update helm chart version to latest in variables.tf",
+      "fileMatch": ["variables.tf$"],
+      "matchStrings": [
+        "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*?default = \"(?<currentValue>.*)\"\\s"
+      ],
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
+    }
+  ],
+  "labels": ["renovate"],
+  "packageRules": [
+    {
+      "matchPackageNames": ["external-secrets/external-secrets", "stakater/Reloader"],
+      "groupName": "Charts and Images",
+      "commitMessageExtra": "to latest",
+      "group": true
+    },
+    {
+      "matchDatasources": ["docker"],
+      "groupName": "Charts and Images",
+      "commitMessageExtra": "to latest",
+      "group": true
+    }
+  ]
 }

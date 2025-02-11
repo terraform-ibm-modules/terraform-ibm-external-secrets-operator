@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: reloader-test-ns
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: example-secret
+  namespace: reloader-test-ns
+  annotations:
+    reloader.stakater.com/auto: "true"
+data:
+  # base64 encoded 'top-secret'
+  mysecret: dG9wLXNlY3JldAo= # pragma: allowlist secret
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-deployment
+  namespace: reloader-test-ns
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: example-busybox
+  template:
+    metadata:
+      labels:
+        app: example-busybox
+    spec:
+      nodeSelector:
+        dedicated: default
+      containers:
+        - name: busybox-container
+          image: busybox
+          command: ["/bin/sh"]
+          args: ["-c", "while true; do echo $(date);echo $MY_SECRET; sleep 5; done"]
+          env:
+            - name: MY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: example-secret
+                  key: mysecret
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"

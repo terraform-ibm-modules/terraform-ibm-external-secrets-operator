@@ -1,6 +1,6 @@
 # Local .terraform directories
 **/.terraform/*
-
+testpod*.*
 # .tfstate files
 *.tfstate
 *.tfstate.*
@@ -40,6 +40,9 @@ terraform.rc
 # Ignore .tfsec
 .tfsec/
 
+# Ignore brew lock
+Brewfile.lock.json
+
 # Ignore Mac files
 .DS_Store
 
@@ -49,25 +52,9 @@ terraform.rc
 # Node modules
 /node_modules
 
-# Visual Studio Code
+testpod*.yaml
+precommit.txt
+
+# VS Code state
 .vscode/
-
-### Go ###
-# Binaries for programs and plugins
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-
-# Test binary, built with `go test -c`
-*.test
-
-# Output of the go coverage tool, specifically when used with LiteIDE
-*.out
-
-# Dependency directories (remove the comment below to include it)
-# vendor/
-
-# Go workspace file
-go.work
+*.code-workspace
