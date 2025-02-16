@@ -16,21 +16,31 @@
       "description": "Update helm chart version to latest in variables.tf",
       "fileMatch": ["variables.tf$"],
       "matchStrings": [
-        "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*?default = \"(?<currentValue>.*)\"\\s"
+        "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*?default\\s*=\\s*\"(?<currentValue>.*)\"\\s"
       ],
       "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
     }
   ],
-  "labels": ["renovate"],
   "packageRules": [
     {
-      "matchPackageNames": ["external-secrets/external-secrets", "stakater/Reloader"],
-      "groupName": "Charts and Images",
-      "commitMessageExtra": "to latest",
-      "group": true
+      "matchManagers": ["regex"],
+      "matchUpdateTypes": ["patch"],
+      "semanticCommitType": "fix"
     },
     {
-      "matchDatasources": ["docker"],
+      "matchManagers": ["regex"],
+      "matchUpdateTypes": ["minor"],
+      "semanticCommitType": "feat"
+    },
+    {
+      "description": "Do not allow major version updates - these should be done manually to ensure no breaking changes",
+      "matchManagers": ["regex"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      "description": "Bundle ESO and Reloader images + helm chart updates into the same PR",
+      "matchPackageNames": ["external-secrets/external-secrets", "stakater/Reloader", "ghcr.io/external-secrets/external-secrets", "ghcr.io/stakater/reloader"],
       "groupName": "Charts and Images",
       "commitMessageExtra": "to latest",
       "group": true
