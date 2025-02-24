@@ -209,7 +209,7 @@ module "network_acl" {
 # OCP CLUSTER creation
 module "ocp_base" {
   source               = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  version              = "3.35.10"
+  version              = "3.41.1"
   cluster_name         = "${var.prefix}-vpc"
   resource_group_id    = module.resource_group.resource_group_id
   region               = var.region
@@ -296,7 +296,7 @@ module "secrets_manager_group_acct" {
 module "iam_secrets_engine" {
   count                                   = var.existing_sm_instance_guid == null ? 1 : 0
   source                                  = "terraform-ibm-modules/secrets-manager-iam-engine/ibm"
-  version                                 = "1.2.6"
+  version                                 = "1.2.8"
   region                                  = local.sm_region
   secrets_manager_guid                    = ibm_resource_instance.secrets_manager[0].guid
   iam_secret_generator_service_id_name    = "${var.prefix}-sid:0.0.1:${ibm_resource_instance.secrets_manager[0].name}-iam-secret-generator:automated:simple-service:secret-manager:"
@@ -401,7 +401,7 @@ locals {
 # Create username_password secret and store in secret manager
 module "sm_userpass_secret" {
   source               = "terraform-ibm-modules/secrets-manager-secret/ibm"
-  version              = "1.4.0"
+  version              = "1.7.0"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   secret_group_id      = local.sm_acct_id

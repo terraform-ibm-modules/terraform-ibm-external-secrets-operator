@@ -53,7 +53,7 @@ module "eso_clusterstore_tpauth" {
 # arbitrary secret to be synched through the clustersecretstore with TP authentication
 module "sm_cstore_arbitrary_secret_tp" {
   source               = "terraform-ibm-modules/secrets-manager-secret/ibm"
-  version              = "1.4.0"
+  version              = "1.7.0"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   secret_group_id      = module.tp_clusterstore_secrets_manager_group.secret_group_id
