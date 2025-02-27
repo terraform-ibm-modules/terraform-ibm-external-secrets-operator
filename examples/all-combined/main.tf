@@ -186,7 +186,7 @@ module "network_acl" {
 # OCP CLUSTER creation
 module "ocp_base" {
   source               = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  version              = "3.41.2"
+  version              = "3.41.3"
   cluster_name         = "${var.prefix}-vpc"
   resource_group_id    = module.resource_group.resource_group_id
   region               = var.region
@@ -197,8 +197,7 @@ module "ocp_base" {
   tags                 = []
   use_existing_cos     = false
   # outbound required by cluster proxy
-  disable_outbound_traffic_protection  = true
-  import_default_worker_pool_on_create = false
+  disable_outbound_traffic_protection = true
 }
 
 
