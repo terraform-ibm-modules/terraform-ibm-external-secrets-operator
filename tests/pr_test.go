@@ -139,12 +139,6 @@ var ignoreUpdates = []string{
 	"module.external_secret_usr_pass.helm_release.kubernetes_secret_user_pw[0]",
 	"module.external_secret_tp_nosg.helm_release.kubernetes_secret[0]",
 	"module.sdnlb_eso_secret.helm_release.sdnlb_external_secret",
-	// ignoring updates on trusted profiles to handle updates on history attribute
-	"module.external_secrets_trusted_profiles[0].ibm_iam_trusted_profile.trusted_profile",
-	"module.external_secrets_trusted_profile_multisg.ibm_iam_trusted_profile.trusted_profile",
-	"module.external_secrets_clusterstore_trusted_profile.ibm_iam_trusted_profile.trusted_profile",
-	"module.external_secrets_trusted_profiles[1].ibm_iam_trusted_profile.trusted_profile",
-	"module.external_secrets_trusted_profile_nosecgroup.ibm_iam_trusted_profile.trusted_profile",
 }
 
 func setupOptions(t *testing.T, prefix string, terraformDir string, terraformVars map[string]interface{}) *testhelper.TestOptions {
