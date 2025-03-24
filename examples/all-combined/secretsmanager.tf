@@ -59,7 +59,7 @@ resource "ibm_resource_instance" "secrets_manager" {
 module "iam_secrets_engine" {
   count                                   = var.existing_sm_instance_guid == null ? 1 : 0
   source                                  = "terraform-ibm-modules/secrets-manager-iam-engine/ibm"
-  version                                 = "1.2.8"
+  version                                 = "1.2.10"
   region                                  = local.sm_region
   secrets_manager_guid                    = ibm_resource_instance.secrets_manager[0].guid
   iam_secret_generator_service_id_name    = "${var.prefix}-sid:0.0.1:${ibm_resource_instance.secrets_manager[0].name}-iam-secret-generator:automated:simple-service:secret-manager:"
@@ -76,7 +76,7 @@ module "iam_secrets_engine" {
 # create secrets group for secrets
 module "secrets_manager_group" {
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.2.2"
+  version                  = "1.2.3"
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = "${var.prefix}-secret-group"                   #checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
@@ -89,7 +89,7 @@ module "secrets_manager_group" {
 # additional secrets manager secret group for service level secrets
 module "secrets_manager_group_acct" {
   source               = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version              = "1.2.2"
+  version              = "1.2.3"
   count                = var.existing_sm_instance_guid == null ? 0 : 1
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid

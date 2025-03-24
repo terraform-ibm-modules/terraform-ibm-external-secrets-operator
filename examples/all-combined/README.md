@@ -42,7 +42,6 @@ This end-to-end example performs the following actions
   - Creates and deploys a key-value secret with single key-value couple
   - Creates and deploys a key-value secret with multiple key-value couples
 
-
 In order to create the intermediate certificate the following parameters are needed:
 - imported_certificate_sm_id: Secrets Manager ID where the componenents for the imported certificate are stored
 - imported_certificate_sm_region: region of the Secrets Manager instance where the componenents for the imported certificate are stored

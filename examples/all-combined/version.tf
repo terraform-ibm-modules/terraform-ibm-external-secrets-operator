@@ -14,9 +14,8 @@ terraform {
       version = ">= 0.9.1"
     }
     ibm = {
-      source = "IBM-Cloud/ibm"
-      # version = ">= 1.62.0
-      version = ">= 1.62.0, < 1.76.0" # locking terraform provider version to 1.75.2 due to issue https://github.com/IBM-Cloud/terraform-provider-ibm/issues/6050
+      source  = "IBM-Cloud/ibm"
+      version = ">= 1.62.0"
     }
     null = {
       source  = "hashicorp/null"
