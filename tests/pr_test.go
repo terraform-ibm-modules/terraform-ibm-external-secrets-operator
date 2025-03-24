@@ -139,6 +139,11 @@ var ignoreUpdates = []string{
 	"module.external_secret_usr_pass.helm_release.kubernetes_secret_user_pw[0]",
 	"module.external_secret_tp_nosg.helm_release.kubernetes_secret[0]",
 	"module.sdnlb_eso_secret.helm_release.sdnlb_external_secret",
+	// ignoring updates on trusted_profile due to issue https://github.com/IBM-Cloud/terraform-provider-ibm/issues/6050
+	// the issue is a workaround for update on trusted_profile resource history field
+	// to remove when solved
+	"module.external_secrets_trusted_profiles[0].ibm_iam_trusted_profile.trusted_profile",
+	"module.external_secrets_trusted_profiles[1].ibm_iam_trusted_profile.trusted_profile",
 }
 
 func setupOptions(t *testing.T, prefix string, terraformDir string, terraformVars map[string]interface{}) *testhelper.TestOptions {
