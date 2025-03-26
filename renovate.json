@@ -23,22 +23,6 @@
   ],
   "packageRules": [
     {
-      "matchManagers": ["regex"],
-      "matchUpdateTypes": ["patch"],
-      "semanticCommitType": "fix"
-    },
-    {
-      "matchManagers": ["regex"],
-      "matchUpdateTypes": ["minor"],
-      "semanticCommitType": "feat"
-    },
-    {
-      "description": "Do not allow major version updates - these should be done manually to ensure no breaking changes",
-      "matchManagers": ["regex"],
-      "matchUpdateTypes": ["major"],
-      "enabled": false
-    },
-    {
       "description": "Bundle ESO and Reloader images + helm chart updates into the same PR",
       "matchPackageNames": ["external-secrets/external-secrets", "stakater/Reloader", "ghcr.io/external-secrets/external-secrets", "ghcr.io/stakater/reloader"],
       "groupName": "Charts and Images",
