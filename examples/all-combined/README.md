@@ -78,3 +78,7 @@ The example is split into separated templates related with their specific scope:
 The test is currently using the existing SecretManager region to deploy the VPC and the cluster if this value is not null. Instead if null it follows what set through `var.region`
 
 This logic is achieved through the local `sm_region` variable that is then used to create resources.
+
+### Note for the example maintainers
+
+The test leverages on a set of secrets existing on IBM Cloud Secrets Manager instance to pull the secrets values and to configure them through External Secrets operator: the secrets for the imported certificate (public certificate stored in `geretain-eso-test-importedcert-public-certificate`, intermediate certificate store in `geretain-eso-test-importedcert-intermediate-certificate` and private key stored in `geretain-eso-test-importedcert-private-key`) expire periodically, in the case these secrets expire the new values can be retrieved from the secret named `geretain-eso-public-certificate-for-imported-ones` which contains the three different components (it is a public certificate generated for a test CN) and it is configured to be automatically rotated by Secrets Manager.
