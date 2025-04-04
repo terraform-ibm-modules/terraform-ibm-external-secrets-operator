@@ -348,7 +348,7 @@ func TestReloaderOperational(t *testing.T) {
 										}
 
 										if newPodName != "" {
-											break
+											break Loop
 										}
 									}
 								}
