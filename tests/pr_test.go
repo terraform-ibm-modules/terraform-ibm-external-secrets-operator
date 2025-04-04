@@ -4,6 +4,9 @@ package test
 import (
 	"log"
 	"os"
+	"path/filepath"
+	"regexp"
+	"strings"
 	"testing"
 	"time"
 
@@ -178,9 +181,10 @@ func TestRunDefaultExample(t *testing.T) {
 	defer func() {
 		options.TestTearDown()
 	}()
-	output, err := options.RunTestConsistency()
+	_, err := options.RunTestConsistency()
 
 	if assert.Nil(t, err, "Consistency test should not have errored") {
+
 		outputs := options.LastTestTerraformOutputs
 		_, tfOutputsErr := testhelper.ValidateTerraformOutputs(outputs, "cluster_id")
 		if assert.Nil(t, tfOutputsErr, tfOutputsErr) {
@@ -233,10 +237,9 @@ func TestRunDefaultExample(t *testing.T) {
 					}
 				}
 			}
+
 		}
 	}
-
-	assert.NotNil(t, output, "Expected some output")
 }
 
 func TestRunUpgradeExample(t *testing.T) {
@@ -280,6 +283,82 @@ func TestReloaderOperational(t *testing.T) {
 					_ = os.Remove(clusterConfigPath)
 				}()
 				if assert.Nil(t, err, "Error getting cluster config path") {
+					// check Reloader is installed with the correct image and version
+					// assert reloader image
+					// get the image and version from the variables.tf in options.TerraformDir
+					// read the file
+					variablesFile := options.TerraformDir + "/variables.tf"
+					data, err := os.ReadFile(variablesFile)
+					if assert.Nil(t, err, "Error reading variables file") {
+						// parse the file
+						lines := strings.Split(string(data), "\n")
+						// find the line with the reloader image
+						var reloaderImage string
+						var reloaderVersion string
+
+						// Get values from TerraformVars if provided
+						if options.TerraformVars["reloader_repository"] != nil {
+							reloaderImage = options.TerraformVars["reloader_repository"].(string)
+						} else {
+							// Check for both reloader_image and reloader_repository variables
+							reloaderImage = extractDefaultValueFromFile(lines, "reloader_repository")
+
+							// If still not found, check the root variables.tf file
+							if reloaderImage == "" {
+								rootVariablesPath := filepath.Join(options.TerraformDir, "..", "..", "variables.tf")
+								if rootData, err := os.ReadFile(rootVariablesPath); err == nil {
+									rootLines := strings.Split(string(rootData), "\n")
+									reloaderImage = extractDefaultValueFromFile(rootLines, "reloader_repository")
+								}
+							}
+						}
+
+						if options.TerraformVars["reloader_image_version"] != nil {
+							reloaderVersion = options.TerraformVars["reloader_image_version"].(string)
+						} else {
+							// Find the line with the reloader version
+							reloaderVersion = extractDefaultValueFromFile(lines, "reloader_image_version")
+							// If not found, check the root variables.tf file
+							if reloaderVersion == "" {
+								rootVariablesPath := filepath.Join(options.TerraformDir, "..", "..", "variables.tf")
+								if rootData, err := os.ReadFile(rootVariablesPath); err == nil {
+									rootLines := strings.Split(string(rootData), "\n")
+									reloaderVersion = extractDefaultValueFromFile(rootLines, "reloader_image_version")
+								}
+							}
+						}
+
+						// Check the image and version
+						// Get reloader pods - use the correct labels and namespace
+						esoNamespace := "apikeynspace1" // staticly set in locals of basic example
+
+						// assert all values are set
+						if !assert.NotEmpty(t, reloaderImage, "Reloader image is empty") {
+							t.Log("FAILURE: Reloader image is empty - could not find value in variables")
+						}
+
+						if !assert.NotEmpty(t, reloaderVersion, "Reloader version is empty") {
+							t.Log("FAILURE: Reloader version is empty - could not find value in variables")
+						}
+
+						// Get the reloader pods
+						reloaderPods, err := k8s.ListPodsE(t, k8s.NewKubectlOptions("", clusterConfigPath, esoNamespace), metav1.ListOptions{
+							LabelSelector: "provider=stakater,group=com.stakater.platform",
+						})
+						if assert.Nil(t, err, "Error getting reloader pods") {
+							if assert.GreaterOrEqual(t, len(reloaderPods), 1, "Expected at least one reloader pod") {
+								reloaderPod := reloaderPods[0]
+								// Check the image of the reloader pod
+								actualImage := reloaderPod.Spec.Containers[0].Image
+								expectedImage := reloaderImage + ":" + reloaderVersion
+								if !assert.Equal(t, expectedImage, actualImage, "Reloader image does not match expected image") {
+									t.Logf("FAILURE: Reloader image does not match expected image. Expected: %s, Actual: %s", expectedImage, actualImage)
+								}
+							}
+						}
+					}
+
+					// test reloader functionality
 					sampleApp := "./samples/sample.yaml"
 					deploymentName := "example-deployment"
 					namespace := "reloader-test-ns"
@@ -309,6 +388,7 @@ func TestReloaderOperational(t *testing.T) {
 								t.Log("Initial secret value found in logs")
 								t.Log(logs)
 							}
+
 							// update secret with updated secret
 							applyError = k8s.KubectlApplyE(t, ocOptions, updatedSecret)
 							if assert.Nil(t, applyError, "Error applying updated secret") {
@@ -337,7 +417,8 @@ func TestReloaderOperational(t *testing.T) {
 										currentPods, err := GetPodNamesFromDeployment(t, ocOptions, deploymentName)
 										if err != nil {
 											t.Log("Error getting initialPod names")
-											break
+											// Use the labeled break to exit the outer loop
+											continue Loop
 										}
 
 										for _, pod := range currentPods {
@@ -348,7 +429,7 @@ func TestReloaderOperational(t *testing.T) {
 										}
 
 										if newPodName != "" {
-											break
+											break Loop
 										}
 									}
 								}
@@ -396,4 +477,58 @@ func GetPodNamesFromDeployment(t *testing.T, options *k8s.KubectlOptions, deploy
 	}
 
 	return podNames, nil
+}
+
+// Helper function to extract default value from terraform variable definitions
+func extractDefaultValueFromFile(lines []string, variableName string) string {
+	inTargetVariable := false
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, "variable") && strings.Contains(line, "\""+variableName+"\"") {
+			inTargetVariable = true
+			continue
+		}
+
+		// We're in the target variable block, look for the default value
+		if inTargetVariable {
+			if strings.HasPrefix(line, "default") {
+				// Extract the value between = and either # or end of line
+				parts := strings.Split(line, "=")
+				if len(parts) > 1 {
+					value := strings.TrimSpace(parts[1])
+
+					// Remove trailing comment if exists
+					if strings.Contains(value, "#") {
+						value = strings.Split(value, "#")[0]
+						value = strings.TrimSpace(value)
+					}
+
+					// Handle quoted strings properly
+					if strings.HasPrefix(value, "\"") {
+						// Extract the string using proper quote handling
+						// This handles any content in quotes, even if it contains special characters
+						re := regexp.MustCompile(`"((?:\\"|[^"])*)"`)
+						matches := re.FindStringSubmatch(value)
+						if len(matches) >= 2 {
+							// Get the content inside the quotes and unescape any quotes
+							value = strings.ReplaceAll(matches[1], "\\\"", "\"")
+						} else {
+							// Fallback to simple trim if regex didn't work
+							value = strings.Trim(value, "\"")
+						}
+					}
+
+					// Remove trailing spaces or commas
+					value = strings.TrimRight(value, " ,")
+					return value
+				}
+			}
+
+			// If we hit a closing brace, we've exited the variable block
+			if line == "}" {
+				inTargetVariable = false
+			}
+		}
+	}
+	return ""
 }

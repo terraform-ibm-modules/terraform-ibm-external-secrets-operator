@@ -197,8 +197,16 @@ variable "reloader_custom_values" {
 variable "reloader_image" {
   type        = string
   description = "The reloader image in the format of `[registry-url]/[namespace]/[image]`."
+  default     = "stakater/reloader"
+  nullable    = false
+}
+
+variable "reloader_repository" {
+  type        = string
+  description = "The reloader image repository in the format of `[registry-url]/[namespace]/[image]`."
   default     = "ghcr.io/stakater/reloader"
   nullable    = false
+
 }
 
 variable "reloader_image_version" {
@@ -222,7 +230,6 @@ variable "reloader_chart_location" {
 variable "reloader_chart_version" {
   type        = string
   description = "The version of the Reloader Helm chart. Ensure that the chart version is compatible with the image version specified in reloader_image_version."
-  # renovate: datasource=github-releases depName=stakater/Reloader
-  default  = "1.3.0"
-  nullable = false
+  default     = "2.0.0"
+  nullable    = false
 }
