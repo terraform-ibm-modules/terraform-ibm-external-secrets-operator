@@ -76,7 +76,7 @@ module "iam_secrets_engine" {
 # create secrets group for secrets
 module "secrets_manager_group" {
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.2.3"
+  version                  = "1.3.2"
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = "${var.prefix}-secret-group"                   #checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
@@ -89,7 +89,7 @@ module "secrets_manager_group" {
 # additional secrets manager secret group for service level secrets
 module "secrets_manager_group_acct" {
   source               = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version              = "1.2.3"
+  version              = "1.3.2"
   count                = var.existing_sm_instance_guid == null ? 0 : 1
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
