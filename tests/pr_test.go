@@ -297,18 +297,18 @@ func TestReloaderOperational(t *testing.T) {
 						var reloaderVersion string
 
 						// Get values from TerraformVars if provided
-						if options.TerraformVars["reloader_repository"] != nil {
-							reloaderImage = options.TerraformVars["reloader_repository"].(string)
+						if options.TerraformVars["reloader_image"] != nil {
+							reloaderImage = options.TerraformVars["reloader_image"].(string)
 						} else {
-							// Check for both reloader_image and reloader_repository variables
-							reloaderImage = extractDefaultValueFromFile(lines, "reloader_repository")
+							// Check for both  reloader_image variables
+							reloaderImage = extractDefaultValueFromFile(lines, "reloader_image")
 
 							// If still not found, check the root variables.tf file
 							if reloaderImage == "" {
 								rootVariablesPath := filepath.Join(options.TerraformDir, "..", "..", "variables.tf")
 								if rootData, err := os.ReadFile(rootVariablesPath); err == nil {
 									rootLines := strings.Split(string(rootData), "\n")
-									reloaderImage = extractDefaultValueFromFile(rootLines, "reloader_repository")
+									reloaderImage = extractDefaultValueFromFile(rootLines, "reloader_image")
 								}
 							}
 						}
