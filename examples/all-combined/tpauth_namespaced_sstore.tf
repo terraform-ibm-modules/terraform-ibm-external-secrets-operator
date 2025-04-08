@@ -40,7 +40,7 @@ module "eso_tp_namespace_secretstores" {
 # creating a secrets group for each namespace to be used for namespaced secretstores with trustedprofile auth
 module "tp_secrets_manager_groups" {
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.2.3"
+  version                  = "1.3.2"
   count                    = length(var.es_namespaces_tp)
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
@@ -140,7 +140,7 @@ module "eso_tp_namespace_secretstore_multisg" {
 # creating two secrets groups for a single namespace to test trusted profile policy on multiple secrets groups
 module "tp_secrets_manager_group_multi_1" {
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.2.3"
+  version                  = "1.3.2"
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = "${var.prefix}-tp-secret-group-multisg-1"                                                                #checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
@@ -152,7 +152,7 @@ module "tp_secrets_manager_group_multi_1" {
 
 module "tp_secrets_manager_group_multi_2" {
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.2.3"
+  version                  = "1.3.2"
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = "${var.prefix}-tp-secret-group-multisg-21"                                                               #checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
@@ -285,7 +285,7 @@ module "eso_tp_namespace_secretstore_nosecgroup" {
 # creating secrets group for a single namespace to test trusted profile policy without any secret group in the TP policy
 module "tp_secrets_manager_group_not_for_policy" {
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.2.3"
+  version                  = "1.3.2"
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = "${var.prefix}-tp-secret-group-not-for-policy"                                                        #checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
