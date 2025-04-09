@@ -228,15 +228,14 @@ resource "helm_release" "pod_reloader" {
   version    = var.reloader_chart_version
   wait       = true
 
-  # Set the deployment image name and tag
   set {
-    name  = "reloader.deployment.image.name"
+    name  = "image.repository"
     type  = "string"
     value = var.reloader_image
   }
 
   set {
-    name  = "reloader.deployment.image.tag"
+    name  = "image.tag"
     type  = "string"
     value = var.reloader_image_version
   }
