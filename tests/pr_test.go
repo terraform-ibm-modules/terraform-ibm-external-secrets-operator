@@ -120,6 +120,16 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
+// Note for the test maintainers
+// The test leverages on a set of secrets existing on IBM Cloud Secrets Manager instance to pull
+// the secrets values and to configure them through External Secrets operator: the secrets for the imported certificate whose
+// - public certificate component is stored in `geretain-eso-test-importedcert-public-certificate`
+// - intermediate certificate component is stored in `geretain-eso-test-importedcert-intermediate-certificate`
+// - private key is stored in `geretain-eso-test-importedcert-private-key`
+// expire periodically: in such a case the new values to populate these secrets can be retrieved from the secret named `geretain-eso-public-certificate-for-imported-ones`
+// which is a public certificate generated for a test CN and contains the three different components whose value can be used to rotate the expired certificates
+// mentioned above. It is configured to be automatically rotated by Secrets Manager so its values are always up to date.
+
 var ignoreUpdates = []string{
 	"module.es_kubernetes_secret_usr_pass.helm_release.external_secrets_operator[0]",
 	"module.es_kubernetes_secret_arbitrary_cloudant.helm_release.external_secrets_operator[0]",
