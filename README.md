@@ -502,7 +502,7 @@ module "es_kubernetes_secret" {
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_eso_namespace"></a> [eso\_namespace](#module\_eso\_namespace) | terraform-ibm-modules/namespace/ibm | 1.0.2 |
+| <a name="module_eso_namespace"></a> [eso\_namespace](#module\_eso\_namespace) | terraform-ibm-modules/namespace/ibm | 1.0.3 |
 
 ### Resources
 
