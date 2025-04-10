@@ -41,12 +41,20 @@ variable "es_kubernetes_secret_type" {
     #  If it is empty, no secret will be created.
     error_message = "The es_kubernetes_secret_type value must be one of the following: opaque, dockerconfigjson, tls or leave it empty."
   }
+  validation {
+    condition     = can(regex("^kv$", var.sm_secret_type)) ? var.es_kubernetes_secret_type == "opaque" : true
+    error_message = "For key-value secrets-manager secrets types es_kubernetes_secret_type cannot be different than opaque - found ${var.es_kubernetes_secret_type}"
+  }
 }
 
 variable "es_kubernetes_secret_data_key" {
   description = "Data key to be used in Kubernetes Opaque secret. Only needed when 'es_kubernetes_secret_type' is configured as `opaque` and sm_secret_type is set to either 'arbitrary' or 'iam_credentials'"
   type        = string
   default     = null
+  validation {
+    condition     = (var.es_kubernetes_secret_type == "opaque" && (var.sm_secret_type == "arbitrary" || var.sm_secret_type == "iam_credentials")) ? var.es_kubernetes_secret_data_key != null : true # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
+    error_message = "A value for 'es_kubernetes_secret_data_key' must be passed when 'es_kubernetes_secret_type = opaque' and 'sm_secret_type' is either 'arbitrary' or 'iam_credentials'"
+  }
 }
 
 variable "sm_secret_type" {
@@ -57,11 +65,20 @@ variable "sm_secret_type" {
     # If it is empty, no secret will be created
     error_message = "The sm_secret_type value must be one of the following: iam_credentials, username_password, arbitrary, imported_cert, public_cert, private_cert, kv or leave it empty."
   }
+  validation {
+    condition = can(regex("^kv$", var.sm_secret_type)) ? var.sm_kv_keyid == null || var.sm_kv_keypath == null : true
+    #  If it is empty, no secret will be created.
+    error_message = "For key-value secrets only one of input variables 'sm_kv_keyid' or 'sm_kv_keypath' can be set."
+  }
 }
 
 variable "sm_secret_id" {
   description = "Secrets-Manager secret ID where source data will be synchronized with Kubernetes secret. It can be null only in the case of a dockerjsonconfig secrets chain"
   type        = string
+  validation {
+    condition     = length(var.es_container_registry_secrets_chain) > 0 ? var.sm_secret_id == null : true
+    error_message = "The input variable sm_secret_id can be null only a dockerjsonconfig secrets chain is going to be created"
+  }
 }
 
 variable "es_container_registry" {
@@ -85,6 +102,10 @@ variable "es_container_registry_secrets_chain" {
   }))
   default  = []
   nullable = false
+  validation {
+    condition     = length(var.es_container_registry_secrets_chain) > 0 ? (var.es_kubernetes_secret_type == "dockerconfigjson" && var.sm_secret_type == "iam_credentials") : true
+    error_message = "If the externalsecret is expected to generate a dockerjsonconfig secrets chain the only supported value for es_kubernetes_secret_type is dockerconfigjson and for sm_secret_type is iam_credentials"
+  }
 }
 
 variable "es_helm_rls_name" {

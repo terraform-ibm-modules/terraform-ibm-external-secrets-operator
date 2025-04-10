@@ -13,25 +13,6 @@ locals {
   secret_group_name            = "${var.prefix}-sm-secret-group"                        #checkov:skip=CKV_SECRET_6
   es_kubernetes_namespaces     = ["${var.prefix}-tp-test-1", "${var.prefix}-tp-test-2"] # namespace to create the externalsecrets resources for secrets sync
 
-  validate_sm_region_cnd = var.existing_sm_instance_guid != null && var.existing_sm_instance_region == null
-  validate_sm_region_msg = "existing_sm_instance_region must also be set when value given for existing_sm_instance_guid."
-  # tflint-ignore: terraform_unused_declarations
-  validate_sm_region_chk = regex(
-    "^${local.validate_sm_region_msg}$",
-    (!local.validate_sm_region_cnd
-      ? local.validate_sm_region_msg
-  : ""))
-
-  # validation for secrets manager crn to be set for existing secrets manager instance if using private service endpoints
-  validate_sm_crn_cnd = var.existing_sm_instance_guid != null && var.existing_sm_instance_crn == null && var.service_endpoints == "private"
-  validate_sm_crn_msg = "existing_sm_instance_crn must also be set when value given for existing_sm_instance_guid if service_endpoints is private."
-  # tflint-ignore: terraform_unused_declarations
-  validate_sm_crn_chk = regex(
-    "^${local.validate_sm_crn_msg}$",
-    (!local.validate_sm_crn_cnd
-      ? local.validate_sm_crn_msg
-  : ""))
-
   sm_guid = var.existing_sm_instance_guid == null ? ibm_resource_instance.secrets_manager[0].guid : var.existing_sm_instance_guid
   # if service_endpoints is not private the crn for SM is not needed because of VPE creation is not needed
   sm_crn = var.existing_sm_instance_crn == null ? (var.service_endpoints == "private" ? ibm_resource_instance.secrets_manager[0].crn : "") : var.existing_sm_instance_crn

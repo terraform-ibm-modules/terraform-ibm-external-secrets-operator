@@ -43,6 +43,14 @@ variable "eso_authentication" {
     condition     = contains(["api_key", "trusted_profile"], var.eso_authentication)
     error_message = "Authentication mode allowed are api_key or/and trusted_profile."
   }
+  validation {
+    condition     = var.eso_authentication == "api_key" ? var.clusterstore_secret_apikey != null : true
+    error_message = "API Key authentication is enabled and scope for store is cluster, therefore clusterstore_secret_apikey must be provided."
+  }
+  validation {
+    condition     = var.eso_authentication == "trusted_profile" ? var.clusterstore_trusted_profile_name != null : true
+    error_message = "Trusted profile authentication is enabled, therefore clusterstore_trusted_profile_name must be provided."
+  }
 }
 
 variable "clusterstore_secret_name" {
@@ -56,6 +64,10 @@ variable "clusterstore_secret_apikey" {
   description = "APIkey to be configured in the clusterstore_secret_name secret in the ESO clusterstore. One between clusterstore_secret_apikey and clusterstore_trusted_profile_name must be filled"
   sensitive   = true
   default     = null
+  validation {
+    condition     = var.clusterstore_secret_apikey != null || var.clusterstore_trusted_profile_name != null
+    error_message = "One of the variables clusterstore_secret_apikey and clusterstore_trusted_profile_name must be provided, cannot be both set to null"
+  }
 }
 
 ####### trusted profile

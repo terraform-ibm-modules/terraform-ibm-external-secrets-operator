@@ -207,6 +207,14 @@ variable "existing_sm_instance_guid" {
   type        = string
   description = "Existing Secrets Manager GUID. If not provided a new instance will be provisioned"
   default     = null
+  validation {
+    condition     = var.existing_sm_instance_guid != null ? var.existing_sm_instance_region != null : true
+    error_message = "existing_sm_instance_region must also be set when value given for existing_sm_instance_guid."
+  }
+  validation {
+    condition     = var.existing_sm_instance_guid != null && var.service_endpoints == "private" ? var.existing_sm_instance_crn != null : true
+    error_message = "existing_sm_instance_crn must also be set when value given for existing_sm_instance_guid if service_endpoints is private."
+  }
 }
 
 variable "existing_sm_instance_crn" {
@@ -287,6 +295,14 @@ variable "imported_certificate_sm_id" {
   type        = string
   default     = null
   description = "Secrets Manager instance id where the components for the intermediate certificate are stored"
+  validation {
+    condition     = var.imported_certificate_sm_id != null ? var.imported_certificate_sm_region != null : true
+    error_message = "imported_certificate_sm_region must also be set when value given for imported_certificate_sm_id"
+  }
+  validation {
+    condition     = (var.imported_certificate_public_secret_id != null && var.imported_certificate_private_secret_id != null) ? var.imported_certificate_sm_id != null : true
+    error_message = "If imported_certificate_public_secret_id and imported_certificate_private_secret_id to create an imported certificate also imported_certificate_sm_id must be set"
+  }
 }
 
 variable "imported_certificate_sm_region" {

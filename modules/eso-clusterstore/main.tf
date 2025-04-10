@@ -1,24 +1,4 @@
 locals {
-  # preliminary authentication validation - one of clusterstore_secret_apikey and clusterstore_trusted_profile_name must be valid
-  auth_validate_condition = var.clusterstore_secret_apikey == null && var.clusterstore_trusted_profile_name == null
-  auth_clusterstore_msg   = "One of the variables clusterstore_secret_apikey and clusterstore_trusted_profile_name must be provided, cannot be both set to null"
-  # tflint-ignore: terraform_unused_declarations
-  auth_validate_check = regex("^${local.auth_clusterstore_msg}$", (!local.auth_validate_condition ? local.auth_clusterstore_msg : ""))
-
-  # auth is apikey so the variable clusterstore_secret_apikey cannot be null
-  api_key_clusterstore_validate_condition = var.eso_authentication == "api_key" && var.clusterstore_secret_apikey == null
-  api_key_clusterstore_msg                = "API Key authentication is enabled and scope for store is cluster, therefore clusterstore_secret_apikey must be provided."
-  # tflint-ignore: terraform_unused_declarations
-  api_key_clusterstore_validate_check = regex("^${local.api_key_clusterstore_msg}$", (!local.api_key_clusterstore_validate_condition ? local.api_key_clusterstore_msg : ""))
-
-  # auth is trustedprofile so the variable clusterstore_trusted_profile_name cannot be null
-  tp_clusterstore_validate_condition = var.eso_authentication == "trusted_profile" && var.clusterstore_trusted_profile_name == null
-  tp_clusterstore_msg                = "Trusted profile authentication is enabled, therefore clusterstore_trusted_profile_name must be provided."
-  # tflint-ignore: terraform_unused_declarations
-  tp_clusterstore_validate_check = regex("^${local.tp_clusterstore_msg}$", (!local.tp_clusterstore_validate_condition ? local.tp_clusterstore_msg : ""))
-}
-
-locals {
   helm_raw_chart_name    = "raw"
   helm_raw_chart_version = "0.2.5"
 

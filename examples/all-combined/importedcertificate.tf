@@ -2,28 +2,6 @@
 # imported certificate for secrets manager
 ##################################################################
 
-locals {
-
-  # validation for secrets manager region to be set for existing secrets manager instance
-  validate_imported_sm_region_cnd = var.imported_certificate_sm_id != null && var.imported_certificate_sm_region == null
-  validate_imported_sm_region_msg = "imported_certificate_sm_region must also be set when value given for imported_certificate_sm_id"
-  # tflint-ignore: terraform_unused_declarations
-  validate_imported_sm_region_chk = regex(
-    "^${local.validate_imported_sm_region_msg}$",
-    (!local.validate_imported_sm_region_cnd
-      ? local.validate_imported_sm_region_msg
-  : ""))
-
-  validate_imported_sm_cnd = (var.imported_certificate_public_secret_id != null && var.imported_certificate_private_secret_id != null) && var.imported_certificate_sm_id == null
-  validate_imported_sm_msg = "If imported_certificate_public_secret_id and imported_certificate_private_secret_id to create an imported certificate also imported_certificate_sm_id must be set"
-  # tflint-ignore: terraform_unused_declarations
-  validate_imported_sm_chk = regex(
-    "^${local.validate_imported_sm_msg}$",
-    (!local.validate_imported_sm_cnd
-      ? local.validate_imported_sm_msg
-  : ""))
-}
-
 # loading from Secrets Manager the three components (private key, intermediate and public cert) composing the imported certificate
 data "ibm_sm_arbitrary_secret" "imported_certificate_intermediate" {
   count       = var.imported_certificate_intermediate_secret_id != null ? 1 : 0
