@@ -1,10 +1,4 @@
 locals {
-  # Validation approach based on https://stackoverflow.com/a/66682419
-  validate_condition_secret = var.es_kubernetes_secret_data_key == null && (var.es_kubernetes_secret_type == "opaque" && (var.sm_secret_type == "arbitrary" || var.sm_secret_type == "iam_credentials")) # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
-  validate_msg_secret       = "A value for 'es_kubernetes_secret_data_key' must be passed when 'es_kubernetes_secret_type = opaque' and 'sm_secret_type' is either 'arbitrary' or 'iam_credentials'"
-  # tflint-ignore: terraform_unused_declarations
-  validate_check_secret = regex("^${local.validate_msg_secret}$", (!local.validate_condition_secret ? local.validate_msg_secret : ""))
-
   # reloader annotation
   reloader_annotation = var.reloader_watching ? "'reloader.stakater.com/auto': 'true'" : "{}"
 }
@@ -16,18 +10,6 @@ locals {
 
   # dockerjsonconfig secrets chain flag
   is_dockerjsonconfig_chain = length(var.es_container_registry_secrets_chain) > 0 ? true : false
-
-  # validation for dockerjsonconfig secrets chain -> if it is a chain the kube secret type must be dockerconfigjson and sm secret type iam_credentials
-  validate_condition_chain = local.is_dockerjsonconfig_chain == true && (var.es_kubernetes_secret_type != "dockerconfigjson" || var.sm_secret_type != "iam_credentials") # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
-  validate_msg_chain       = "If the externalsecret is expected to generate a dockerjsonconfig secrets chain the only supported value for es_kubernetes_secret_type is dockerconfigjson and for sm_secret_type is iam_credentials"
-  # tflint-ignore: terraform_unused_declarations
-  validate_check_chain = regex("^${local.validate_msg_chain}$", (!local.validate_condition_chain ? local.validate_msg_chain : ""))
-
-  # validation of sm_secret_id => it can be null only in the case of a dockerjsonconfig chain (secret_ids will be stored )
-  validate_condition_sm_secret_id = var.sm_secret_id == null && local.is_dockerjsonconfig_chain == false
-  validate_msg_sm_secret_id       = "The input variable sm_secret_id can be null only a dockerjsonconfig secrets chain is going to be created"
-  # tflint-ignore: terraform_unused_declarations
-  validate_check_sm_secret_id = regex("^${local.validate_msg_sm_secret_id}$", (!local.validate_condition_sm_secret_id ? local.validate_msg_sm_secret_id : ""))
 
   # for certificate secrets public_cert and private_cert the id is the last part of the sm_secret_sm
   cert_remoteref_key = local.is_certificate ? "${var.sm_secret_type}/${var.sm_secret_id}" : ""
@@ -107,18 +89,6 @@ locals {
 
   # key-value secret management
   is_kv = can(regex("^kv$", var.sm_secret_type))
-
-  # validation for key-value secret type
-  validate_condition_kv_secret = local.is_kv && var.sm_kv_keyid != null && var.sm_kv_keypath != null
-  validate_msg_kv_secret       = "For key-value secrets only one of input variables 'sm_kv_keyid' or 'sm_kv_keypath' can be set."
-  # tflint-ignore: terraform_unused_declarations
-  validate_check_kv_secret = regex("^${local.validate_msg_kv_secret}$", (!local.validate_condition_kv_secret ? local.validate_msg_kv_secret : ""))
-
-  # second validation for key-value secret type - allowing only opaque for es_kubernetes_secret_type if sm_secret_type is kv
-  validate_condition_kv_kube_type = local.is_kv && var.es_kubernetes_secret_type != "opaque"
-  validate_msg_kv_kube_type       = "For key-value secrets-manager secrets types es_kubernetes_secret_type cannot be different than opaque - found ${var.es_kubernetes_secret_type}"
-  # tflint-ignore: terraform_unused_declarations
-  validate_check_kv_kube_type = regex("^${local.validate_msg_kv_kube_type}$", (!local.validate_condition_kv_kube_type ? local.validate_msg_kv_kube_type : ""))
 
   # setting up the remoteref property for kv
   kv_remoteref_property = var.sm_kv_keyid != null ? var.sm_kv_keyid : (var.sm_kv_keypath != null ? var.sm_kv_keypath : "")
