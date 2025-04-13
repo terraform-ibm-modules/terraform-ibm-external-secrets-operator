@@ -87,11 +87,6 @@ variable "es_container_registry_secrets_chain" {
   default  = []
   nullable = false
 }
-variable "deploy_username_apikey" {
-  description = "The secret manager certificate is provided with intermediate certificate. By enabling this flag the certificate body on kube will contain certificate and intermediate content, otherwise only certificate will be added. Valid only for public and imported certificate"
-  type        = bool
-  default     = true
-}
 
 variable "es_helm_rls_name" {
   description = "Name to use for the helm release for externalsecrets resource. Must be unique in the namespace"
