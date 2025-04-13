@@ -17,9 +17,9 @@ locals {
   # dockerjsonconfig secrets chain flag
   is_dockerjsonconfig_chain = length(var.es_container_registry_secrets_chain) > 0 ? true : false
 
-  # validation for dockerjsonconfig secrets chain -> if it is a chain the kube secret type must be dockerconfigjson and sm secret type iam_credentials
-  validate_condition_chain = local.is_dockerjsonconfig_chain == true && (var.es_kubernetes_secret_type != "dockerconfigjson" || var.sm_secret_type != "iam_credentials") # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
-  validate_msg_chain       = "If the externalsecret is expected to generate a dockerjsonconfig secrets chain the only supported value for es_kubernetes_secret_type is dockerconfigjson and for sm_secret_type is iam_credentials"
+  # validation for dockerjsonconfig secrets chain -> if it is a chain the kube secret type must be dockerconfigjson and sm secret types iam_credentials, trusted_profile
+  validate_condition_chain = local.is_dockerjsonconfig_chain == true && (var.es_kubernetes_secret_type != "dockerconfigjson" || (var.sm_secret_type != "iam_credentials" && var.sm_secret_type != "trusted_profile")) # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
+  validate_msg_chain       = "If the externalsecret is expected to generate a dockerjsonconfig secrets chain the only supported value for es_kubernetes_secret_type is dockerconfigjson and for sm_secret_type is iam_credentials and trusted_profile"
   # tflint-ignore: terraform_unused_declarations
   validate_check_chain = regex("^${local.validate_msg_chain}$", (!local.validate_condition_chain ? local.validate_msg_chain : ""))
 
@@ -46,7 +46,7 @@ locals {
   certificate_spec_data = local.is_certificate ? (var.sm_secret_type == "public_cert" ? local.public_certificate_spec_data : (var.sm_secret_type == "imported_cert" ? local.imported_certificate_spec_data : (var.sm_secret_type == "private_cert" ? local.private_certificate_spec_data : ""))) : ""    # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
 
   # dockerjson format
-  docker_user     = var.sm_secret_type == "username_password" ? "{{ .username }}" : "iamapikey" # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
+  docker_user     = var.sm_secret_type == "username_password" || var.sm_secret_type=="trusted_profile" ? "{{ .username }}" : "iamapikey" # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
   docker_password = var.sm_secret_type == "username_password" ? "{{ .password }}" : "{{ .secretid }}"
 
   # setting data_type according to the kube secret and the SM secret types
@@ -85,6 +85,10 @@ locals {
         "username" : "iamapikey", "password" : "{{ .secretid_${index} }}", "email" : (element.es_container_registry_email)
       }
       :
+      (element.trusted_profile != null && element.trusted_profile != "") ?
+      {
+        "username" : element.trusted_profile, "password" : "{{ .secretid_${index} }}"
+      }:
       {
         "username" : "iamapikey", "password" : "{{ .secretid_${index} }}"
       }
@@ -168,7 +172,7 @@ resource "helm_release" "kubernetes_secret" {
 
 ### Define kubernetes secret to be installed in cluster for sm_secret_type iam_credentials and kubernetes secret type dockerjsonconfig and configured with a chain of secrets
 resource "helm_release" "kubernetes_secret_chain_list" {
-  count     = local.is_dockerjsonconfig_chain == true ? 1 : 0
+  count     = local.is_dockerjsonconfig_chain == true && var.sm_secret_type!="trusted_profile" ? 1 : 0
   name      = local.helm_secret_name
   namespace = local.es_helm_rls_namespace
   chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
@@ -206,6 +210,47 @@ resource "helm_release" "kubernetes_secret_chain_list" {
     EOF
   ]
 }
+
+resource "helm_release" "kubernetes_secret_chain_list_tp" {
+  count     = local.is_dockerjsonconfig_chain == true && var.sm_secret_type=="trusted_profile" ? 1 : 0
+  name      = local.helm_secret_name
+  namespace = local.es_helm_rls_namespace
+  chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
+  version   = local.helm_raw_chart_version
+  timeout   = 600
+  values = [
+    <<-EOF
+    resources:
+      - apiVersion: external-secrets.io/v1beta1
+        kind: ExternalSecret
+        metadata:
+          name: "${var.es_kubernetes_secret_name}"
+          namespace: "${var.es_kubernetes_namespace}"
+        spec:
+          refreshInterval: ${var.es_refresh_interval}
+          secretStoreRef:
+            name: "${var.eso_store_name}"
+            kind: "${local.secret_store_ref_kind}"
+          target:
+            name: "${var.es_kubernetes_secret_name}"
+            template:
+              engineVersion: v2
+              type: "${local.es_kubernetes_secret_type}"
+              metadata:
+                annotations:
+                  ${local.reloader_annotation}
+              data:
+                ${local.data_chain}
+          data:
+%{for index, element in var.es_container_registry_secrets_chain~}
+          - secretKey: secretid_${index}
+            remoteRef:
+              key: "${element.sm_secret_id}"
+%{endfor~}
+    EOF
+  ]
+}
+
 
 ### Define kubernetes secret to be installed in cluster for opaque secret type based on SM user credential secret type
 resource "helm_release" "kubernetes_secret_user_pw" {

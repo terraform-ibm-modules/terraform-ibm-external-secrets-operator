@@ -53,9 +53,9 @@ variable "sm_secret_type" {
   description = "Secrets-manager secret type to be used as source data by ESO. Valid input types are 'arbitrary', 'username_password' and 'iam_credentials'"
   type        = string
   validation {
-    condition = can(regex("^iam_credentials$|^username_password$|^arbitrary$|^imported_cert$|^public_cert$|^private_cert|^kv$|$^$", var.sm_secret_type))
+    condition = can(regex("^iam_credentials$|^username_password$|^trusted_profile$|^arbitrary$|^imported_cert$|^public_cert$|^private_cert|^kv$|$^$", var.sm_secret_type))
     # If it is empty, no secret will be created
-    error_message = "The sm_secret_type value must be one of the following: iam_credentials, username_password, arbitrary, imported_cert, public_cert, private_cert, kv or leave it empty."
+    error_message = "The sm_secret_type value must be one of the following: iam_credentials, trusted_profile, username_password, arbitrary, imported_cert, public_cert, private_cert, kv or leave it empty."
   }
 }
 
@@ -82,9 +82,15 @@ variable "es_container_registry_secrets_chain" {
     es_container_registry       = string
     sm_secret_id                = string # id of the secret storing the apikey that will be used for the secrets chain
     es_container_registry_email = optional(string, null)
+    trusted_profile = optional(string,null)
   }))
   default  = []
   nullable = false
+}
+variable "deploy_username_apikey" {
+  description = "The secret manager certificate is provided with intermediate certificate. By enabling this flag the certificate body on kube will contain certificate and intermediate content, otherwise only certificate will be added. Valid only for public and imported certificate"
+  type        = bool
+  default     = true
 }
 
 variable "es_helm_rls_name" {
