@@ -46,7 +46,7 @@ locals {
   certificate_spec_data = local.is_certificate ? (var.sm_secret_type == "public_cert" ? local.public_certificate_spec_data : (var.sm_secret_type == "imported_cert" ? local.imported_certificate_spec_data : (var.sm_secret_type == "private_cert" ? local.private_certificate_spec_data : ""))) : ""    # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
 
   # dockerjson format
-  docker_user     = var.sm_secret_type == "username_password" || var.sm_secret_type=="trusted_profile" ? "{{ .username }}" : "iamapikey" # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
+  docker_user     = var.sm_secret_type == "username_password" ? "{{ .username }}" : "iamapikey" # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
   docker_password = var.sm_secret_type == "username_password" ? "{{ .password }}" : "{{ .secretid }}"
 
   # setting data_type according to the kube secret and the SM secret types
