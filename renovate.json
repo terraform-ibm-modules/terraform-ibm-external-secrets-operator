@@ -13,18 +13,27 @@
     },
     {
       "customType": "regex",
-      "description": "Update helm chart version to latest in variables.tf",
+      "description": "Update reloader helm chart version to latest in variables.tf",
       "fileMatch": ["variables.tf$"],
-      "matchStrings": [
-        "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*?default\\s*=\\s*\"(?<currentValue>.*)\"\\s"
-      ],
-      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
+      "matchStrings": ["default\\s*=\\s*\"(?<currentValue>.*?)\"\\s*# registryUrl: stakater.github.io/stakater-charts\\n"],
+      "depNameTemplate": "reloader",
+      "datasourceTemplate": "helm",
+      "registryUrlTemplate": "https://stakater.github.io/stakater-charts"
+    },
+    {
+      "customType": "regex",
+      "description": "Update ESO helm chart version to latest in variables.tf",
+      "fileMatch": ["variables.tf$"],
+      "matchStrings": ["default\\s*=\\s*\"(?<currentValue>.*?)\"\\s*# registryUrl: charts.external-secrets.io\\n"],
+      "depNameTemplate": "external-secrets",
+      "datasourceTemplate": "helm",
+      "registryUrlTemplate": "https://charts.external-secrets.io"
     }
   ],
   "packageRules": [
     {
       "description": "Bundle ESO and Reloader images + helm chart updates into the same PR",
-      "matchPackageNames": ["external-secrets/external-secrets", "stakater/Reloader", "ghcr.io/external-secrets/external-secrets", "ghcr.io/stakater/reloader"],
+      "matchPackageNames": ["external-secrets/external-secrets", "stakater/Reloader", "ghcr.io/external-secrets/external-secrets", "ghcr.io/stakater/reloader", "external-secrets", "reloader"],
       "groupName": "Charts and Images",
       "commitMessageExtra": "to latest",
       "group": true
