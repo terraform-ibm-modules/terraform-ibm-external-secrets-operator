@@ -300,7 +300,7 @@ variable "imported_certificate_sm_id" {
     error_message = "imported_certificate_sm_region must also be set when value given for imported_certificate_sm_id"
   }
   validation {
-    condition     = (var.imported_certificate_public_secret_id != null && var.imported_certificate_private_secret_id != null) ? var.imported_certificate_sm_id != null : true
+    condition     = (var.imported_certificate_public_secret_id != null && var.imported_certificate_private_secret_id != null) && var.imported_certificate_sm_id == null ? false : true
     error_message = "If imported_certificate_public_secret_id and imported_certificate_private_secret_id to create an imported certificate also imported_certificate_sm_id must be set"
   }
 }

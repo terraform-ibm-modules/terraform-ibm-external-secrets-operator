@@ -33,10 +33,6 @@ variable "eso_authentication" {
     error_message = "Authentication mode allowed are api_key or/and trusted_profile."
   }
   validation {
-    condition     = var.eso_authentication == "api_key" ? var.sstore_secret_apikey != null : true
-    error_message = "API Key authentication is enabled and scope for store is cluster, therefore sstore_secret_apikey must be provided."
-  }
-  validation {
     condition     = var.eso_authentication == "trusted_profile" ? var.sstore_trusted_profile_name != null : true
     error_message = "Trusted profile authentication is enabled, therefore sstore_trusted_profile_name must be provided."
   }
@@ -55,7 +51,11 @@ variable "sstore_secret_apikey" {
   type        = string
   default     = null
   validation {
-    condition     = var.sstore_secret_apikey != null || var.sstore_trusted_profile_name != null
+    condition     = var.eso_authentication == "api_key" ? var.sstore_secret_apikey != null : true
+    error_message = "API Key authentication is enabled and scope for store is cluster, therefore sstore_secret_apikey must be provided."
+  }
+  validation {
+    condition     = (var.sstore_secret_apikey == null && var.sstore_trusted_profile_name == null) ? false : true
     error_message = "One of the variables sstore_secret_apikey and sstore_trusted_profile_name must be provided, cannot be both set to null"
   }
 }
