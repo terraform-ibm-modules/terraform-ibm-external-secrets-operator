@@ -133,7 +133,7 @@ locals {
 
 ### Define kubernetes secret to be installed in cluster for sm_secret_type iam_credentials or arbitrary
 resource "helm_release" "kubernetes_secret" {
-  count     = (var.sm_secret_type == "iam_credentials" || var.sm_secret_type == "arbitrary") && local.is_dockerjsonconfig_chain == false ? 1 : 0
+  count     = (var.sm_secret_type == "iam_credentials" || var.sm_secret_type == "arbitrary" || var.sm_secret_type == "trusted_profile") && local.is_dockerjsonconfig_chain == false ? 1 : 0
   name      = local.helm_secret_name
   namespace = local.es_helm_rls_namespace
   chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
@@ -172,7 +172,7 @@ resource "helm_release" "kubernetes_secret" {
 
 ### Define kubernetes secret to be installed in cluster for sm_secret_type iam_credentials and kubernetes secret type dockerjsonconfig and configured with a chain of secrets
 resource "helm_release" "kubernetes_secret_chain_list" {
-  count     = local.is_dockerjsonconfig_chain == true && var.sm_secret_type!="trusted_profile" ? 1 : 0
+  count     = local.is_dockerjsonconfig_chain == true ? 1 : 0
   name      = local.helm_secret_name
   namespace = local.es_helm_rls_namespace
   chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
@@ -205,47 +205,7 @@ resource "helm_release" "kubernetes_secret_chain_list" {
 %{for index, element in var.es_container_registry_secrets_chain~}
           - secretKey: secretid_${index}
             remoteRef:
-              key: "${var.sm_secret_type}/${element.sm_secret_id}"
-%{endfor~}
-    EOF
-  ]
-}
-
-resource "helm_release" "kubernetes_secret_chain_list_tp" {
-  count     = local.is_dockerjsonconfig_chain == true && var.sm_secret_type=="trusted_profile" ? 1 : 0
-  name      = local.helm_secret_name
-  namespace = local.es_helm_rls_namespace
-  chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
-  version   = local.helm_raw_chart_version
-  timeout   = 600
-  values = [
-    <<-EOF
-    resources:
-      - apiVersion: external-secrets.io/v1beta1
-        kind: ExternalSecret
-        metadata:
-          name: "${var.es_kubernetes_secret_name}"
-          namespace: "${var.es_kubernetes_namespace}"
-        spec:
-          refreshInterval: ${var.es_refresh_interval}
-          secretStoreRef:
-            name: "${var.eso_store_name}"
-            kind: "${local.secret_store_ref_kind}"
-          target:
-            name: "${var.es_kubernetes_secret_name}"
-            template:
-              engineVersion: v2
-              type: "${local.es_kubernetes_secret_type}"
-              metadata:
-                annotations:
-                  ${local.reloader_annotation}
-              data:
-                ${local.data_chain}
-          data:
-%{for index, element in var.es_container_registry_secrets_chain~}
-          - secretKey: secretid_${index}
-            remoteRef:
-              key: "${element.sm_secret_id}"
+              key: "${var.sm_secret_type == "trusted_profile" ? "iam_credentials/${element.sm_secret_id}" : "${var.sm_secret_type}/${element.sm_secret_id}"}"
 %{endfor~}
     EOF
   ]
