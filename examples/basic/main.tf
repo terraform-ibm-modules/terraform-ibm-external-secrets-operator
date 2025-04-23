@@ -18,7 +18,6 @@ locals {
 
 
   sm_region           = var.existing_sm_instance_region == null ? var.region : var.existing_sm_instance_region
-  sm_acct_id          = var.existing_sm_instance_guid == null ? module.iam_secrets_engine[0].acct_secret_group_id : module.secrets_manager_group_acct[0].secret_group_id
   es_namespace_apikey = "es-operator" # pragma: allowlist secret
   eso_namespace       = "apikeynspace1"
 }
@@ -279,30 +278,11 @@ resource "ibm_resource_instance" "secrets_manager" {
 module "secrets_manager_group_acct" {
   source               = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
   version              = "1.3.2"
-  count                = var.existing_sm_instance_guid == null ? 0 : 1
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   #tfsec:ignore:general-secrets-no-plaintext-exposure
   secret_group_name        = "${var.prefix}-account-secret-group"           #checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
   secret_group_description = "Secret-Group for storing account credentials" #tfsec:ignore:general-secrets-no-plaintext-exposure
-  depends_on               = [module.iam_secrets_engine]
-  providers = {
-    ibm = ibm.ibm-sm
-  }
-}
-
-# Configure instance with IAM engine
-module "iam_secrets_engine" {
-  count                                   = var.existing_sm_instance_guid == null ? 1 : 0
-  source                                  = "terraform-ibm-modules/secrets-manager-iam-engine/ibm"
-  version                                 = "1.2.11"
-  region                                  = local.sm_region
-  secrets_manager_guid                    = ibm_resource_instance.secrets_manager[0].guid
-  iam_secret_generator_service_id_name    = "${var.prefix}-sid:0.0.1:${ibm_resource_instance.secrets_manager[0].name}-iam-secret-generator:automated:simple-service:secret-manager:"
-  iam_secret_generator_apikey_name        = "${var.prefix}-iam-secret-generator-apikey"
-  new_secret_group_name                   = "${var.prefix}-account-secret-group"
-  iam_secret_generator_apikey_secret_name = "${var.prefix}-iam-secret-generator-apikey-secret"
-  iam_engine_name                         = "iam-engine"
   providers = {
     ibm = ibm.ibm-sm
   }
@@ -327,7 +307,7 @@ resource "ibm_iam_service_policy" "secret_puller_policy" {
     service              = "secrets-manager"
     resource_instance_id = local.sm_guid
     resource_type        = "secret-group"
-    resource             = local.sm_acct_id
+    resource             = module.secrets_manager_group_acct.secret_group_id
   }
 }
 
@@ -353,8 +333,8 @@ module "dynamic_serviceid_apikey1" {
   sm_iam_secret_description = "Example of dynamic IAM secret / apikey" #tfsec:ignore:general-secrets-no-plaintext-exposure
   serviceid_id              = ibm_iam_service_id.secret_puller.id
   secrets_manager_guid      = local.sm_guid
-  secret_group_id           = local.sm_acct_id
-  depends_on                = [module.iam_secrets_engine, ibm_iam_service_policy.secret_puller_policy, ibm_iam_service_id.secret_puller]
+  secret_group_id           = module.secrets_manager_group_acct.secret_group_id
+  depends_on                = [ibm_iam_service_policy.secret_puller_policy, ibm_iam_service_id.secret_puller]
   providers = {
     ibm = ibm.ibm-sm
   }
@@ -403,7 +383,7 @@ module "sm_userpass_secret" {
   version              = "1.7.0"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
-  secret_group_id      = local.sm_acct_id
+  secret_group_id      = module.secrets_manager_group_acct.secret_group_id
   #tfsec:ignore:general-secrets-no-plaintext-exposure
   secret_name             = "${var.prefix}-usernamepassword-secret"              # checkov:skip=CKV_SECRET_6
   secret_description      = "example secret in existing secret manager instance" #tfsec:ignore:general-secrets-no-plaintext-exposure # checkov:skip=CKV_SECRET_6
