@@ -95,9 +95,8 @@ variable "eso_chart_location" {
 variable "eso_chart_version" {
   type        = string
   description = "The version of the External Secrets Operator Helm chart. Ensure that the chart version is compatible with the image version specified in eso_image_version."
-  # renovate: datasource=github-tags depName=external-secrets/external-secrets versioning="regex:^helm-chart-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$"
-  default  = "0.15.1"
-  nullable = false
+  default     = "0.15.1" # registryUrl: charts.external-secrets.io
+  nullable    = false
 }
 
 ############################################################################################################
@@ -223,6 +222,6 @@ variable "reloader_chart_location" {
 variable "reloader_chart_version" {
   type        = string
   description = "The version of the Reloader Helm chart. Ensure that the chart version is compatible with the image version specified in reloader_image_version."
-  default     = "2.0.0"
+  default     = "2.0.0" # registryUrl: stakater.github.io/stakater-charts
   nullable    = false
 }
