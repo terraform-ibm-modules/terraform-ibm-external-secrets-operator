@@ -98,7 +98,7 @@ module "image_pull" {
   #tfsec:ignore:general-secrets-no-plaintext-exposure
   service_id_secret_name     = "${var.prefix}-image-pull-service-id"
   service_id_secret_group_id = module.secrets_manager_group.secret_group_id
-  depends_on                 = [module.iam_secrets_engine, module.secrets_manager_group]
+  depends_on                 = [module.secrets_manager_group]
   providers = {
     ibm = ibm.ibm-sm
   }
@@ -138,7 +138,7 @@ module "image_pull_chain_secret_1" {
   #tfsec:ignore:general-secrets-no-plaintext-exposure
   service_id_secret_name     = "${var.prefix}-image-pull-service-id-chain-sec-1"
   service_id_secret_group_id = module.secrets_manager_group.secret_group_id
-  depends_on                 = [module.iam_secrets_engine, module.secrets_manager_group]
+  depends_on                 = [module.secrets_manager_group]
   providers = {
     ibm = ibm.ibm-sm
   }
@@ -154,7 +154,7 @@ module "image_pull_chain_secret_2" {
   #tfsec:ignore:general-secrets-no-plaintext-exposure
   service_id_secret_name     = "${var.prefix}-image-pull-service-id-chain-sec-2"
   service_id_secret_group_id = module.secrets_manager_group.secret_group_id
-  depends_on                 = [module.iam_secrets_engine, module.secrets_manager_group]
+  depends_on                 = [module.secrets_manager_group]
   providers = {
     ibm = ibm.ibm-sm
   }
@@ -170,7 +170,7 @@ module "image_pull_chain_secret_3" {
   #tfsec:ignore:general-secrets-no-plaintext-exposure
   service_id_secret_name     = "${var.prefix}-image-pull-service-id-chain-sec-3"
   service_id_secret_group_id = module.secrets_manager_group.secret_group_id
-  depends_on                 = [module.iam_secrets_engine, module.secrets_manager_group]
+  depends_on                 = [module.secrets_manager_group]
   providers = {
     ibm = ibm.ibm-sm
   }
