@@ -82,7 +82,7 @@ variable "es_container_registry_secrets_chain" {
     es_container_registry       = string
     sm_secret_id                = string # id of the secret storing the apikey that will be used for the secrets chain
     es_container_registry_email = optional(string, null)
-    trusted_profile = optional(string,null)
+    trusted_profile             = optional(string, null)
   }))
   default  = []
   nullable = false

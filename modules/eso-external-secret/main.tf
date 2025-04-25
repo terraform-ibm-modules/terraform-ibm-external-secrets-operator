@@ -88,7 +88,7 @@ locals {
       (element.trusted_profile != null && element.trusted_profile != "") ?
       {
         "username" : element.trusted_profile, "password" : "{{ .secretid_${index} }}"
-      }:
+      } :
       {
         "username" : "iamapikey", "password" : "{{ .secretid_${index} }}"
       }
