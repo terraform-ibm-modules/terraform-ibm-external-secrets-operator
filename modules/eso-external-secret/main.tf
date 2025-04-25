@@ -223,7 +223,7 @@ resource "helm_release" "kubernetes_secret_user_pw" {
   values = [
     <<-EOF
     resources:
-      - apiVersion: external-secrets.io/v1alpha1
+      - apiVersion: external-secrets.io/v1beta1
         kind: ExternalSecret
         metadata:
           name: "${var.es_kubernetes_secret_name}"
