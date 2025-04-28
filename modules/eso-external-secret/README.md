@@ -38,7 +38,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_es_container_registry"></a> [es\_container\_registry](#input\_es\_container\_registry) | The registry URL to be used in dockerconfigjson | `string` | `"us.icr.io"` | no |
 | <a name="input_es_container_registry_email"></a> [es\_container\_registry\_email](#input\_es\_container\_registry\_email) | Optional - Email to be used in dockerconfigjson | `string` | `null` | no |
-| <a name="input_es_container_registry_secrets_chain"></a> [es\_container\_registry\_secrets\_chain](#input\_es\_container\_registry\_secrets\_chain) | Structure to generate a chain of secrets into a single dockerjsonconfig secret for multiple registries authentication. | <pre>list(object({<br/>    es_container_registry       = string<br/>    sm_secret_id                = string # id of the secret storing the apikey that will be used for the secrets chain<br/>    es_container_registry_email = optional(string, null)<br/>  }))</pre> | `[]` | no |
+| <a name="input_es_container_registry_secrets_chain"></a> [es\_container\_registry\_secrets\_chain](#input\_es\_container\_registry\_secrets\_chain) | Structure to generate a chain of secrets into a single dockerjsonconfig secret for multiple registries authentication. | <pre>list(object({<br/>    es_container_registry       = string<br/>    sm_secret_id                = string # id of the secret storing the apikey that will be used for the secrets chain<br/>    es_container_registry_email = optional(string, null)<br/>    trusted_profile             = optional(string, null)<br/>  }))</pre> | `[]` | no |
 | <a name="input_es_helm_rls_name"></a> [es\_helm\_rls\_name](#input\_es\_helm\_rls\_name) | Name to use for the helm release for externalsecrets resource. Must be unique in the namespace | `string` | n/a | yes |
 | <a name="input_es_helm_rls_namespace"></a> [es\_helm\_rls\_namespace](#input\_es\_helm\_rls\_namespace) | Namespace to deploy the helm release for the externalsecret. Default if null is the externalsecret namespace | `string` | `null` | no |
 | <a name="input_es_kubernetes_namespace"></a> [es\_kubernetes\_namespace](#input\_es\_kubernetes\_namespace) | Namespace to use to generate the externalsecret | `string` | n/a | yes |
@@ -54,7 +54,7 @@ No modules.
 | <a name="input_sm_kv_keyid"></a> [sm\_kv\_keyid](#input\_sm\_kv\_keyid) | Secrets-Manager key value (kv) keyid | `string` | `null` | no |
 | <a name="input_sm_kv_keypath"></a> [sm\_kv\_keypath](#input\_sm\_kv\_keypath) | Secrets-Manager key value (kv) keypath | `string` | `null` | no |
 | <a name="input_sm_secret_id"></a> [sm\_secret\_id](#input\_sm\_secret\_id) | Secrets-Manager secret ID where source data will be synchronized with Kubernetes secret. It can be null only in the case of a dockerjsonconfig secrets chain | `string` | n/a | yes |
-| <a name="input_sm_secret_type"></a> [sm\_secret\_type](#input\_sm\_secret\_type) | Secrets-manager secret type to be used as source data by ESO. Valid input types are 'arbitrary', 'username\_password' and 'iam\_credentials' | `string` | n/a | yes |
+| <a name="input_sm_secret_type"></a> [sm\_secret\_type](#input\_sm\_secret\_type) | Secrets-manager secret type to be used as source data by ESO. Valid input types are 'iam\_credentials', 'username\_password', 'trusted\_profile', 'arbitrary', 'imported\_cert', 'public\_cert', 'private\_cert', 'kv' | `string` | n/a | yes |
 
 ### Outputs
 
