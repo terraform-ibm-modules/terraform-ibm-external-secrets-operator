@@ -11,18 +11,6 @@ locals {
   # dockerjsonconfig secrets chain flag
   is_dockerjsonconfig_chain = length(var.es_container_registry_secrets_chain) > 0 ? true : false
 
-  # validation for dockerjsonconfig secrets chain -> if it is a chain the kube secret type must be dockerconfigjson and sm secret types iam_credentials or trusted_profile
-  validate_condition_chain = local.is_dockerjsonconfig_chain == true && (var.es_kubernetes_secret_type != "dockerconfigjson" || (var.sm_secret_type != "iam_credentials" && var.sm_secret_type != "trusted_profile")) # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
-  validate_msg_chain       = "If the externalsecret is expected to generate a dockerjsonconfig secrets chain the only supported value for es_kubernetes_secret_type is dockerconfigjson and for sm_secret_type is iam_credentials or trusted_profile"
-  # tflint-ignore: terraform_unused_declarations
-  validate_check_chain = regex("^${local.validate_msg_chain}$", (!local.validate_condition_chain ? local.validate_msg_chain : ""))
-
-  # validation of sm_secret_id => it can be null only in the case of a dockerjsonconfig chain (secret_ids will be stored )
-  validate_condition_sm_secret_id = var.sm_secret_id == null && local.is_dockerjsonconfig_chain == false
-  validate_msg_sm_secret_id       = "The input variable sm_secret_id can be null only a dockerjsonconfig secrets chain is going to be created"
-  # tflint-ignore: terraform_unused_declarations
-  validate_check_sm_secret_id = regex("^${local.validate_msg_sm_secret_id}$", (!local.validate_condition_sm_secret_id ? local.validate_msg_sm_secret_id : ""))
-
   # for certificate secrets public_cert and private_cert the id is the last part of the sm_secret_sm
   cert_remoteref_key = local.is_certificate ? "${var.sm_secret_type}/${var.sm_secret_id}" : ""
   # defining the template data structure according to the type of certificate

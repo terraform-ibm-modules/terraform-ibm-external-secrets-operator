@@ -50,8 +50,8 @@ variable "es_kubernetes_secret_type" {
     error_message = "A value for 'es_kubernetes_secret_data_key' must be passed when 'es_kubernetes_secret_type = opaque' and 'sm_secret_type' is either 'arbitrary' or 'iam_credentials'"
   }
   validation {
-    condition     = (local.is_dockerjsonconfig_chain == true && (var.es_kubernetes_secret_type != "dockerconfigjson" || var.sm_secret_type != "iam_credentials")) ? false : true
-    error_message = "If the externalsecret is expected to generate a dockerjsonconfig secrets chain the only supported value for es_kubernetes_secret_type is dockerconfigjson and for sm_secret_type is iam_credentials"
+    condition     = (local.is_dockerjsonconfig_chain == true && (var.es_kubernetes_secret_type != "dockerconfigjson" || (var.sm_secret_type != "iam_credentials" && var.sm_secret_type != "trusted_profile"))) ? false : true
+    error_message = "If the externalsecret is expected to generate a dockerjsonconfig secrets chain the only supported value for es_kubernetes_secret_type is dockerconfigjson and for sm_secret_type is iam_credentials or trusted_profile"
   }
 }
 
