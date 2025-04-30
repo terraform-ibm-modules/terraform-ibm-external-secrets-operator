@@ -204,7 +204,7 @@ variable "reloader_image" {
 variable "reloader_image_version" {
   type        = string
   description = "The version or digest for the reloader image to deploy. If changing the value, ensure it is compatible with the chart version set in reloader_chart_version."
-  default     = "v1.4.1-ubi@sha256:aff89a3997ad1f749f6ab776d37ea6cfeabf6d179740044bfe337be055f83c5b" # datasource: ghcr.io/stakater/reloader
+  default     = "v1.4.2-ubi@sha256:e80c47260ed11f44a3b81331486f218955c4e36e82aa121d3bfdbfcab28b2055" # datasource: ghcr.io/stakater/reloader
   nullable    = false
   validation {
     condition     = can(regex("(^v\\d+\\.\\d+.\\d+(\\-\\w+)?(\\@sha256\\:\\w+){0,1})$", var.reloader_image_version))
@@ -222,6 +222,6 @@ variable "reloader_chart_location" {
 variable "reloader_chart_version" {
   type        = string
   description = "The version of the Reloader Helm chart. Ensure that the chart version is compatible with the image version specified in reloader_image_version."
-  default     = "2.1.2" # registryUrl: stakater.github.io/stakater-charts
+  default     = "2.1.3" # registryUrl: stakater.github.io/stakater-charts
   nullable    = false
 }
