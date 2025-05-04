@@ -80,7 +80,7 @@ variable "sm_secret_id" {
   type        = string
   validation {
     condition     = (var.sm_secret_id == null && local.is_dockerjsonconfig_chain == false) ? false : true
-    error_message = "The input variable sm_secret_id can be null only a dockerjsonconfig secrets chain is going to be created"
+    error_message = "The input variable sm_secret_id cannot be null unless the secret to create is a dockerjsonconfig secrets chain"
   }
 }
 
