@@ -36,7 +36,7 @@ module "secrets_manager_public_certificate" {
   count                             = (var.acme_letsencrypt_private_key != null || (var.acme_letsencrypt_private_key_sm_id != null && var.acme_letsencrypt_private_key_secret_id != null && var.acme_letsencrypt_private_key_sm_region != null)) ? 1 : 0
   depends_on                        = [module.secrets_manager_public_cert_engine]
   source                            = "terraform-ibm-modules/secrets-manager-public-cert/ibm"
-  version                           = "1.2.2"
+  version                           = "1.3.0"
   cert_common_name                  = local.cert_common_name
   cert_description                  = "Certificate for ${local.cert_common_name}"
   cert_name                         = "${var.prefix}-sm-public-cert"
