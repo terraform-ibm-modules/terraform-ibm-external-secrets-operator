@@ -51,6 +51,10 @@ variable "existing_sm_instance_guid" {
   type        = string
   description = "Existing Secrets Manager GUID. If not provided a new instance will be provisioned"
   default     = null
+  validation {
+    condition     = var.existing_sm_instance_guid != null ? var.existing_sm_instance_region != null : true
+    error_message = "existing_sm_instance_region must also be set when value given for existing_sm_instance_guid."
+  }
 }
 
 variable "existing_sm_instance_region" {

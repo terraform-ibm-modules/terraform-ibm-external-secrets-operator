@@ -3,27 +3,6 @@
 ##############################################################################
 
 locals {
-
-  # validation for secrets manager region to be set for existing secrets manager instance
-  validate_sm_region_cnd = var.existing_sm_instance_guid != null && var.existing_sm_instance_region == null
-  validate_sm_region_msg = "existing_sm_instance_region must also be set when value given for existing_sm_instance_guid."
-  # tflint-ignore: terraform_unused_declarations
-  validate_sm_region_chk = regex(
-    "^${local.validate_sm_region_msg}$",
-    (!local.validate_sm_region_cnd
-      ? local.validate_sm_region_msg
-  : ""))
-
-  # validation for secrets manager crn to be set for existing secrets manager instance if using private service endpoints
-  validate_sm_crn_cnd = var.existing_sm_instance_guid != null && var.existing_sm_instance_crn == null && var.service_endpoints == "private"
-  validate_sm_crn_msg = "existing_sm_instance_crn must also be set when value given for existing_sm_instance_guid if service_endpoints is private."
-  # tflint-ignore: terraform_unused_declarations
-  validate_sm_crn_chk = regex(
-    "^${local.validate_sm_crn_msg}$",
-    (!local.validate_sm_crn_cnd
-      ? local.validate_sm_crn_msg
-  : ""))
-
   # setting the secrets manager resource id to use
   sm_guid = var.existing_sm_instance_guid == null ? ibm_resource_instance.secrets_manager[0].guid : var.existing_sm_instance_guid
 
