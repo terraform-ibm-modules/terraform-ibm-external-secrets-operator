@@ -1,22 +1,61 @@
+#######################################################################
+# Generic
+#######################################################################
+
+variable "ibmcloud_api_key" {
+  type        = string
+  description = "IBM Cloud API Key"
+  sensitive   = true
+}
+
+variable "prefix" {
+  type        = string
+  description = "Prefix to add to all resources created by this deployable architecture. To not use any prefix value, you can set this value to `null` or an empty string. If provided all the stores, secrets groups, serviceIDs and secrets will be prefixed with this value."
+  
+}
+
+variable "existing_cluster_crn" {
+  type        = string
+  description = "The CRN of the to deploy ESO operator onto. This value cannot be null."
+  nullable = false
+}
+
+variable "existing_secrets_manager_crn" {
+  type        = string
+  description = "The CRN of the existing Secrets Manager instance to use. This value cannot be null."
+  nullable    = false  
+}
+
 ############################################################################################################
-# EXTERNAL SECRETS CONFIGURATIONS
+# ESO DEPLOYMENT CONFIGURATION
 ############################################################################################################
 
 variable "eso_namespace" {
-  description = "Namespace to create and be used to install ESO components including helm releases."
   type        = string
-  default     = null
+  description = "Cluster namespace to create and to deploy the External secrets Operator and Reloader into."
+  default     = "es-operator"
+  validation {
+    condition     = var.eso_namespace == null || can(regex("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$", var.eso_namespace))
+    error_message = "The value of the eso_namespace must be a valid Kubernetes namespace name"
+  }
 }
 
 variable "existing_eso_namespace" {
-  description = "Existing Namespace to be used to install ESO components including helm releases."
   type        = string
+  description = "Existing cluster namespace to deploy the External secrets Operator and Reloader into. If eso_namespace is not null, this value will be ignored."
   default     = null
+  validation {
+    condition     = var.existing_eso_namespace == null || can(regex("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$", var.existing_eso_namespace))
+    error_message = "The value of the existing_eso_namespace must be a valid Kubernetes namespace name."
+  }
+  validation {
+    condition     = var.existing_eso_namespace == null && var.eso_namespace == null ? false : true
+    error_message = "The values of var.existing_eso_namespace var.eso_namespace cannot be null at the same time."
+  }
 }
 
-# ESO deployment cluster nodes configuration
 variable "eso_cluster_nodes_configuration" {
-  description = "Configuration to use to customise ESO deployment on specific cluster nodes. Setting appropriate values will result in customising ESO helm release. Default value is null to keep ESO standard deployment."
+  description = "Configuration to use to customise ESO deployment on specific cluster nodes. Default value is null to keep ESO standard deployment. Learn more [here](https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator#customise-eso-deployment-on-specific-cluster-nodes)"
   type = object({
     nodeSelector = object({
       label = string
@@ -34,7 +73,7 @@ variable "eso_cluster_nodes_configuration" {
 
 # ESO deployment cluster pods configuration
 variable "eso_pod_configuration" {
-  description = "Configuration to use to customise ESO deployment on specific pods. Setting appropriate values will result in customising ESO helm release. Default value is {} to keep ESO standard deployment. Ignore the key if not required."
+  description = "Configuration to use to customise ESO deployment on specific pods. Default value is {} to keep ESO standard deployment. Ignore if not needed."
   type = object({
     annotations = optional(object({
       # The annotations for external secret controller pods.
@@ -54,19 +93,10 @@ variable "eso_pod_configuration" {
       external_secrets_webhook = optional(map(string), {})
     }), {})
   })
-
   default = {}
 }
 
-# ESO
-variable "eso_enroll_in_servicemesh" {
-  description = "Flag to enroll ESO into istio servicemesh"
-  type        = bool
-  default     = false
-}
-
-# external secrets image and helm charts references
-
+# external secrets operator image and helm charts references
 variable "eso_image" {
   type        = string
   description = "The External Secrets Operator image in the format of `[registry-url]/[namespace]/[image]`."
@@ -100,15 +130,15 @@ variable "eso_chart_version" {
 }
 
 ############################################################################################################
-# RELOADER CONFIGURATIONS
+# RELOADER DEPLOYMENT CONFIGURATION
 ############################################################################################################
 
-# Reloader variables full documentation https://github.com/stakater/Reloader/tree/master#helm-charts
 variable "reloader_deployed" {
-  description = "Whether to deploy reloader or not https://github.com/stakater/Reloader"
+  description = "Flag to enable the deployment of [reloader](https://github.com/stakater/Reloader) along with ESO. Learn more [here](https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator#pod-reloader)"
   type        = bool
   default     = true
 }
+
 variable "reloader_reload_strategy" {
   description = "The reload strategy to use for reloader. Possible values are `env-vars` or `annotations`. Default value is `annotations`"
   type        = string
@@ -118,46 +148,55 @@ variable "reloader_reload_strategy" {
     error_message = "The specified reloader_reload_strategy is not a valid selection! Valid values are `env-vars` or `annotations`"
   }
 }
+
 variable "reloader_namespaces_to_ignore" {
   description = "List of comma separated namespaces to ignore for reloader. If multiple are provided they are combined with the AND operator"
   type        = string
   default     = null
 }
+
 variable "reloader_resources_to_ignore" {
   description = "List of comma separated resources to ignore for reloader. If multiple are provided they are combined with the AND operator"
   type        = string
   default     = null
 }
+
 variable "reloader_namespaces_selector" {
   description = "List of comma separated label selectors, if multiple are provided they are combined with the AND operator"
   type        = string
   default     = null
 }
+
 variable "reloader_resource_label_selector" {
   description = "List of comma separated label selectors, if multiple are provided they are combined with the AND operator"
   type        = string
   default     = null
 }
+
 variable "reloader_ignore_secrets" {
   description = "Whether to ignore secret changes or not"
   type        = bool
   default     = false
 }
+
 variable "reloader_ignore_configmaps" {
   description = "Whether to ignore configmap changes or not"
   type        = bool
   default     = false
 }
+
 variable "reloader_is_openshift" {
   description = "Enable OpenShift DeploymentConfigs"
   type        = bool
   default     = true
 }
+
 variable "reloader_is_argo_rollouts" {
   description = "Enable Argo Rollouts"
   type        = bool
   default     = false
 }
+
 variable "reloader_reload_on_create" {
   description = "Enable reload on create events"
   type        = bool
@@ -168,8 +207,8 @@ variable "reloader_sync_after_restart" {
   description = "Enable sync after Reloader restarts for Add events, works only when reloadOnCreate is true"
   type        = bool
   default     = true
-
 }
+
 variable "reloader_pod_monitor_metrics" {
   description = "Enable to scrape Reloader's Prometheus metrics"
   type        = bool
@@ -185,20 +224,19 @@ variable "reloader_log_format" {
     error_message = "The specified reloader_log_format is not a valid selection! Valid values are `json` or `text`"
   }
 }
+
 variable "reloader_custom_values" {
-  description = "String containing custom values to be used for reloader helm chart. See https://github.com/stakater/Reloader/blob/master/deployments/kubernetes/chart/reloader/values.yaml"
+  description = "String containing custom values to be used for reloader helm chart. More details [here](https://github.com/stakater/Reloader/blob/master/deployments/kubernetes/chart/reloader/values.yaml)"
   type        = string
   default     = null
 }
 
 # reloader image and helm charts references
-
 variable "reloader_image" {
   type        = string
   description = "The reloader image repository in the format of `[registry-url]/[namespace]/[image]`."
   default     = "ghcr.io/stakater/reloader"
   nullable    = false
-
 }
 
 variable "reloader_image_version" {
@@ -224,4 +262,58 @@ variable "reloader_chart_version" {
   description = "The version of the Reloader Helm chart. Ensure that the chart version is compatible with the image version specified in reloader_image_version."
   default     = "2.1.3" # registryUrl: stakater.github.io/stakater-charts
   nullable    = false
+}
+
+# secrets stores configuration
+
+variable "eso_secretsstores_configuration" {
+  description = "Configuration of the [cluster secrets stores](https://external-secrets.io/latest/api/clustersecretstore/) and [secrets stores](https://external-secrets.io/latest/api/secretstore/) to create. Learn more about this configuration [here](https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/blob/main/solutions/fully-configurable/DA-eso-configuration.md)"
+  type = object({
+    cluster_secrets_stores = map(object({
+      # name = string
+      namespace = string
+      create_namespace = bool
+      existing_serviceid_id = string
+      serviceid_name = string
+      serviceid_description = string
+      existing_account_secrets_group_id = string
+      account_secrets_group_name = string
+      account_secrets_group_description = string
+      trusted_profile_name = string # if both the trusted_profile_name and the serviceid_name/existing_serviceid_id are set, the trusted_profile_name will be used
+      trusted_profile_description = string
+      existing_service_secrets_group_id_list = list(string)
+      service_secrets_groups_list = list(object({
+        name = string
+        description = string
+      }))
+    }))
+    secrets_stores = map(object({
+      # name = string
+      create_namespace = bool
+      namespace = string
+      existing_serviceid_id = string
+      serviceid_name = string
+      serviceid_description = string
+      existing_account_secrets_group_id = string
+      account_secrets_group_name = string
+      account_secrets_group_description = string
+      trusted_profile_name = string # if both the trusted_profile_name and the serviceid_name/existing_serviceid_id are set, the trusted_profile_name will be used
+      trusted_profile_description = string
+      existing_service_secrets_group_id_list = list(string)
+      service_secrets_groups_list = list(object({
+        name = string
+        description = string
+      }))
+    }))
+  })
+  default = {
+    cluster_secrets_stores = {}
+    secrets_stores = {}
+  }
+}
+
+variable "service_endpoints" {
+  type        = string
+  description = "The service endpoint type to communicate with the provided secrets manager instance. Possible values are `public` or `private`. This also will set the iam endpoint for containerAuth when enabling Trusted Profile/CR based authentication."
+  default     = "public"
 }

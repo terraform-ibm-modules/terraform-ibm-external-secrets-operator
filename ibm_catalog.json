@@ -1,0 +1,234 @@
+
+{
+    "products": [
+      {
+        "name": "deploy-arch-ibm-eso",
+        "label": "Cloud automation for External Secrets Operator",
+        "product_kind": "solution",
+        "tags": [
+          "ibm_created",
+          "target_terraform",
+          "terraform",
+          "solution",
+          "security"
+        ],
+        "keywords": [
+          "ESO",
+          "Secrets",
+          "Secrets Management",
+          "Secrets Manager",
+          "Secrets Management Service",
+          "cluster",
+          "terraform",
+          "solution"
+        ],
+        "short_description": "Deploys the External Secrets Operator (ESO) on an IBM Cloud Kubernetes Service (IKS) OpenShift cluster.",
+        "long_description": "This architecture allows to deploy the External Secrets Operator (ESO) and the related configuration on an IBM Cloud OpenShift Cluster to manage the secrets deployed on the cluster through IBM Cloud Secrets Manager.",
+        "offering_docs_url": "https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/blob/main/solutions/fully-configurable/README.md",
+        "offering_icon_url": "",
+        "provider_name": "IBM",
+        "features": [
+          {
+            "title": "Deploys the External Secrets Operator (ESO)",
+            "description": "For more details [see here](https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/blob/main/solutions/fully-configurable/README.md)."
+          },
+          {
+            "title": "Configures the External Secrets Operator (ESO) Cluster Secrets Stores and Secrets Stores with the related ServiceIDs and Secrets Groups",
+            "description": "For more details about the Stores configuration [see here](https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/blob/main/solutions/fully-configurable/DA-eso-configuration.md)."
+          },
+          {
+            "title": "Deploys Stakater Reloader](https://github.com/stakater/Reloader] into the cluster to refresh the secrets in the cluster pods when needed",
+            "description": "For more details about Reloader [see here](https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/blob/main/solutions/fully-configurable/README.md#pod-reloader.md)."
+          }
+        ],
+        "support_details": "This product is in the community registry, as such support is handled through the originated repo. If you experience issues please open an issue in this repository [https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/issues). Please note this product is not supported via the IBM Cloud Support Center.",
+        "flavors": [
+          {
+            "label": "Fully configurable",
+            "name": "fully-configurable",
+            "install_type": "fullstack",
+            "working_directory": "solutions/fully-configurable",
+            "compliance": {},
+            "iam_permissions": [
+              {
+                "role_crns": [
+                  "crn:v1:bluemix:public:iam::::role:Administrator"
+                ],
+                "service_name": "iam-identity",
+                "notes": "[Optional] Required if Cloud automation for account configuration is enabled."
+              }
+            ],
+            "configuration": [
+              {
+                "key": "ibmcloud_api_key"
+              },
+              {
+                "key": "prefix",
+                "required": true
+              },
+              {
+                "key": "existing_cluster_crn",
+                "required": true
+              },
+              {
+                "key": "existing_secrets_manager_crn",
+                "required": true
+              },
+              {
+                "key": "eso_namespace"
+              },
+              {
+                "key": "existing_eso_namespace"
+              },
+              {
+                "key": "eso_cluster_nodes_configuration"
+              },
+              {
+                "key": "eso_pod_configuration"
+              },
+              {
+                "key": "eso_image"
+              },
+              {
+                "key": "eso_image_version"
+              },
+              {
+                "key": "eso_chart_location"
+              },
+              {
+                "key": "eso_chart_version"
+              },
+              {
+                "key": "reloader_deployed"
+              },
+              {
+                "key": "reloader_reload_strategy"
+              },
+              {
+                "key": "reloader_namespaces_to_ignore"
+              },
+              {
+                "key": "reloader_resources_to_ignore"
+              },
+              {
+                "key": "reloader_namespaces_selector"
+              },
+              {
+                "key": "reloader_resource_label_selector"
+              },
+              {
+                "key": "reloader_ignore_secrets"
+              },
+              {
+                "key": "reloader_ignore_configmaps"
+              },
+              {
+                "key": "reloader_is_openshift"
+              },
+              {
+                "key": "reloader_is_argo_rollouts"
+              },
+              {
+                "key": "reloader_reload_on_create"
+              },
+              {
+                "key": "reloader_sync_after_restart"
+              },
+              {
+                "key": "reloader_pod_monitor_metrics"
+              },
+              {
+                "key": "reloader_log_format"
+              },
+              {
+                "key": "reloader_custom_values"
+              },
+              {
+                "key": "reloader_image"
+              },
+              {
+                "key": "reloader_image_version"
+              },
+              {
+                "key": "reloader_chart_location"
+              },
+              {
+                "key": "reloader_chart_location"
+              },
+              {
+                "key": "reloader_chart_version"
+              },
+              {
+                "key": "eso_secretsstores_configuration"
+              },
+              {
+                "key": "service_endpoints"
+              }
+            ],
+            "architecture": {
+              "description": "This architecture supports deploying External Secrets Operator on IBM Cloud OpenShift cluster.",
+              "features": [
+                {
+                  "title": "External Secrets Operator",
+                  "description": "Deploys External Secrets Operator."
+                },
+                {
+                  "title": "Configures External Secrets Operator Cluster Secrets Stores and Secrets Stores",
+                  "description": "Creates and configures External Secrets Operator Cluster Secrets Stores and Secrets Stores."
+                },
+                {
+                  "title": "Deploys Stakater Reloader",
+                  "description": "Deploys Stakater Reloader to refresh the secrets in the cluster pods when needed."
+                }
+              ],
+              "diagrams": [
+                {
+                  "diagram": {
+                    "caption": "External Secrets Operator architecture on IBM Cloud OpenShift cluster",
+                    "url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/main/reference-architecture/eso.svg",
+                    "type": "image/svg+xml"
+                  },
+                  "description": "This architecture supports deploying External Secrets Operator on IBM Cloud OpenShift cluster."
+                }
+              ]
+            },
+            "dependencies": [
+                {
+                    "name": "testing-deploy-arch-ibm-secrets-manager",
+                    "id": "5f149ae6-d781-460a-977d-c8c4171ad0fa-global",
+                    "flavors": [
+                      "standard"
+                    ],
+                    "catalog_id": "7a4d68b4-cf8b-40cd-a3d1-f49aff526eb3",
+                    "version": "^1.2.2",
+                    "optional": true,
+                    "on_by_default": true,
+                    "default_flavor": "standard",
+                    "input_mapping": [
+                      {
+                        "reference_version": true,
+                        "dependency_input": "region",
+                        "version_input": "region"
+                      },
+                      {
+                        "reference_version": true,
+                        "dependency_input": "prefix",
+                        "version_input": "prefix"
+                      },
+                      {
+                        "dependency_output": "secrets_manager_crn",
+                        "version_input": "existing_secrets_manager_crn"
+                      }
+                    ],
+                    "ignore_auto_referencing": [
+                      "*"
+                    ]
+                  }
+          ],
+            "dependency_version_2": true,
+            "terraform_version": "1.10.5"
+          }
+        ]
+      }
+    ]
+  }

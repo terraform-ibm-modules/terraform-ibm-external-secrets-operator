@@ -11,18 +11,25 @@ This module automates the installation and configuration of the [External Secret
 <!-- Below content is automatically populated via pre-commit hook -->
 <!-- BEGIN OVERVIEW HOOK -->
 ## Overview
-* [terraform-ibm-external-secrets-operator](#terraform-ibm-external-secrets-operator)
-* [Submodules](./modules)
-    * [eso-clusterstore](./modules/eso-clusterstore)
-    * [eso-external-secret](./modules/eso-external-secret)
-    * [eso-secretstore](./modules/eso-secretstore)
-    * [eso-trusted-profile](./modules/eso-trusted-profile)
-* [Examples](./examples)
-    * [Basic Example](./examples/basic)
-    * [Example that uses trusted profiles (container authentication)](./examples/trusted-profiles-authentication)
-    * [Example to deploy the External Secret Operator and to create a different set of resources in terms of secrets, secret groups, stores and auth configurations](./examples/all-combined)
-    * [ImagePull API key Secrets Manager](./examples/all-combined/imagepull-apikey-secrets-manager)
-* [Contributing](#contributing)
+- [Terraform IBM External Secrets Operator module](#terraform-ibm-external-secrets-operator-module)
+- [Overview](#overview)
+- [external-secrets-operator-module](#external-secrets-operator-module)
+  - [Customise ESO deployment on specific cluster nodes](#customise-eso-deployment-on-specific-cluster-nodes)
+  - [Example of Multitenancy configuration example in namespaced externalsecrets stores](#example-of-multitenancy-configuration-example-in-namespaced-externalsecrets-stores)
+  - [More information links](#more-information-links)
+  - [_Important current limitation of ESO deployment_](#important-current-limitation-of-eso-deployment)
+  - [Pod Reloader](#pod-reloader)
+  - [Troubleshooting](#troubleshooting)
+  - [_Important note_](#important-note)
+  - [Examples of the secrets format and layout](#examples-of-the-secrets-format-and-layout)
+- [Usage](#usage)
+  - [Required IAM access policies](#required-iam-access-policies)
+  - [Requirements](#requirements)
+  - [Modules](#modules)
+  - [Resources](#resources)
+  - [Inputs](#inputs)
+  - [Outputs](#outputs)
+- [Contributing](#contributing)
 <!-- END OVERVIEW HOOK -->
 
 <!-- Match this heading to the name of the root level module (the repo name) -->
@@ -490,6 +497,14 @@ module "es_kubernetes_secret" {
 ```
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+
+### Required IAM access policies
+
+TBD 
+Secrets Manager
+ServiceIDs secrets groups and apikeys creation
+Cluster admin
+
 ### Requirements
 
 | Name | Version |
