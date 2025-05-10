@@ -1,19 +1,3 @@
-TBD
-
-eso_cluster_nodes_configuration = {
-    nodeSelector = {
-      label = "ibm-cloud.kubernetes.io/worker-pool-name"
-      value = "edge"
-    }
-    tolerations = {
-      key = "dedicated"
-      operator = "Equal"
-      value = "edge"
-      effect = "NoExecute"
-    }
-  }
-}
-
 # Terraform IBM External Secrets Operator
 
 This architecture allows to deploy [External Secrets Operator](https://external-secrets.io/latest/) (also known as ESO) on an existing IBM Cloud OpenShift Cluster
