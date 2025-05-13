@@ -129,6 +129,13 @@ variable "eso_chart_version" {
   nullable    = false
 }
 
+# ESO
+variable "eso_enroll_in_servicemesh" {
+  description = "Flag to enroll the External Secrets Operator into RedHat Service Mesh adding the istio-injection annotation to the ESO namespace and to ESO pods. Default to false."
+  type        = bool
+  default     = false
+}
+
 ############################################################################################################
 # RELOADER DEPLOYMENT CONFIGURATION
 ############################################################################################################
@@ -270,7 +277,6 @@ variable "eso_secretsstores_configuration" {
   description = "Configuration of the [cluster secrets stores](https://external-secrets.io/latest/api/clustersecretstore/) and [secrets stores](https://external-secrets.io/latest/api/secretstore/) to create. Learn more about this configuration [here](https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/blob/main/solutions/fully-configurable/DA-eso-configuration.md)"
   type = object({
     cluster_secrets_stores = map(object({
-      # name = string
       namespace                              = string
       create_namespace                       = bool
       existing_serviceid_id                  = string
@@ -288,7 +294,6 @@ variable "eso_secretsstores_configuration" {
       }))
     }))
     secrets_stores = map(object({
-      # name = string
       create_namespace                       = bool
       namespace                              = string
       existing_serviceid_id                  = string

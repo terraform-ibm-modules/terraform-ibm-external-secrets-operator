@@ -98,6 +98,9 @@
                 "key": "eso_chart_version"
               },
               {
+                "key": "eso_enroll_in_servicemesh"
+              },
+              {
                 "key": "reloader_deployed"
               },
               {

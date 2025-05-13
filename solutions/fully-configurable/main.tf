@@ -39,10 +39,10 @@ resource "time_sleep" "wait_45_seconds" {
 ##################################################################
 
 module "external_secrets_operator" {
-  source                 = "../../"
-  eso_namespace          = var.eso_namespace
-  existing_eso_namespace = var.existing_eso_namespace
-  # eso_enroll_in_servicemesh = false
+  source                    = "../../"
+  eso_namespace             = var.eso_namespace
+  existing_eso_namespace    = var.existing_eso_namespace
+  eso_enroll_in_servicemesh = var.eso_enroll_in_servicemesh
   # ESO configuration
   eso_cluster_nodes_configuration = var.eso_cluster_nodes_configuration
   eso_pod_configuration           = var.eso_pod_configuration
@@ -115,17 +115,7 @@ module "cluster_secrets_stores_service_secrets_groups" {
 }
 
 locals {
-  # cluster_secrets_stores_service_secrets_groups = flatten([
-  #   for cluster_secrets_store_key, cluster_secrets_store in var.eso_secretsstores_configuration.cluster_secrets_stores : [
-  #     for service_secrets_group_key, service_secrets_group in cluster_secrets_store.service_secrets_groups_list : {
-  #       key           = "${cluster_secrets_store_key}.${service_secrets_group.name}"
-  #       name          = try("${local.prefix}-${service_secrets_group.name}", service_secrets_group.name)
-  #       description   = service_secrets_group.description
-  #       secrets_group = module.cluster_secrets_stores_service_secrets_groups["${cluster_secrets_store_key}.${service_secrets_group.name}"]
-  #     }
-  #   ]
-  # ])
-
+  # map of cluster secrets stores service secrets groups enriched with the created secrets groups details
   cluster_secrets_stores_service_secrets_groups = {
     for cluster_secrets_store_key, cluster_secrets_store in var.eso_secretsstores_configuration.cluster_secrets_stores :
     cluster_secrets_store_key => [
@@ -140,7 +130,6 @@ locals {
 }
 
 # trusted profile authentication for the cluster secrets stores
-
 locals {
   # putting together the service secrets groups IDs to use for each cluster secrets store with the trusted profile to read them
   cluster_secrets_stores_trusted_profile_to_create = tomap({
@@ -186,6 +175,7 @@ module "cluster_secrets_stores_account_secrets_groups" {
 }
 
 locals {
+  # map of cluster secrets stores account secrets groups enriched with the created secrets groups details
   cluster_secrets_stores_account_secrets_groups = {
     for cluster_secrets_store_key, cluster_secrets_store in var.eso_secretsstores_configuration.cluster_secrets_stores :
     cluster_secrets_store_key => {
@@ -210,6 +200,7 @@ resource "ibm_iam_service_id" "cluster_secrets_stores_secret_puller" {
 }
 
 locals {
+  # map of serviceIDs details owning the secrets to pull from Secrets Manager for each cluster secrets stores
   cluster_secrets_stores_secret_puller_service_ids = {
     for cluster_secrets_store_key, cluster_secrets_store in var.eso_secretsstores_configuration.cluster_secrets_stores :
     cluster_secrets_store_key => {
@@ -329,6 +320,7 @@ data "ibm_sm_iam_credentials_secret" "cluster_secrets_store_account_serviceid_ap
 }
 
 locals {
+  # map of account ServiceIDs enriched with the created secrets manager secret details
   cluster_secrets_store_account_serviceid_apikey_secrets = {
     for cluster_secrets_store_key, cluster_secrets_store in var.eso_secretsstores_configuration.cluster_secrets_stores :
     cluster_secrets_store_key => {
@@ -363,18 +355,6 @@ locals {
     ]
   ])
 
-  # going to generate a map with key the name of the secrets store and the name of the service secrets group concatenated with "." to keep the keys unique (performed in two steps)
-  # secrets_stores_account_secrets_groups_list = flatten([
-  #   for secrets_store_key, secrets_store in var.eso_secretsstores_configuration.secrets_stores : {
-  #     key         = "${secrets_store_key}.${secrets_store.account_secrets_group_name}"
-  #     name        = try("${local.prefix}-${secrets_store.account_secrets_group_name}", secrets_store.account_secrets_group_name)
-  #     description = secrets_store.account_secrets_group_description
-  #   } if(secrets_store.existing_account_secrets_group_id == null || secrets_store.existing_account_secrets_group_id == "") && secrets_store.account_secrets_group_name != null
-  # ])
-
-  # secrets_stores_account_secrets_groups_map = tomap({
-  #   for idx, element in local.secrets_stores_account_secrets_groups_list : element.key => element
-  # })
 }
 
 # service secrets groups for the secrets stores
@@ -394,6 +374,7 @@ module "secrets_stores_service_secrets_groups" {
 }
 
 locals {
+  # map of service secrets groups details for each secrets store
   secrets_stores_service_secrets_groups = {
     for secrets_store_key, secrets_store in var.eso_secretsstores_configuration.secrets_stores :
     secrets_store_key => [
@@ -453,13 +434,8 @@ module "secrets_stores_account_secrets_groups" {
 }
 
 locals {
-  # secrets_stores_account_secrets_groups = flatten([
-  #   for secrets_store_key, secrets_store in var.eso_secretsstores_configuration.secrets_stores : {
-  #     name          = try("${local.prefix}-${secrets_store.account_secrets_group_name}", secrets_store.account_secrets_group_name)
-  #     secrets_group = module.secrets_stores_account_secrets_groups[secrets_store_key]
-  #   }
-  # ])
 
+  # map of account secrets groups details for each secrets stores
   secrets_stores_account_secrets_groups = {
     for secrets_store_key, secrets_store in var.eso_secretsstores_configuration.secrets_stores :
     secrets_store_key => {
@@ -483,6 +459,7 @@ resource "ibm_iam_service_id" "secrets_stores_secret_puller" {
 }
 
 locals {
+  # map of serviceID details for pulling secrets from Secrets Manager for each secrets stores
   secrets_stores_secret_puller_service_ids = {
     for secrets_store_key, secrets_store in var.eso_secretsstores_configuration.secrets_stores :
     secrets_store_key => {
@@ -592,6 +569,7 @@ module "secrets_store_account_serviceid_apikey" {
 }
 
 locals {
+  # map of Secrets Manager secrets details for pulling secrets from Secrets Manager for each secrets stores
   secrets_store_account_serviceid_apikey_secrets = {
     for secrets_store_key, secrets_store in var.eso_secretsstores_configuration.secrets_stores :
     secrets_store_key => {

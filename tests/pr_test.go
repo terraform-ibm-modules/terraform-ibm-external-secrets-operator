@@ -579,9 +579,7 @@ func setupOptionsSchematics(t *testing.T, prefix string, dir string) *testhelper
 		TerraformDir: dir,
 		Prefix:       prefix,
 		IgnoreUpdates: testhelper.Exemptions{ // Ignore for consistency check
-			List: []string{
-				// "time_sleep.sleep_time",
-			},
+			List: []string{},
 		},
 		Region:        region,
 		ResourceGroup: resourceGroup,
@@ -725,17 +723,12 @@ func getFullConfigSolutionTestVariables(mainOptions *testschematic.TestSchematic
 
 	logger.Log(mainOptions.Testing, "setupSolutionSchematicOptions - Using mainOptions.Prefix: ", mainOptions.Prefix)
 
-	// TODO TO REMOVE
-	tempClusterCRN := "crn:v1:bluemix:public:containers-kubernetes:us-east:a/abac0df06b644a9cabc6e44f55b3880e:d0gtejpw0a5163f67aig::"
-
 	vars := []testschematic.TestSchematicTerraformVar{
 		{Name: "ibmcloud_api_key", Value: mainOptions.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
 		{Name: "prefix", Value: mainOptions.Prefix, DataType: "string"},
 		{Name: "existing_secrets_manager_crn", Value: smCRN, DataType: "string"},
-		// TODO TO UNCOMMENT
-		// {Name: "existing_cluster_crn", Value: existingOptions.LastTestTerraformOutputs["cluster_crn"], DataType: "string"},
-		// TODO TO REMOVE
-		{Name: "existing_cluster_crn", Value: tempClusterCRN, DataType: "string"},
+		{Name: "existing_cluster_crn", Value: existingOptions.LastTestTerraformOutputs["cluster_crn"], DataType: "string"},
+
 		{Name: "eso_secretsstores_configuration", Value: eso_secretsstores_configuration, DataType: "object"},
 	}
 
@@ -747,16 +740,16 @@ func TestRunFullConfigSolutionSchematics(t *testing.T) {
 	// set up the options for existing resource deployment
 	// needed by solution
 	existingResourceOptions := setupOptionsSchematics(t, "eso-cluster-full", existingResourcesTerraformDir)
-	// TODO TO UNCOMMENT
+
 	// Creates temp dirs and runs InitAndApply for existing resources
 	// outputs will be in options after apply
 
-	// existingResourceOptions.SkipTestTearDown = true
-	// _, existDeployErr := existingResourceOptions.RunTest()
-	// defer existingResourceOptions.TestTearDown() // public function ignores skip above
+	existingResourceOptions.SkipTestTearDown = true
+	_, existDeployErr := existingResourceOptions.RunTest()
+	defer existingResourceOptions.TestTearDown() // public function ignores skip above
 
-	// // immediately fail and exit test if existing deployment failed (tear down is in a defer)
-	// require.NoError(t, existDeployErr, "error creating needed existing VPC resources")
+	// immediately fail and exit test if existing deployment failed (tear down is in a defer)
+	require.NoError(t, existDeployErr, "error creating needed existing resources")
 
 	// start main schematics test
 	options := setupSolutionSchematicOptions(t, "eso-full", fullConfigSolutionDir)
@@ -776,16 +769,16 @@ func TestRunFullConfigSolutionUpgradeSchematics(t *testing.T) {
 	// set up the options for existing resource deployment
 	// needed by solution
 	existingResourceOptions := setupOptionsSchematics(t, "eso-cluster-fupg", existingResourcesTerraformDir)
-	// TODO TO UNCOMMENT
+
 	// Creates temp dirs and runs InitAndApply for existing resources
 	// outputs will be in options after apply
 
-	// existingResourceOptions.SkipTestTearDown = true
-	// _, existDeployErr := existingResourceOptions.RunTest()
-	// defer existingResourceOptions.TestTearDown() // public function ignores skip above
+	existingResourceOptions.SkipTestTearDown = true
+	_, existDeployErr := existingResourceOptions.RunTest()
+	defer existingResourceOptions.TestTearDown() // public function ignores skip above
 
-	// // immediately fail and exit test if existing deployment failed (tear down is in a defer)
-	// require.NoError(t, existDeployErr, "error creating needed existing VPC resources")
+	// immediately fail and exit test if existing deployment failed (tear down is in a defer)
+	require.NoError(t, existDeployErr, "error creating needed existing VPC resources")
 
 	// start main schematics test
 	options := setupSolutionSchematicOptions(t, "eso-fupg", fullConfigSolutionDir)
