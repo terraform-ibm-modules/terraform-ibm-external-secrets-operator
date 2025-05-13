@@ -115,8 +115,20 @@ module "cluster_secrets_stores_service_secrets_groups" {
 }
 
 locals {
-  cluster_secrets_stores_service_secrets_groups = flatten([
-    for cluster_secrets_store_key, cluster_secrets_store in var.eso_secretsstores_configuration.cluster_secrets_stores : [
+  # cluster_secrets_stores_service_secrets_groups = flatten([
+  #   for cluster_secrets_store_key, cluster_secrets_store in var.eso_secretsstores_configuration.cluster_secrets_stores : [
+  #     for service_secrets_group_key, service_secrets_group in cluster_secrets_store.service_secrets_groups_list : {
+  #       key           = "${cluster_secrets_store_key}.${service_secrets_group.name}"
+  #       name          = try("${local.prefix}-${service_secrets_group.name}", service_secrets_group.name)
+  #       description   = service_secrets_group.description
+  #       secrets_group = module.cluster_secrets_stores_service_secrets_groups["${cluster_secrets_store_key}.${service_secrets_group.name}"]
+  #     }
+  #   ]
+  # ])
+
+  cluster_secrets_stores_service_secrets_groups = {
+    for cluster_secrets_store_key, cluster_secrets_store in var.eso_secretsstores_configuration.cluster_secrets_stores :
+    cluster_secrets_store_key => [
       for service_secrets_group_key, service_secrets_group in cluster_secrets_store.service_secrets_groups_list : {
         key           = "${cluster_secrets_store_key}.${service_secrets_group.name}"
         name          = try("${local.prefix}-${service_secrets_group.name}", service_secrets_group.name)
@@ -124,7 +136,7 @@ locals {
         secrets_group = module.cluster_secrets_stores_service_secrets_groups["${cluster_secrets_store_key}.${service_secrets_group.name}"]
       }
     ]
-  ])
+  }
 }
 
 # trusted profile authentication for the cluster secrets stores
@@ -382,8 +394,9 @@ module "secrets_stores_service_secrets_groups" {
 }
 
 locals {
-  secrets_stores_service_secrets_groups = flatten([
-    for secrets_store_key, secrets_store in var.eso_secretsstores_configuration.secrets_stores : [
+  secrets_stores_service_secrets_groups = {
+    for secrets_store_key, secrets_store in var.eso_secretsstores_configuration.secrets_stores :
+    secrets_store_key => [
       for service_secrets_group_key, service_secrets_group in secrets_store.service_secrets_groups_list : {
         key           = "${secrets_store_key}.${service_secrets_group.name}"
         name          = try("${local.prefix}-${service_secrets_group.name}", service_secrets_group.name)
@@ -391,7 +404,7 @@ locals {
         secrets_group = module.secrets_stores_service_secrets_groups["${secrets_store_key}.${service_secrets_group.name}"]
       }
     ]
-  ])
+  }
 }
 
 # trusted profile authentication for secrets stores
@@ -440,12 +453,20 @@ module "secrets_stores_account_secrets_groups" {
 }
 
 locals {
-  secrets_stores_account_secrets_groups = flatten([
-    for secrets_store_key, secrets_store in var.eso_secretsstores_configuration.secrets_stores : {
+  # secrets_stores_account_secrets_groups = flatten([
+  #   for secrets_store_key, secrets_store in var.eso_secretsstores_configuration.secrets_stores : {
+  #     name          = try("${local.prefix}-${secrets_store.account_secrets_group_name}", secrets_store.account_secrets_group_name)
+  #     secrets_group = module.secrets_stores_account_secrets_groups[secrets_store_key]
+  #   }
+  # ])
+
+  secrets_stores_account_secrets_groups = {
+    for secrets_store_key, secrets_store in var.eso_secretsstores_configuration.secrets_stores :
+    secrets_store_key => {
       name          = try("${local.prefix}-${secrets_store.account_secrets_group_name}", secrets_store.account_secrets_group_name)
       secrets_group = module.secrets_stores_account_secrets_groups[secrets_store_key]
     }
-  ])
+  }
 }
 
 # for each secrets store creating the service id to pull secrets if existing service id is not provided
