@@ -174,12 +174,14 @@ module "cluster_secrets_stores_account_secrets_groups" {
 }
 
 locals {
-  cluster_secrets_stores_account_secrets_groups = flatten([
-    for cluster_secrets_store_key, cluster_secrets_store in var.eso_secretsstores_configuration.cluster_secrets_stores : {
+  cluster_secrets_stores_account_secrets_groups = {
+    for cluster_secrets_store_key, cluster_secrets_store in var.eso_secretsstores_configuration.cluster_secrets_stores :
+    cluster_secrets_store_key => {
       name          = try("${local.prefix}-${cluster_secrets_store.account_secrets_group_name}", cluster_secrets_store.account_secrets_group_name)
       secrets_group = module.cluster_secrets_stores_account_secrets_groups[cluster_secrets_store_key]
+
     }
-  ])
+  }
 }
 
 # for each cluster secrets store creating the service id to pull secrets if existing service id is not provided
