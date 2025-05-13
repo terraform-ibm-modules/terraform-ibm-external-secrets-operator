@@ -621,17 +621,6 @@ func setupSolutionSchematicOptions(t *testing.T, prefix string, dir string) *tes
 // helper function to set up inputs for full config solution test, will help keep it consistent
 // between normal and upgrade tests
 func getFullConfigSolutionTestVariables(mainOptions *testschematic.TestSchematicOptions, existingOptions *testhelper.TestOptions) []testschematic.TestSchematicTerraformVar {
-	// // try to cover some variety of use cases
-	// testCloudSvcList := []map[string]any{
-	// 	{"service_name": "is"},
-	// 	{"service_name": "kms", "allow_dns_resolution_binding": true},
-	// 	{"service_name": "cloud-object-storage", "vpe_name": mainOptions.Prefix + "-cos"},
-	// }
-
-	// // use our perm postgres for this
-	// testCrnList := []map[string]any{
-	// 	{"crn": permanentResources["postgresqlPITRCrn"], "service_name": "pg"}, // had to shorten the name!
-	// }
 
 	eso_secretsstores_configuration := map[string]any{
 		"cluster_secrets_stores": map[string]any{
@@ -736,13 +725,16 @@ func getFullConfigSolutionTestVariables(mainOptions *testschematic.TestSchematic
 
 	logger.Log(mainOptions.Testing, "setupSolutionSchematicOptions - Using mainOptions.Prefix: ", mainOptions.Prefix)
 
+	// TODO TO REMOVE
 	tempClusterCRN := "crn:v1:bluemix:public:containers-kubernetes:us-east:a/abac0df06b644a9cabc6e44f55b3880e:d0gtejpw0a5163f67aig::"
 
 	vars := []testschematic.TestSchematicTerraformVar{
 		{Name: "ibmcloud_api_key", Value: mainOptions.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
 		{Name: "prefix", Value: mainOptions.Prefix, DataType: "string"},
 		{Name: "existing_secrets_manager_crn", Value: smCRN, DataType: "string"},
+		// TODO TO UNCOMMENT
 		// {Name: "existing_cluster_crn", Value: existingOptions.LastTestTerraformOutputs["cluster_crn"], DataType: "string"},
+		// TODO TO REMOVE
 		{Name: "existing_cluster_crn", Value: tempClusterCRN, DataType: "string"},
 		{Name: "eso_secretsstores_configuration", Value: eso_secretsstores_configuration, DataType: "object"},
 	}
@@ -755,6 +747,7 @@ func TestRunFullConfigSolutionSchematics(t *testing.T) {
 	// set up the options for existing resource deployment
 	// needed by solution
 	existingResourceOptions := setupOptionsSchematics(t, "eso-cluster-full", existingResourcesTerraformDir)
+	// TODO TO UNCOMMENT
 	// Creates temp dirs and runs InitAndApply for existing resources
 	// outputs will be in options after apply
 
@@ -767,6 +760,10 @@ func TestRunFullConfigSolutionSchematics(t *testing.T) {
 
 	// start main schematics test
 	options := setupSolutionSchematicOptions(t, "eso-full", fullConfigSolutionDir)
+
+	// TODO TO REMOVE
+	options.SkipTestTearDown = true
+
 	options.TerraformVars = getFullConfigSolutionTestVariables(options, existingResourceOptions)
 
 	err := options.RunSchematicTest()
@@ -779,6 +776,7 @@ func TestRunFullConfigSolutionUpgradeSchematics(t *testing.T) {
 	// set up the options for existing resource deployment
 	// needed by solution
 	existingResourceOptions := setupOptionsSchematics(t, "eso-cluster-fupg", existingResourcesTerraformDir)
+	// TODO TO UNCOMMENT
 	// Creates temp dirs and runs InitAndApply for existing resources
 	// outputs will be in options after apply
 

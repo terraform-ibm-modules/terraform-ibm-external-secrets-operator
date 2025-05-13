@@ -11,6 +11,8 @@ DA_DIR="solutions/fully-configurable"
 TERRAFORM_SOURCE_DIR="tests/existing-resources"
 JSON_FILE="${DA_DIR}/catalogValidationValues.json"
 REGION="us-south"
+RESOURCE_GROUP="geretain-test-ext-secrets-sync"
+EXISTING_SECRETS_MANAGER_CRN="crn:v1:bluemix:public:secrets-manager:us-south:a/abac0df06b644a9cabc6e44f55b3880e:79c6d411-c18f-4670-b009-b0044a238667::"
 TF_VARS_FILE="terraform.tfvars"
 
 (
@@ -21,33 +23,28 @@ TF_VARS_FILE="terraform.tfvars"
   # $VALIDATION_APIKEY is available in the catalog runtime
   {
     echo "ibmcloud_api_key=\"${VALIDATION_APIKEY}\""
-    echo "prefix=\"was-slz-$(openssl rand -hex 2)\""
+    echo "prefix=\"eso-da-$(openssl rand -hex 2)\""
     echo "region=\"${REGION}\""
-  } >> ${TF_VARS_FILE}
-  terraform apply -input=false -auto-approve -var-file=${TF_VARS_FILE} || exit 1
+    echo "resource_group=\"${RESOURCE_GROUP}\""
+  } >> "${TF_VARS_FILE}"
+  terraform apply -input=false -auto-approve -var-file="${TF_VARS_FILE}" || exit 1
 
-  region_var_name="region"
-  cluster_id_var_name="cluster_id"
+  existing_secrets_manager_crn_var_name="existing_secrets_manager_crn"
+  existing_cluster_crn_var_name="existing_cluster_crn"
   prefix_var_name="prefix"
-  prefix_var_value=$(terraform output -state=terraform.tfstate -raw prefix)
+  prefix_var_value="$(terraform output -state=terraform.tfstate -raw prefix)"
+  existing_cluster_crn_var_value="$(terraform output -state=terraform.tfstate -raw existing_cluster_crn)"
 
-  rg_var_name="resource_group"
-  rg_var_value="${prefix_var_value}-workload-rg"
-
-  echo "Appending '${prefix_var_name}', '${rg_var_name}', '${cluster_id_var_name}' and '${region_var_name}' input variable values to ${JSON_FILE}.."
-
-  cluster_id_value=$(terraform output -state=terraform.tfstate -raw workload_cluster_id)
+  echo "Appending '${prefix_var_name}', '${existing_cluster_crn_var_name}', '${existing_secrets_manager_crn_var_name}' input variable values to ${JSON_FILE}..."
 
   cd "${cwd}"
   jq -r --arg prefix_var_name "${prefix_var_name}" \
         --arg prefix_var_value "${prefix_var_value}" \
-        --arg rg_var_name "${rg_var_name}" \
-        --arg rg_var_value "${rg_var_value}" \
-        --arg region_var_name "${region_var_name}" \
-        --arg region_var_value "${REGION}" \
-        --arg cluster_id_var_name "${cluster_id_var_name}" \
-        --arg cluster_id_value "${cluster_id_value}" \
-        '. + {($prefix_var_name): $prefix_var_value, ($cluster_id_var_name): $cluster_id_value, ($rg_var_name): $rg_var_value, ($region_var_name): $region_var_value}' "${JSON_FILE}" > tmpfile && mv tmpfile "${JSON_FILE}" || exit 1
+        --arg existing_cluster_crn_var_name "${existing_cluster_crn_var_name}" \
+        --arg existing_cluster_crn_var_value "${existing_cluster_crn_var_value}" \
+        --arg existing_secrets_manager_crn_var_name "${existing_secrets_manager_crn_var_name}" \
+        --arg existing_secrets_manager_crn_var_value "${EXISTING_SECRETS_MANAGER_CRN}" \
+        '. + {($prefix_var_name): $prefix_var_value, ($existing_cluster_crn_var_name): $existing_cluster_crn_var_value, ($existing_secrets_manager_crn_var_name): $existing_secrets_manager_crn_var_value}' "${JSON_FILE}" > tmpfile && mv tmpfile "${JSON_FILE}" || exit 1
 
   echo "Pre-validation complete successfully"
 )

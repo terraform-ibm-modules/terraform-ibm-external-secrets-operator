@@ -12,7 +12,7 @@ TF_VARS_FILE="terraform.tfvars"
 
 (
   cd ${TERRAFORM_SOURCE_DIR}
-  echo "Destroying prerequisite SLZ ROKS Cluster .."
+  echo "Destroying prerequisite ESO DA Cluster .."
   terraform destroy -input=false -auto-approve -var-file=${TF_VARS_FILE} || exit 1
 
   echo "Post-validation complete successfully"
