@@ -1,6 +1,7 @@
-# Configuring External Secrets Operator stores 
+# Configuring External Secrets Operator stores
 
 In the Architecture configuration it is possible to configure the set of [Cluster Secrets Stores](https://external-secrets.io/latest/api/clustersecretstore/) and [Secrets Stores](https://external-secrets.io/latest/api/clustersecretstore/) to deploy on the cluster after the External Secrets Operator deployment and that are responsible to handle the integration of the operator components with the IBM Cloud Secrets Manager instance.
+The configuration of these stores is performed through the complex object `eso_secretsstores_configuration` and by specifying this input parameter when configuring the deployable architecture.
 
 Below the configuration of the input variable `eso_secretsstores_configuration` and the related options available:
 
@@ -60,7 +61,7 @@ variable "eso_secretsstores_configuration" {
 Below an example to configure this input variable:
 
 ```
-ibmcloud_api_key = "******"
+ibmcloud_api_key = "******" # pragma: allowlist secret
 prefix="test-esoda"
 existing_cluster_crn="crn:v1:bluemix:public:containers-kubernetes:eu-de:a/abac0df06b644a9cabc6e44f55b3880e:d0e5mo7f0ngjpufiljug::"
 existing_resource_group_name="myresourcegroup"

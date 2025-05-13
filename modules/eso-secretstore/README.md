@@ -38,13 +38,13 @@ No modules.
 | <a name="input_eso_authentication"></a> [eso\_authentication](#input\_eso\_authentication) | Authentication method, Possible values are api\_key or/and trusted\_profile. | `string` | `"trusted_profile"` | no |
 | <a name="input_region"></a> [region](#input\_region) | Region where Secrets Manager is deployed. It will be used to build the regional URL to the service | `string` | n/a | yes |
 | <a name="input_service_endpoints"></a> [service\_endpoints](#input\_service\_endpoints) | The service endpoint type to communicate with the provided secrets manager instance. Possible values are `public` or `private`. This also will set the iam endpoint for containerAuth when enabling Trusted Profile/CR based authentication. | `string` | `"public"` | no |
-| <a name="input_sstore_helm_rls_name"></a> [sstore\_helm\_rls\_name](#input\_sstore\_helm\_rls\_name) | Name of helm release for external secret | `string` | `"external-secret-store"` | no |
-| <a name="input_sstore_namespace"></a> [sstore\_namespace](#input\_sstore\_namespace) | Namespace to create the SecretStore. The namespace must exist as it is not created by this module | `string` | n/a | yes |
-| <a name="input_sstore_secret_apikey"></a> [sstore\_secret\_apikey](#input\_sstore\_secret\_apikey) | APIkey to be stored into sstore\_secret\_name to authenticate on Secrets Manager instance | `string` | `null` | no |
-| <a name="input_sstore_secret_name"></a> [sstore\_secret\_name](#input\_sstore\_secret\_name) | Secret name to be used/referenced in the ESO secretstore to pull from Secrets Manager | `string` | `"ibm-secret"` | no |
-| <a name="input_sstore_secrets_manager_guid"></a> [sstore\_secrets\_manager\_guid](#input\_sstore\_secrets\_manager\_guid) | Secrets manager instance GUID for secretstore where secrets will be stored or fetched from | `string` | n/a | yes |
+| <a name="input_sstore_helm_rls_name"></a> [sstore\_helm\_rls\_name](#input\_sstore\_helm\_rls\_name) | Name of helm release for the secrets store | `string` | `"external-secret-store"` | no |
+| <a name="input_sstore_namespace"></a> [sstore\_namespace](#input\_sstore\_namespace) | Namespace to create the secret store. The namespace must exist as it is not created by this module | `string` | n/a | yes |
+| <a name="input_sstore_secret_apikey"></a> [sstore\_secret\_apikey](#input\_sstore\_secret\_apikey) | APIkey to be stored into var.sstore\_secret\_name secret to authenticate with Secrets Manager instance | `string` | `null` | no |
+| <a name="input_sstore_secret_name"></a> [sstore\_secret\_name](#input\_sstore\_secret\_name) | Secret name to be used/referenced in the ESO secretsstore to pull from Secrets Manager | `string` | `"ibm-secret"` | no |
+| <a name="input_sstore_secrets_manager_guid"></a> [sstore\_secrets\_manager\_guid](#input\_sstore\_secrets\_manager\_guid) | Secrets manager instance GUID for secrets store where secrets will be stored or fetched from | `string` | n/a | yes |
 | <a name="input_sstore_store_name"></a> [sstore\_store\_name](#input\_sstore\_store\_name) | Name of the SecretStore to create | `string` | n/a | yes |
-| <a name="input_sstore_trusted_profile_name"></a> [sstore\_trusted\_profile\_name](#input\_sstore\_trusted\_profile\_name) | The name of the trusted profile to use for the secretstore. This allows ESO to use CRI based authentication to access secrets manager. The trusted profile must be created in advance | `string` | `null` | no |
+| <a name="input_sstore_trusted_profile_name"></a> [sstore\_trusted\_profile\_name](#input\_sstore\_trusted\_profile\_name) | The name of the trusted profile to use for the secrets store. This allows ESO to use CRI based authentication to access secrets manager. The trusted profile must be created in advance | `string` | `null` | no |
 
 ### Outputs
 

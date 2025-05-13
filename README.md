@@ -11,25 +11,18 @@ This module automates the installation and configuration of the [External Secret
 <!-- Below content is automatically populated via pre-commit hook -->
 <!-- BEGIN OVERVIEW HOOK -->
 ## Overview
-- [Terraform IBM External Secrets Operator module](#terraform-ibm-external-secrets-operator-module)
-- [Overview](#overview)
-- [external-secrets-operator-module](#external-secrets-operator-module)
-  - [Customise ESO deployment on specific cluster nodes](#customise-eso-deployment-on-specific-cluster-nodes)
-  - [Example of Multitenancy configuration example in namespaced externalsecrets stores](#example-of-multitenancy-configuration-example-in-namespaced-externalsecrets-stores)
-  - [More information links](#more-information-links)
-  - [_Important current limitation of ESO deployment_](#important-current-limitation-of-eso-deployment)
-  - [Pod Reloader](#pod-reloader)
-  - [Troubleshooting](#troubleshooting)
-  - [_Important note_](#important-note)
-  - [Examples of the secrets format and layout](#examples-of-the-secrets-format-and-layout)
-- [Usage](#usage)
-  - [Required IAM access policies](#required-iam-access-policies)
-  - [Requirements](#requirements)
-  - [Modules](#modules)
-  - [Resources](#resources)
-  - [Inputs](#inputs)
-  - [Outputs](#outputs)
-- [Contributing](#contributing)
+* [terraform-ibm-external-secrets-operator](#terraform-ibm-external-secrets-operator)
+* [Submodules](./modules)
+    * [eso-clusterstore](./modules/eso-clusterstore)
+    * [eso-external-secret](./modules/eso-external-secret)
+    * [eso-secretstore](./modules/eso-secretstore)
+    * [eso-trusted-profile](./modules/eso-trusted-profile)
+* [Examples](./examples)
+    * [Basic Example](./examples/basic)
+    * [Example that uses trusted profiles (container authentication)](./examples/trusted-profiles-authentication)
+    * [Example to deploy the External Secret Operator and to create a different set of resources in terms of secrets, secret groups, stores and auth configurations](./examples/all-combined)
+    * [ImagePull API key Secrets Manager](./examples/all-combined/imagepull-apikey-secrets-manager)
+* [Contributing](#contributing)
 <!-- END OVERVIEW HOOK -->
 
 <!-- Match this heading to the name of the root level module (the repo name) -->
@@ -497,14 +490,6 @@ module "es_kubernetes_secret" {
 ```
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
-
-### Required IAM access policies
-
-TBD 
-Secrets Manager
-ServiceIDs secrets groups and apikeys creation
-Cluster admin
-
 ### Requirements
 
 | Name | Version |
@@ -537,9 +522,9 @@ Cluster admin
 | <a name="input_eso_enroll_in_servicemesh"></a> [eso\_enroll\_in\_servicemesh](#input\_eso\_enroll\_in\_servicemesh) | Flag to enroll ESO into istio servicemesh | `bool` | `false` | no |
 | <a name="input_eso_image"></a> [eso\_image](#input\_eso\_image) | The External Secrets Operator image in the format of `[registry-url]/[namespace]/[image]`. | `string` | `"ghcr.io/external-secrets/external-secrets"` | no |
 | <a name="input_eso_image_version"></a> [eso\_image\_version](#input\_eso\_image\_version) | The version or digest for the external secrets image to deploy. If changing the value, ensure it is compatible with the chart version set in eso\_chart\_version. | `string` | `"v0.16.2-ubi@sha256:8bebcd31c654a626f513428021f5733177411afa8fd49ff467fe4efbf926a43c"` | no |
-| <a name="input_eso_namespace"></a> [eso\_namespace](#input\_eso\_namespace) | Namespace to create and be used to install ESO components including helm releases. If eso\_store\_scope == cluster, this will also be used to deploy ClusterSecretStore/cluster\_store in it | `string` | `null` | no |
+| <a name="input_eso_namespace"></a> [eso\_namespace](#input\_eso\_namespace) | Namespace to create and be used to install ESO components including helm releases. | `string` | `null` | no |
 | <a name="input_eso_pod_configuration"></a> [eso\_pod\_configuration](#input\_eso\_pod\_configuration) | Configuration to use to customise ESO deployment on specific pods. Setting appropriate values will result in customising ESO helm release. Default value is {} to keep ESO standard deployment. Ignore the key if not required. | <pre>object({<br/>    annotations = optional(object({<br/>      # The annotations for external secret controller pods.<br/>      external_secrets = optional(map(string), {})<br/>      # The annotations for external secret cert controller pods.<br/>      external_secrets_cert_controller = optional(map(string), {})<br/>      # The annotations for external secret controller pods.<br/>      external_secrets_webhook = optional(map(string), {})<br/>    }), {})<br/><br/>    labels = optional(object({<br/>      # The labels for external secret controller pods.<br/>      external_secrets = optional(map(string), {})<br/>      # The labels for external secret cert controller pods.<br/>      external_secrets_cert_controller = optional(map(string), {})<br/>      # The labels for external secret controller pods.<br/>      external_secrets_webhook = optional(map(string), {})<br/>    }), {})<br/>  })</pre> | `{}` | no |
-| <a name="input_existing_eso_namespace"></a> [existing\_eso\_namespace](#input\_existing\_eso\_namespace) | Existing Namespace to be used to install ESO components including helm releases. If eso\_store\_scope == cluster, this will also be used to deploy ClusterSecretStore/cluster\_store in it | `string` | `null` | no |
+| <a name="input_existing_eso_namespace"></a> [existing\_eso\_namespace](#input\_existing\_eso\_namespace) | Existing Namespace to be used to install ESO components including helm releases. | `string` | `null` | no |
 | <a name="input_reloader_chart_location"></a> [reloader\_chart\_location](#input\_reloader\_chart\_location) | The location of the Reloader Helm chart. | `string` | `"https://stakater.github.io/stakater-charts"` | no |
 | <a name="input_reloader_chart_version"></a> [reloader\_chart\_version](#input\_reloader\_chart\_version) | The version of the Reloader Helm chart. Ensure that the chart version is compatible with the image version specified in reloader\_image\_version. | `string` | `"2.1.3"` | no |
 | <a name="input_reloader_custom_values"></a> [reloader\_custom\_values](#input\_reloader\_custom\_values) | String containing custom values to be used for reloader helm chart. See https://github.com/stakater/Reloader/blob/master/deployments/kubernetes/chart/reloader/values.yaml | `string` | `null` | no |

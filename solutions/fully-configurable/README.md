@@ -8,7 +8,7 @@ The architecture provides the following features:
 - Install and configure External Secrets Operator (ESO).
 - Customise External Secret Operator deployment on specific cluster workers by configuration approriate NodeSelector and Tolerations in the ESO helm release [More details below](#customise-eso-deployment-on-specific-cluster-nodes)
 - Deploy and configure [ClusterSecretStore](https://external-secrets.io/latest/api/clustersecretstore/) resources for cluster scope secrets store
-- Deploy and configure [SecretStore](https://external-secrets.io/latest/api/secretstore/) resources for namespace scope secrets store 
+- Deploy and configure [SecretStore](https://external-secrets.io/latest/api/secretstore/) resources for namespace scope secrets store
 - Leverage on two authentication methods to be configured on the single stores instances:
   - IAM apikey standard authentication
   - IAM Trusted profile

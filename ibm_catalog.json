@@ -48,7 +48,6 @@
             "name": "fully-configurable",
             "install_type": "fullstack",
             "working_directory": "solutions/fully-configurable",
-            "compliance": {},
             "iam_permissions": [
               {
                 "role_crns": [
@@ -148,9 +147,6 @@
               },
               {
                 "key": "reloader_image_version"
-              },
-              {
-                "key": "reloader_chart_location"
               },
               {
                 "key": "reloader_chart_location"

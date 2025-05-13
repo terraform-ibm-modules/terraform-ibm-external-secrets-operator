@@ -11,19 +11,19 @@ variable "ibmcloud_api_key" {
 variable "prefix" {
   type        = string
   description = "Prefix to add to all resources created by this deployable architecture. To not use any prefix value, you can set this value to `null` or an empty string. If provided all the stores, secrets groups, serviceIDs and secrets will be prefixed with this value."
-  
+
 }
 
 variable "existing_cluster_crn" {
   type        = string
   description = "The CRN of the to deploy ESO operator onto. This value cannot be null."
-  nullable = false
+  nullable    = false
 }
 
 variable "existing_secrets_manager_crn" {
   type        = string
   description = "The CRN of the existing Secrets Manager instance to use. This value cannot be null."
-  nullable    = false  
+  nullable    = false
 }
 
 ############################################################################################################
@@ -271,44 +271,44 @@ variable "eso_secretsstores_configuration" {
   type = object({
     cluster_secrets_stores = map(object({
       # name = string
-      namespace = string
-      create_namespace = bool
-      existing_serviceid_id = string
-      serviceid_name = string
-      serviceid_description = string
-      existing_account_secrets_group_id = string
-      account_secrets_group_name = string
-      account_secrets_group_description = string
-      trusted_profile_name = string # if both the trusted_profile_name and the serviceid_name/existing_serviceid_id are set, the trusted_profile_name will be used
-      trusted_profile_description = string
+      namespace                              = string
+      create_namespace                       = bool
+      existing_serviceid_id                  = string
+      serviceid_name                         = string
+      serviceid_description                  = string
+      existing_account_secrets_group_id      = string
+      account_secrets_group_name             = string
+      account_secrets_group_description      = string
+      trusted_profile_name                   = string # if both the trusted_profile_name and the serviceid_name/existing_serviceid_id are set, the trusted_profile_name will be used
+      trusted_profile_description            = string
       existing_service_secrets_group_id_list = list(string)
       service_secrets_groups_list = list(object({
-        name = string
+        name        = string
         description = string
       }))
     }))
     secrets_stores = map(object({
       # name = string
-      create_namespace = bool
-      namespace = string
-      existing_serviceid_id = string
-      serviceid_name = string
-      serviceid_description = string
-      existing_account_secrets_group_id = string
-      account_secrets_group_name = string
-      account_secrets_group_description = string
-      trusted_profile_name = string # if both the trusted_profile_name and the serviceid_name/existing_serviceid_id are set, the trusted_profile_name will be used
-      trusted_profile_description = string
+      create_namespace                       = bool
+      namespace                              = string
+      existing_serviceid_id                  = string
+      serviceid_name                         = string
+      serviceid_description                  = string
+      existing_account_secrets_group_id      = string
+      account_secrets_group_name             = string
+      account_secrets_group_description      = string
+      trusted_profile_name                   = string # if both the trusted_profile_name and the serviceid_name/existing_serviceid_id are set, the trusted_profile_name will be used
+      trusted_profile_description            = string
       existing_service_secrets_group_id_list = list(string)
       service_secrets_groups_list = list(object({
-        name = string
+        name        = string
         description = string
       }))
     }))
   })
   default = {
     cluster_secrets_stores = {}
-    secrets_stores = {}
+    secrets_stores         = {}
   }
 }
 
