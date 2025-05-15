@@ -13,7 +13,7 @@ The architecture provides the following features:
   - IAM apikey standard authentication
   - IAM Trusted profile
 
-The current version of the architecture supports multitenants configuration by setting up "ESO as a service" (ref. https://cloud.redhat.com/blog/how-to-setup-external-secrets-operator-eso-as-a-service) for both authentication methods
+The current version of the architecture supports multitenants configuration by setting up "ESO as a service" (ref. https://cloud.redhat.com/blog/how-to-setup-external-secrets-operator-eso-as-a-service) for both authentication methods<br/>
 [More details](https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator#example-of-multitenancy-configuration-example-in-namespaced-externalsecrets-stores)
 
 ### Pod Reloader

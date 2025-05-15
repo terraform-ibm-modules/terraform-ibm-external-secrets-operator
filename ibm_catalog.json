@@ -25,20 +25,20 @@
         "short_description": "Deploys the External Secrets Operator (ESO) on an IBM Cloud Kubernetes Service (IKS) OpenShift cluster.",
         "long_description": "This architecture allows to deploy the External Secrets Operator (ESO) and the related configuration on an IBM Cloud OpenShift Cluster to manage the secrets deployed on the cluster through IBM Cloud Secrets Manager.",
         "offering_docs_url": "https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/blob/main/solutions/fully-configurable/README.md",
-        "offering_icon_url": "",
+        "offering_icon_url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/refs/heads/da_task_11723/deploy-arch-ibm-eso.svg",
         "provider_name": "IBM",
         "features": [
           {
             "title": "Deploys the External Secrets Operator (ESO)",
-            "description": "For more details [see here](https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/blob/main/solutions/fully-configurable/README.md)."
+            "description": "This architecture allows to deploy [External Secrets Operator](https://external-secrets.io/latest/) (also known as ESO) on an existing IBM Cloud OpenShift Cluster."
           },
           {
             "title": "Configures the External Secrets Operator (ESO) Cluster Secrets Stores and Secrets Stores with the related ServiceIDs and Secrets Groups",
-            "description": "For more details about the Stores configuration [see here](https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/blob/main/solutions/fully-configurable/DA-eso-configuration.md)."
+            "description": "Deploy and configure [ClusterSecretStore](https://external-secrets.io/latest/api/clustersecretstore/) resources for cluster scoped secrets store and [SecretStore](https://external-secrets.io/latest/api/secretstore/) resources for namespace scoped secrets store"
           },
           {
             "title": "Deploys Stakater Reloader](https://github.com/stakater/Reloader] into the cluster to refresh the secrets in the cluster pods when needed",
-            "description": "For more details about Reloader [see here](https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/blob/main/solutions/fully-configurable/README.md#pod-reloader.md)."
+            "description": "The architecture allows to deploy optionally Stakater Reloader](https://github.com/stakater/Reloader) to configure automatic pod reloading"
           }
         ],
         "support_details": "This product is in the community registry, as such support is handled through the originated repo. If you experience issues please open an issue in this repository [https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/issues). Please note this product is not supported via the IBM Cloud Support Center.",
@@ -184,7 +184,7 @@
                 {
                   "diagram": {
                     "caption": "External Secrets Operator architecture on IBM Cloud OpenShift cluster",
-                    "url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/main/reference-architecture/eso.svg",
+                    "url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/refs/heads/da_task_11723/reference-architecture/eso.svg",
                     "type": "image/svg+xml"
                   },
                   "description": "This architecture supports deploying External Secrets Operator on IBM Cloud OpenShift cluster."
