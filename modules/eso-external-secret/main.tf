@@ -67,7 +67,7 @@ locals {
         "username" : "iamapikey", "password" : "{{ .secretid_${index} }}", "email" : (element.es_container_registry_email)
       }
       :
-      (element.trusted_profile != null && element.trusted_profile != "") ?
+      (element.trusted_profile != null && element.trusted_profile != "" && var.sm_secret_type == "trusted_profile") ?
       {
         "username" : element.trusted_profile, "password" : "{{ .secretid_${index} }}"
       } :
