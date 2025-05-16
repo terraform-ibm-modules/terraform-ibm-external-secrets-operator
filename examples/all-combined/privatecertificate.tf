@@ -13,7 +13,7 @@ locals {
 # private certificate engine
 module "secrets_manager_private_secret_engine" {
   source                    = "terraform-ibm-modules/secrets-manager-private-cert-engine/ibm"
-  version                   = "1.4.0"
+  version                   = "1.5.0"
   secrets_manager_guid      = local.sm_guid
   region                    = local.sm_region
   root_ca_name              = var.pvt_ca_name != null ? var.pvt_ca_name : "pvt-${var.prefix}-project-root-ca"
