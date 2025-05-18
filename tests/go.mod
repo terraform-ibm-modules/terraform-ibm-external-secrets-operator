@@ -7,7 +7,7 @@ toolchain go1.24.3
 require (
 	github.com/gruntwork-io/terratest v0.49.0
 	github.com/stretchr/testify v1.10.0
-	github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper v1.50.0
+	github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper v1.50.1
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/apimachinery v0.33.1
 )
@@ -19,7 +19,7 @@ require (
 	github.com/IBM-Cloud/power-go-client v1.11.0 // indirect
 	github.com/IBM/cloud-databases-go-sdk v0.7.1 // indirect
 	github.com/IBM/go-sdk-core/v5 v5.19.1 // indirect
-	github.com/IBM/platform-services-go-sdk v0.81.0 // indirect
+	github.com/IBM/platform-services-go-sdk v0.81.1 // indirect
 	github.com/IBM/project-go-sdk v0.3.6 // indirect
 	github.com/IBM/schematics-go-sdk v0.4.0 // indirect
 	github.com/IBM/vpc-go-sdk v1.0.2 // indirect
@@ -111,7 +111,7 @@ require (
 	github.com/hashicorp/go-safetemp v1.0.0 // indirect
 	github.com/hashicorp/go-version v1.7.0 // indirect
 	github.com/hashicorp/hcl/v2 v2.22.0 // indirect
-	github.com/hashicorp/terraform-json v0.24.0 // indirect
+	github.com/hashicorp/terraform-json v0.25.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/pgx/v5 v5.7.1 // indirect
@@ -150,7 +150,7 @@ require (
 	github.com/urfave/cli v1.22.16 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
-	github.com/zclconf/go-cty v1.15.1 // indirect
+	github.com/zclconf/go-cty v1.16.2 // indirect
 	go.mongodb.org/mongo-driver v1.17.2 // indirect
 	go.opentelemetry.io/otel v1.29.0 // indirect
 	go.opentelemetry.io/otel/metric v1.29.0 // indirect
