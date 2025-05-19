@@ -13,12 +13,10 @@
           "security"
         ],
         "keywords": [
-          "ESO",
           "Secrets",
-          "Secrets Management",
           "Secrets Manager",
-          "Secrets Management Service",
-          "cluster",
+          "IaC",
+          "infrastructure as code",
           "terraform",
           "solution"
         ],

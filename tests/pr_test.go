@@ -746,6 +746,7 @@ func TestRunFullConfigSolutionSchematics(t *testing.T) {
 
 	existingResourceOptions.SkipTestTearDown = true
 	_, existDeployErr := existingResourceOptions.RunTest()
+
 	defer existingResourceOptions.TestTearDown() // public function ignores skip above
 
 	// immediately fail and exit test if existing deployment failed (tear down is in a defer)
@@ -753,9 +754,6 @@ func TestRunFullConfigSolutionSchematics(t *testing.T) {
 
 	// start main schematics test
 	options := setupSolutionSchematicOptions(t, "eso-full", fullConfigSolutionDir)
-
-	// TODO TO REMOVE
-	options.SkipTestTearDown = true
 
 	options.TerraformVars = getFullConfigSolutionTestVariables(options, existingResourceOptions)
 
