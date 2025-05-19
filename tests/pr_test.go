@@ -184,6 +184,7 @@ func setupOptions(t *testing.T, prefix string, terraformDir string, terraformVar
 				"module.ocp_base.time_sleep.wait_operators",
 			},
 		},
+		CheckApplyResultForUpgrade: true,
 	})
 
 	return options
