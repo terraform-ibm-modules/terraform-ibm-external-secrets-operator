@@ -189,39 +189,7 @@
                 }
               ]
             },
-            "dependencies": [
-                {
-                    "name": "testing-deploy-arch-ibm-secrets-manager",
-                    "id": "5f149ae6-d781-460a-977d-c8c4171ad0fa-global",
-                    "flavors": [
-                      "standard"
-                    ],
-                    "catalog_id": "7a4d68b4-cf8b-40cd-a3d1-f49aff526eb3",
-                    "version": "^1.2.2",
-                    "optional": true,
-                    "on_by_default": true,
-                    "default_flavor": "standard",
-                    "input_mapping": [
-                      {
-                        "reference_version": true,
-                        "dependency_input": "region",
-                        "version_input": "region"
-                      },
-                      {
-                        "reference_version": true,
-                        "dependency_input": "prefix",
-                        "version_input": "prefix"
-                      },
-                      {
-                        "dependency_output": "secrets_manager_crn",
-                        "version_input": "existing_secrets_manager_crn"
-                      }
-                    ],
-                    "ignore_auto_referencing": [
-                      "*"
-                    ]
-                  }
-          ],
+            "dependencies": [],
             "dependency_version_2": true,
             "terraform_version": "1.10.5"
           }
