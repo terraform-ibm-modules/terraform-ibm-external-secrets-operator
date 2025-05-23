@@ -163,7 +163,6 @@
               }
             ],
             "architecture": {
-              "description": "This architecture supports deploying External Secrets Operator on IBM Cloud OpenShift cluster.",
               "features": [
                 {
                   "title": "External Secrets Operator",
