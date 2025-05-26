@@ -489,6 +489,18 @@ module "es_kubernetes_secret" {
 }
 ```
 
+## Required IAM access policies
+You need the following permissions to run this module.
+
+- Account Management
+    - IAM Services
+        - **Secrets Manager** service
+            - `Administrator` platform access
+            - `Manager` service access
+        - **Kubernetes** service
+            - `Administrator` platform access
+            - `Manager` service access
+
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ### Requirements
 

@@ -31,12 +31,8 @@
             "description": "This architecture allows to deploy the External Secrets Operator on an existing IBM Cloud OpenShift Cluster."
           },
           {
-            "title": "Configures the External Secrets Operator (ESO) Cluster Secrets Stores and Secrets Stores with the related ServiceIDs and Secrets Groups",
-            "description": "Deploy and configure ESO Cluster Secret Store resources for cluster scoped secrets store and ESO Secret Store resources for namespace scoped secrets store.<br/>For more details about Cluster Secret Store please refer to this [documentation](https://external-secrets.io/latest/api/clustersecretstore/).<br/>For more details about Secret Store please refer to this [documentation](https://external-secrets.io/latest/api/secretstore/)."
-          },
-          {
-            "title": "Supports two different authentication methods in both the supported Secrets Store types, API key and Trusted Profile authentication",
-            "description": "This architecture allows to leverage on two different authentication methods, IAM API key and Truster Profile, in both the supported Secret Stores.<br/>For more details about configuri the Stores through this architecture input please refer to this [page](https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/refs/heads/da_task_11723/solutions/fully-configurable/DA-eso-configuration.md)"
+            "title": "Configures the External Secrets Operator (ESO) Cluster Secrets Stores and Secrets Stores with the related ServiceIDs, Secrets Groups and authentication methods",
+            "description": "Deploy and configure ESO Cluster Secret Store resources for cluster scoped secrets store and ESO Secret Store resources for namespace scoped secrets store.<br/><br/>For more details about Cluster Secret Store please refer to this [documentation](https://external-secrets.io/latest/api/clustersecretstore/).<br/>For more details about Secret Store please refer to this [documentation](https://external-secrets.io/latest/api/secretstore/).<br/><br/>Both the Secret Store types support two different authentication methods, IAM API key and Truster Profile.<br/>For more details about configuri the Stores through this architecture input please refer to this [page](https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/refs/heads/da_task_11723/solutions/fully-configurable/DA-eso-configuration.md)"
           },
           {
             "title": "Deploys and configures Stakater Reloader into the cluster",
@@ -51,14 +47,27 @@
             "install_type": "fullstack",
             "working_directory": "solutions/fully-configurable",
             "iam_permissions": [
-              {
-                "role_crns": [
-                  "crn:v1:bluemix:public:iam::::role:Administrator"
-                ],
-                "service_name": "iam-identity",
-                "notes": "[Optional] Required if Cloud automation for account configuration is enabled."
-              }
-            ],
+            {
+              "role_crns": [
+                "crn:v1:bluemix:public:iam::::role:Administrator"
+              ],
+              "service_name": "iam-identity"
+            },
+            {
+              "service_name": "secrets-manager",
+              "role_crns": [
+                "crn:v1:bluemix:public:iam::::serviceRole:Administrator",
+                "crn:v1:bluemix:public:iam::::serviceRole:Manager"
+              ]
+            },
+            {
+              "service_name": "containers-kubernetes",
+              "role_crns": [
+                "crn:v1:bluemix:public:iam::::serviceRole:Manager",
+                "crn:v1:bluemix:public:iam::::role:Editor"
+              ]
+            }
+          ],
             "configuration": [
               {
                 "key": "ibmcloud_api_key"
