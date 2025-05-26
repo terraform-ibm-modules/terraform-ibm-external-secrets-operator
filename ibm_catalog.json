@@ -32,10 +32,10 @@
           },
           {
             "title": "Configures the External Secrets Operator (ESO) Cluster Secrets Stores and Secrets Stores with the related ServiceIDs and Secrets Groups",
-            "description": "Deploy and configure ESO Cluster Secret Store resources for cluster scoped secrets store and ESI Secret Store resources for namespace scoped secrets store."
+            "description": "Deploy and configure ESO Cluster Secret Store resources for cluster scoped secrets store and ESO Secret Store resources for namespace scoped secrets store. For more details about Cluster Secret Store please refer [here](https://external-secrets.io/latest/api/clustersecretstore/) and for Secret Store please refer [here](https://external-secrets.io/latest/api/secretstore/)."
           },
           {
-            "title": "Optionally deploys Stakater Reloader into the cluster",
+            "title": "Deploys and configures Stakater Reloader into the cluster",
             "description": "The architecture allows to optionally deploy Stakater Reloader into the cluster to refresh the cluster's secrets values by reloading pods when needed. For more information about Stakater Reloader, please refer to the [Stakater Reloader documentation](https://github.com/stakater/Reloader]."
           }
         ],
