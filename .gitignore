@@ -55,6 +55,9 @@ Brewfile.lock.json
 testpod*.yaml
 precommit.txt
 
+# drawio temporary files
+**/.*.drawio.bkp
+
 # VS Code state
 .vscode/
 *.code-workspace
