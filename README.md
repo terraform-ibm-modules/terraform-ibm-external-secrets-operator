@@ -26,7 +26,7 @@ This module automates the installation and configuration of the [External Secret
 <!-- END OVERVIEW HOOK -->
 
 <!-- Match this heading to the name of the root level module (the repo name) -->
-## external-secrets-operator-module
+## External Secrets Operator module
 
 External Secrets Operator synchronizes secrets in the Kubernetes cluster with secrets that are mapped in [Secrets Manager](https://cloud.ibm.com/docs/secrets-manager).
 
@@ -288,11 +288,11 @@ For more information about IAM Trusted profiles and ESO Multitenancy configurati
 - [Setup of ESO as a Service from RedHat](https://cloud.redhat.com/blog/how-to-setup-external-secrets-operator-eso-as-a-service)
 - [ESO Multitenancy configuration from ESO Docs](https://external-secrets.io/latest/guides/multi-tenancy/)
 
-### _Important current limitation of ESO deployment_
+### _Important current architectural limitation of ESO deployment_
 
 The current ESO version doesn't allow to customise the default IAM endpoint (https://iam.cloud.ibm.com) it uses when authenticating through apikey (`api_key` authentication) for both ClusterSecretStore and SecretStore APIs.
 
-As a direct effect of this limitation, for a standard OCP cluster topology as defined by GoldenEye design (3 workers zones `edge` `private` and `transit`), an ESO deployment with `api_key` authentication configuration needs to be performed on the workers pool with access to the public network (`dedicated: edge` label in GE usual topology) to work fine. If the ESO deployment is performed on a workers pool without access to public network (i.e. to https://iam.cloud.ibm.com) the apikey authentication is expected to fail.
+As a direct effect of this limitation, for an OCP cluster topology designed with three different subnet layers `edge` `private` and `transit`, where only `edge` one has access to the public network, `private` is for business workload and `transit` for private networking, an ESO deployment with `api_key` authentication configuration needs to be performed on the workers pool with access to the public network (`dedicated: edge` label in GE usual topology) to work fine. If the ESO deployment is performed on a workers pool without access to public network (i.e. to https://iam.cloud.ibm.com) the apikey authentication is expected to fail, unless ESO is enrolled into RedHat Service Mesh (this module allows to add the expected resources annotations but the Mesh gateways configuration is out of the scope of the module) or a different networking solution is implemented.
 
 
 ### Pod Reloader

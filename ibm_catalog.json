@@ -27,16 +27,20 @@
         "provider_name": "IBM",
         "features": [
           {
-            "title": "Deploys the External Secrets Operator (ESO)",
+            "title": "Deploys the External Secrets Operator (ESO) in existing cluster",
             "description": "This architecture allows to deploy the External Secrets Operator on an existing IBM Cloud OpenShift Cluster."
           },
           {
             "title": "Configures the External Secrets Operator (ESO) Cluster Secrets Stores and Secrets Stores with the related ServiceIDs and Secrets Groups",
-            "description": "Deploy and configure ESO Cluster Secret Store resources for cluster scoped secrets store and ESO Secret Store resources for namespace scoped secrets store.<br/>For more details about Cluster Secret Store please refer to this [documentation](https://external-secrets.io/latest/api/clustersecretstore/).<br/>For more details about Secret Store please refer to this [documentation](https://external-secrets.io/latest/api/secretstore/).<br/>For more details about how to configure the Stores through this architecture input please refer to this [page](https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/refs/heads/da_task_11723/solutions/fully-configurable/DA-eso-configuration.md)"
+            "description": "Deploy and configure ESO Cluster Secret Store resources for cluster scoped secrets store and ESO Secret Store resources for namespace scoped secrets store.<br/>For more details about Cluster Secret Store please refer to this [documentation](https://external-secrets.io/latest/api/clustersecretstore/).<br/>For more details about Secret Store please refer to this [documentation](https://external-secrets.io/latest/api/secretstore/)."
+          },
+          {
+            "title": "Supports two different authentication methods in both the supported Secrets Store types, API key and Trusted Profile authentication",
+            "description": "This architecture allows to leverage on two different authentication methods, IAM API key and Truster Profile, in both the supported Secret Stores.<br/>For more details about configuri the Stores through this architecture input please refer to this [page](https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/refs/heads/da_task_11723/solutions/fully-configurable/DA-eso-configuration.md)"
           },
           {
             "title": "Deploys and configures Stakater Reloader into the cluster",
-            "description": "The architecture allows to optionally deploy Stakater Reloader into the cluster to refresh the cluster's secrets values by reloading pods when needed. For more information about Stakater Reloader, please refer to the [Stakater Reloader documentation](https://github.com/stakater/Reloader)."
+            "description": "The architecture allows to optionally deploy Stakater Reloader into the cluster that helps with refreshing the cluster's secrets values by reloading pods when needed. For more information about Stakater Reloader, please refer to the [Stakater Reloader documentation](https://github.com/stakater/Reloader)."
           }
         ],
         "support_details": "This product is in the community registry, as such support is handled through the originated repo. If you experience issues please open an issue in this repository [https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/issues). Please note this product is not supported via the IBM Cloud Support Center.",
