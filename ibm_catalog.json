@@ -32,7 +32,7 @@
           },
           {
             "title": "Configures the External Secrets Operator (ESO) Cluster Secrets Stores and Secrets Stores with the related ServiceIDs and Secrets Groups",
-            "description": "Deploy and configure ESO Cluster Secret Store resources for cluster scoped secrets store and ESO Secret Store resources for namespace scoped secrets store. For more details about Cluster Secret Store please refer [here](https://external-secrets.io/latest/api/clustersecretstore/) and for Secret Store please refer [here](https://external-secrets.io/latest/api/secretstore/)."
+            "description": "Deploy and configure ESO Cluster Secret Store resources for cluster scoped secrets store and ESO Secret Store resources for namespace scoped secrets store. For more details about Cluster Secret Store please refer [here](https://external-secrets.io/latest/api/clustersecretstore/) and for Secret Store please refer [here](https://external-secrets.io/latest/api/secretstore/). For more details about how to configure the Stores through architecture input please refer [here](https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/refs/heads/da_task_11723/solutions/fully-configurable/DA-eso-configuration.md)"
           },
           {
             "title": "Deploys and configures Stakater Reloader into the cluster",
