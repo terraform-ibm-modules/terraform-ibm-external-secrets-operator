@@ -343,7 +343,7 @@ Labels:       app=raw
               release=apikeynspace1-es-docker-uc
 Annotations:  meta.helm.sh/release-name: apikeynspace1-es-docker-uc
               meta.helm.sh/release-namespace: apikeynspace1
-API Version:  external-secrets.io/v1beta1
+API Version:  external-secrets.io/v1
 Kind:         ExternalSecret
 Metadata:
   (...)
