@@ -103,12 +103,13 @@ locals {
 
 ### Define kubernetes secret to be installed in cluster for sm_secret_type iam_credentials or arbitrary
 resource "helm_release" "kubernetes_secret" {
-  count     = (var.sm_secret_type == "iam_credentials" || var.sm_secret_type == "arbitrary" || var.sm_secret_type == "trusted_profile") && local.is_dockerjsonconfig_chain == false ? 1 : 0
-  name      = local.helm_secret_name
-  namespace = local.es_helm_rls_namespace
-  chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
-  version   = local.helm_raw_chart_version
-  timeout   = 600
+  count        = (var.sm_secret_type == "iam_credentials" || var.sm_secret_type == "arbitrary" || var.sm_secret_type == "trusted_profile") && local.is_dockerjsonconfig_chain == false ? 1 : 0
+  name         = local.helm_secret_name
+  namespace    = local.es_helm_rls_namespace
+  chart        = "${path.module}/../../chart/${local.helm_raw_chart_name}"
+  version      = local.helm_raw_chart_version
+  timeout      = 600
+  force_update = true
   values = [
     <<-EOF
     resources:
@@ -142,12 +143,13 @@ resource "helm_release" "kubernetes_secret" {
 
 ### Define kubernetes secret to be installed in cluster for sm_secret_type iam_credentials and kubernetes secret type dockerjsonconfig and configured with a chain of secrets
 resource "helm_release" "kubernetes_secret_chain_list" {
-  count     = local.is_dockerjsonconfig_chain == true ? 1 : 0
-  name      = local.helm_secret_name
-  namespace = local.es_helm_rls_namespace
-  chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
-  version   = local.helm_raw_chart_version
-  timeout   = 600
+  count        = local.is_dockerjsonconfig_chain == true ? 1 : 0
+  name         = local.helm_secret_name
+  namespace    = local.es_helm_rls_namespace
+  chart        = "${path.module}/../../chart/${local.helm_raw_chart_name}"
+  version      = local.helm_raw_chart_version
+  timeout      = 600
+  force_update = true
   values = [
     <<-EOF
     resources:
@@ -184,12 +186,13 @@ resource "helm_release" "kubernetes_secret_chain_list" {
 
 ### Define kubernetes secret to be installed in cluster for opaque secret type based on SM user credential secret type
 resource "helm_release" "kubernetes_secret_user_pw" {
-  count     = var.sm_secret_type == "username_password" ? 1 : 0
-  name      = local.helm_secret_name
-  namespace = var.es_kubernetes_namespace
-  chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
-  version   = local.helm_raw_chart_version
-  timeout   = 600
+  count        = var.sm_secret_type == "username_password" ? 1 : 0
+  name         = local.helm_secret_name
+  namespace    = var.es_kubernetes_namespace
+  chart        = "${path.module}/../../chart/${local.helm_raw_chart_name}"
+  version      = local.helm_raw_chart_version
+  timeout      = 600
+  force_update = true
   values = [
     <<-EOF
     resources:
@@ -228,12 +231,13 @@ resource "helm_release" "kubernetes_secret_user_pw" {
 
 ### Define kubernetes secret to be installed in cluster for certificate secret based on SM certificate secret type
 resource "helm_release" "kubernetes_secret_certificate" {
-  count     = local.is_certificate ? 1 : 0 #checkov:skip=CKV_SECRET_6
-  name      = local.helm_secret_name
-  namespace = var.es_kubernetes_namespace
-  chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
-  version   = local.helm_raw_chart_version
-  timeout   = 600
+  count        = local.is_certificate ? 1 : 0 #checkov:skip=CKV_SECRET_6
+  name         = local.helm_secret_name
+  namespace    = var.es_kubernetes_namespace
+  chart        = "${path.module}/../../chart/${local.helm_raw_chart_name}"
+  version      = local.helm_raw_chart_version
+  timeout      = 600
+  force_update = true
   values = [
     <<-EOF
     resources:
@@ -265,12 +269,13 @@ resource "helm_release" "kubernetes_secret_certificate" {
 
 ### Define kubernetes secret to be installed in cluster for key-value secret based on SM kv secret type based on keyid or key path
 resource "helm_release" "kubernetes_secret_kv_key" {
-  count     = local.is_kv && local.kv_remoteref_property != "" ? 1 : 0
-  name      = local.helm_secret_name
-  namespace = var.es_kubernetes_namespace
-  chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
-  version   = local.helm_raw_chart_version
-  timeout   = 600
+  count        = local.is_kv && local.kv_remoteref_property != "" ? 1 : 0
+  name         = local.helm_secret_name
+  namespace    = var.es_kubernetes_namespace
+  chart        = "${path.module}/../../chart/${local.helm_raw_chart_name}"
+  version      = local.helm_raw_chart_version
+  timeout      = 600
+  force_update = true
   values = [
     <<-EOF
     resources:
@@ -305,12 +310,13 @@ resource "helm_release" "kubernetes_secret_kv_key" {
 
 ### Define kubernetes secret to be installed in cluster for key-value secret based on SM kv secret type pulling all the keys structure
 resource "helm_release" "kubernetes_secret_kv_all" {
-  count     = local.is_kv && local.kv_remoteref_property == "" ? 1 : 0
-  name      = local.helm_secret_name
-  namespace = var.es_kubernetes_namespace
-  chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
-  version   = local.helm_raw_chart_version
-  timeout   = 600
+  count        = local.is_kv && local.kv_remoteref_property == "" ? 1 : 0
+  name         = local.helm_secret_name
+  namespace    = var.es_kubernetes_namespace
+  chart        = "${path.module}/../../chart/${local.helm_raw_chart_name}"
+  version      = local.helm_raw_chart_version
+  timeout      = 600
+  force_update = true
   values = [
     <<-EOF
     resources:

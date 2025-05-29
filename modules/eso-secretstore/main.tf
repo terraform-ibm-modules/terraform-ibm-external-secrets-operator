@@ -22,12 +22,13 @@ resource "kubernetes_secret" "eso_secretsstore_secret" {
 
 ### Define secret store used to connect with SM instance for apikey auth
 resource "helm_release" "external_secret_store_apikey" {
-  count     = var.eso_authentication == "api_key" ? 1 : 0
-  name      = substr(join("-", [var.sstore_namespace, var.sstore_helm_rls_name]), 0, 52)
-  namespace = var.sstore_namespace
-  chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
-  version   = local.helm_raw_chart_version
-  timeout   = 600
+  count        = var.eso_authentication == "api_key" ? 1 : 0
+  name         = substr(join("-", [var.sstore_namespace, var.sstore_helm_rls_name]), 0, 52)
+  namespace    = var.sstore_namespace
+  chart        = "${path.module}/../../chart/${local.helm_raw_chart_name}"
+  version      = local.helm_raw_chart_version
+  timeout      = 600
+  force_update = true
   values = [
     <<-EOF
     resources:
@@ -51,12 +52,13 @@ resource "helm_release" "external_secret_store_apikey" {
 
 # Trusted profile authentication Use ContainerAuth with CRI based authentication (trusted profile support)
 resource "helm_release" "external_secret_store_tp" {
-  count     = var.eso_authentication == "trusted_profile" ? 1 : 0
-  name      = substr(join("-", [var.sstore_namespace, var.sstore_helm_rls_name]), 0, 52)
-  namespace = var.sstore_namespace
-  chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
-  version   = local.helm_raw_chart_version
-  timeout   = 600
+  count        = var.eso_authentication == "trusted_profile" ? 1 : 0
+  name         = substr(join("-", [var.sstore_namespace, var.sstore_helm_rls_name]), 0, 52)
+  namespace    = var.sstore_namespace
+  chart        = "${path.module}/../../chart/${local.helm_raw_chart_name}"
+  version      = local.helm_raw_chart_version
+  timeout      = 600
+  force_update = true
   values = [
     <<-EOF
     resources:

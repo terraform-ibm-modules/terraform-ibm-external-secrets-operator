@@ -27,12 +27,13 @@ resource "kubernetes_secret" "eso_clusterstore_secret" {
 
 # define cluster secret store for cluster scope and apikey auth
 resource "helm_release" "cluster_secret_store_apikey" {
-  count     = var.eso_authentication == "api_key" ? 1 : 0
-  name      = "${var.clusterstore_helm_rls_name}-apikey"
-  namespace = var.eso_namespace
-  chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
-  version   = local.helm_raw_chart_version
-  timeout   = 600
+  count        = var.eso_authentication == "api_key" ? 1 : 0
+  name         = "${var.clusterstore_helm_rls_name}-apikey"
+  namespace    = var.eso_namespace
+  chart        = "${path.module}/../../chart/${local.helm_raw_chart_name}"
+  version      = local.helm_raw_chart_version
+  timeout      = 600
+  force_update = true
   values = [
     <<-EOF
     resources:
@@ -61,12 +62,13 @@ resource "helm_release" "cluster_secret_store_apikey" {
 # define cluster secret store for cluster scope and trusted store auth
 # ContainerAuth with CRI based authentication
 resource "helm_release" "cluster_secret_store_tp" {
-  count     = var.eso_authentication == "trusted_profile" ? 1 : 0
-  name      = "${var.clusterstore_helm_rls_name}-tp"
-  namespace = var.eso_namespace
-  chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
-  version   = local.helm_raw_chart_version
-  timeout   = 600
+  count        = var.eso_authentication == "trusted_profile" ? 1 : 0
+  name         = "${var.clusterstore_helm_rls_name}-tp"
+  namespace    = var.eso_namespace
+  chart        = "${path.module}/../../chart/${local.helm_raw_chart_name}"
+  version      = local.helm_raw_chart_version
+  timeout      = 600
+  force_update = true
   values = [
     <<-EOF
     resources:
