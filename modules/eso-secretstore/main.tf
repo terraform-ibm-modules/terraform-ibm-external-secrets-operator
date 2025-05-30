@@ -31,7 +31,7 @@ resource "helm_release" "external_secret_store_apikey" {
   values = [
     <<-EOF
     resources:
-      - apiVersion: external-secrets.io/v1beta1
+      - apiVersion: external-secrets.io/v1
         kind: SecretStore
         metadata:
           name: "${var.sstore_store_name}"
@@ -60,7 +60,7 @@ resource "helm_release" "external_secret_store_tp" {
   values = [
     <<-EOF
     resources:
-      - apiVersion: external-secrets.io/v1beta1
+      - apiVersion: external-secrets.io/v1
         kind: SecretStore
         metadata:
           name: "${var.sstore_store_name}"

@@ -36,7 +36,7 @@ resource "helm_release" "cluster_secret_store_apikey" {
   values = [
     <<-EOF
     resources:
-      - apiVersion: external-secrets.io/v1beta1
+      - apiVersion: external-secrets.io/v1
         kind: ClusterSecretStore
         metadata:
           name: "${var.clusterstore_name}"
@@ -70,7 +70,7 @@ resource "helm_release" "cluster_secret_store_tp" {
   values = [
     <<-EOF
     resources:
-      - apiVersion: external-secrets.io/v1beta1
+      - apiVersion: external-secrets.io/v1
         kind: ClusterSecretStore
         metadata:
           name: "${var.clusterstore_name}"
