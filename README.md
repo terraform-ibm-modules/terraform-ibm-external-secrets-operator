@@ -343,7 +343,7 @@ Labels:       app=raw
               release=apikeynspace1-es-docker-uc
 Annotations:  meta.helm.sh/release-name: apikeynspace1-es-docker-uc
               meta.helm.sh/release-namespace: apikeynspace1
-API Version:  external-secrets.io/v1beta1
+API Version:  external-secrets.io/v1
 Kind:         ExternalSecret
 Metadata:
   (...)
@@ -469,23 +469,10 @@ data:
 ## Usage
 
 ```hcl
-module "es_kubernetes_secret" {
-  source                     = "../modules/eso-external-secret"
-  es_kubernetes_secret_type = "dockerconfigjson"
-  sm_secret_type = "iam_credentials"
-  sm_secret_id = module.docker_config.serviceid_apikey_secret_id
-  eso_setup = true
-  es_kubernetes_namespaces = var.es_kubernetes_namespaces
-  es_docker_email = "terraform@ibm.com"
-  eso_generic_secret_apikey = data.ibm_secrets_manager_secret.secret_puller_secret.api_key # pragma: allowlist secret
-  secrets_manager_guid = module.secrets_manager_iam_configuration.secrets_manager_guid
-  region = "us-south"
-  es_kubernetes_secret_name = "dockerconfigjson-iam"
-  depends_on = [
-    kubernetes_namespace.cluster_namespaces
-  ]
-  es_kubernetes_secret_data_key = "apiKey"
-  es_helm_rls_name = "es-docker-iam"
+# Replace "master" with a GIT release version to lock into a specific release
+module "external_secrets_operator" {
+  source        = "git::https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator.git?ref=master"
+  eso_namespace = var.eso_namespace
 }
 ```
 
@@ -517,7 +504,7 @@ module "es_kubernetes_secret" {
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_eso_chart_location"></a> [eso\_chart\_location](#input\_eso\_chart\_location) | The location of the External Secrets Operator Helm chart. | `string` | `"https://charts.external-secrets.io"` | no |
-| <a name="input_eso_chart_version"></a> [eso\_chart\_version](#input\_eso\_chart\_version) | The version of the External Secrets Operator Helm chart. Ensure that the chart version is compatible with the image version specified in eso\_image\_version. | `string` | `"0.16.2"` | no |
+| <a name="input_eso_chart_version"></a> [eso\_chart\_version](#input\_eso\_chart\_version) | The version of the External Secrets Operator Helm chart. Ensure that the chart version is compatible with the image version specified in eso\_image\_version. | `string` | `"0.17.0"` | no |
 | <a name="input_eso_cluster_nodes_configuration"></a> [eso\_cluster\_nodes\_configuration](#input\_eso\_cluster\_nodes\_configuration) | Configuration to use to customise ESO deployment on specific cluster nodes. Setting appropriate values will result in customising ESO helm release. Default value is null to keep ESO standard deployment. | <pre>object({<br/>    nodeSelector = object({<br/>      label = string<br/>      value = string<br/>    })<br/>    tolerations = object({<br/>      key      = string<br/>      operator = string<br/>      value    = string<br/>      effect   = string<br/>    })<br/>  })</pre> | `null` | no |
 | <a name="input_eso_enroll_in_servicemesh"></a> [eso\_enroll\_in\_servicemesh](#input\_eso\_enroll\_in\_servicemesh) | Flag to enroll ESO into istio servicemesh | `bool` | `false` | no |
 | <a name="input_eso_image"></a> [eso\_image](#input\_eso\_image) | The External Secrets Operator image in the format of `[registry-url]/[namespace]/[image]`. | `string` | `"ghcr.io/external-secrets/external-secrets"` | no |

@@ -112,7 +112,7 @@ resource "helm_release" "kubernetes_secret" {
   values = [
     <<-EOF
     resources:
-      - apiVersion: external-secrets.io/v1beta1
+      - apiVersion: external-secrets.io/v1
         kind: ExternalSecret
         metadata:
           name: "${var.es_kubernetes_secret_name}"
@@ -151,7 +151,7 @@ resource "helm_release" "kubernetes_secret_chain_list" {
   values = [
     <<-EOF
     resources:
-      - apiVersion: external-secrets.io/v1beta1
+      - apiVersion: external-secrets.io/v1
         kind: ExternalSecret
         metadata:
           name: "${var.es_kubernetes_secret_name}"
@@ -193,7 +193,7 @@ resource "helm_release" "kubernetes_secret_user_pw" {
   values = [
     <<-EOF
     resources:
-      - apiVersion: external-secrets.io/v1beta1
+      - apiVersion: external-secrets.io/v1
         kind: ExternalSecret
         metadata:
           name: "${var.es_kubernetes_secret_name}"
@@ -237,7 +237,7 @@ resource "helm_release" "kubernetes_secret_certificate" {
   values = [
     <<-EOF
     resources:
-      - apiVersion: external-secrets.io/v1beta1
+      - apiVersion: external-secrets.io/v1
         kind: ExternalSecret
         metadata:
           name: "${var.es_kubernetes_secret_name}"
@@ -274,7 +274,7 @@ resource "helm_release" "kubernetes_secret_kv_key" {
   values = [
     <<-EOF
     resources:
-      - apiVersion: external-secrets.io/v1beta1
+      - apiVersion: external-secrets.io/v1
         kind: ExternalSecret
         metadata:
           name: "${var.es_kubernetes_secret_name}"
@@ -314,7 +314,7 @@ resource "helm_release" "kubernetes_secret_kv_all" {
   values = [
     <<-EOF
     resources:
-      - apiVersion: external-secrets.io/v1beta1
+      - apiVersion: external-secrets.io/v1
         kind: ExternalSecret
         metadata:
           name: "${var.es_kubernetes_secret_name}"
