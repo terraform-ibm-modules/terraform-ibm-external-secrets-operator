@@ -178,16 +178,16 @@
             "architecture": {
               "features": [
                 {
-                  "title": "External Secrets Operator",
-                  "description": "Deploys External Secrets Operator."
+                  "title": "Deploys the External Secrets Operator (ESO) in existing cluster",
+                  "description": "This architecture allows to deploy the External Secrets Operator on an existing IBM Cloud OpenShift Cluster."
                 },
                 {
-                  "title": "Configures External Secrets Operator Cluster Secrets Stores and Secrets Stores",
-                  "description": "Creates and configures External Secrets Operator Cluster Secrets Stores and Secrets Stores."
+                  "title": "Configures the External Secrets Operator (ESO) Cluster Secrets Stores and Secrets Stores with the related ServiceIDs, Secrets Groups and authentication methods",
+                  "description": "Deploy and configure ESO Cluster Secret Store resources for cluster scoped secrets store and ESO Secret Store resources for namespace scoped secrets store.<br/>For more details about Cluster Secret Store please refer to this [documentation](https://external-secrets.io/latest/api/clustersecretstore/).<br/>For more details about Secret Store please refer to this [documentation](https://external-secrets.io/latest/api/secretstore/).<br/>Both the Secret Store types support two different authentication methods, IAM API key and Truster Profile.<br/>For more details about configuri the Stores through this architecture input please refer to this [page](https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/refs/heads/da_task_11723/solutions/fully-configurable/DA-eso-configuration.md)"
                 },
                 {
-                  "title": "Deploys Stakater Reloader",
-                  "description": "Deploys Stakater Reloader to refresh the secrets in the cluster pods when needed."
+                  "title": "Deploys and configures Stakater Reloader into the cluster",
+                  "description": "The architecture allows to optionally deploy Stakater Reloader into the cluster that helps with refreshing the cluster's secrets values by reloading pods when needed.<br/>For more information about Stakater Reloader, please refer to the [Stakater Reloader documentation](https://github.com/stakater/Reloader)."
                 }
               ],
               "diagrams": [
