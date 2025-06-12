@@ -50,7 +50,7 @@ variable "existing_eso_namespace" {
   }
   validation {
     condition     = var.existing_eso_namespace == null && var.eso_namespace == null ? false : true
-    error_message = "The values of var.existing_eso_namespace var.eso_namespace cannot be null at the same time."
+    error_message = "The values of var.existing_eso_namespace and var.eso_namespace cannot be null at the same time."
   }
 }
 
