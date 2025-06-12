@@ -38,6 +38,14 @@ resource "time_sleep" "wait_45_seconds" {
 # Configures ESO and reloader deployments
 ##################################################################
 
+locals {
+  # converting list of strings to comma separated values as expected by the module
+  reloader_namespaces_to_ignore    = length(var.reloader_namespaces_to_ignore) != 0 ? join(", ", var.reloader_namespaces_to_ignore) : null
+  reloader_resources_to_ignore     = length(var.reloader_resources_to_ignore) != 0 ? join(", ", var.reloader_resources_to_ignore) : null
+  reloader_namespaces_selector     = length(var.reloader_namespaces_selector) != 0 ? join(", ", var.reloader_namespaces_selector) : null
+  reloader_resource_label_selector = length(var.reloader_resource_label_selector) != 0 ? join(", ", var.reloader_resource_label_selector) : null
+}
+
 module "external_secrets_operator" {
   source                    = "../../"
   eso_namespace             = var.eso_namespace
@@ -53,10 +61,10 @@ module "external_secrets_operator" {
   # reloader configuration
   reloader_deployed                = var.reloader_deployed
   reloader_reload_strategy         = var.reloader_reload_strategy
-  reloader_namespaces_to_ignore    = var.reloader_namespaces_to_ignore
-  reloader_resources_to_ignore     = var.reloader_resources_to_ignore
-  reloader_namespaces_selector     = var.reloader_namespaces_selector
-  reloader_resource_label_selector = var.reloader_resource_label_selector
+  reloader_namespaces_to_ignore    = local.reloader_namespaces_to_ignore
+  reloader_resources_to_ignore     = local.reloader_resources_to_ignore
+  reloader_namespaces_selector     = local.reloader_namespaces_selector
+  reloader_resource_label_selector = local.reloader_resource_label_selector
   reloader_ignore_secrets          = var.reloader_ignore_secrets
   reloader_ignore_configmaps       = var.reloader_ignore_configmaps
   reloader_is_openshift            = var.reloader_is_openshift

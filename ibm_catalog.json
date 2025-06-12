@@ -39,7 +39,7 @@
             "description": "The architecture allows to optionally deploy Stakater Reloader into the cluster that helps with refreshing the cluster's secrets values by reloading pods when needed.<br/>For more information about Stakater Reloader, please refer to the [Stakater Reloader documentation](https://github.com/stakater/Reloader)."
           }
         ],
-        "support_details": "This product is in the community registry, as such support is handled through the originated repo. If you experience issues please open an issue in this repository [https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/issues). Please note this product is not supported via the IBM Cloud Support Center.",
+        "support_details": "This product is in the community registry, as such support is handled through the originated repo. If you experience issues please open an issue [in this repository](https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/issues). Please note this product is not supported via the IBM Cloud Support Center.",
         "flavors": [
           {
             "label": "Fully configurable",
@@ -75,6 +75,24 @@
               {
                 "key": "prefix",
                 "required": true
+              },
+              {
+                "key": "provider_visibility",
+                "hidden": true,
+                "options": [
+                  {
+                    "displayname": "private",
+                    "value": "private"
+                  },
+                  {
+                    "displayname": "public",
+                    "value": "public"
+                  },
+                  {
+                    "displayname": "public-and-private",
+                    "value": "public-and-private"
+                  }
+                ]
               },
               {
                 "key": "existing_cluster_crn",
@@ -118,16 +136,49 @@
                 "key": "reloader_reload_strategy"
               },
               {
-                "key": "reloader_namespaces_to_ignore"
+                "key": "reloader_namespaces_to_ignore",
+                "type": "string",
+                "custom_config": {
+                  "type": "array",
+                  "grouping": "deployment",
+                  "original_grouping": "deployment",
+                  "config_constraints": {
+                    "type": "string"
+                  }
+                }
               },
               {
-                "key": "reloader_resources_to_ignore"
+                "key": "reloader_resources_to_ignore",
+                "custom_config": {
+                  "type": "array",
+                  "grouping": "deployment",
+                  "original_grouping": "deployment",
+                  "config_constraints": {
+                    "type": "string"
+                  }
+                }
               },
               {
-                "key": "reloader_namespaces_selector"
+                "key": "reloader_namespaces_selector",
+                "custom_config": {
+                  "type": "array",
+                  "grouping": "deployment",
+                  "original_grouping": "deployment",
+                  "config_constraints": {
+                    "type": "string"
+                  }
+                }
               },
               {
-                "key": "reloader_resource_label_selector"
+                "key": "reloader_resource_label_selector",
+                "custom_config": {
+                  "type": "array",
+                  "grouping": "deployment",
+                  "original_grouping": "deployment",
+                  "config_constraints": {
+                    "type": "string"
+                  }
+                }
               },
               {
                 "key": "reloader_ignore_secrets"
@@ -169,10 +220,29 @@
                 "key": "reloader_chart_version"
               },
               {
-                "key": "eso_secretsstores_configuration"
+                "key": "eso_secretsstores_configuration",
+                "type": "string",
+                "custom_config": {
+                  "type": "json_editor",
+                  "grouping": "deployment",
+                  "original_grouping": "deployment",
+                  "config_constraints": {
+                    "type": "string"
+                  }
+                }
               },
               {
-                "key": "service_endpoints"
+                "key": "service_endpoints",
+                "options": [
+                  {
+                    "displayname": "Public",
+                    "value": "public"
+                  },
+                  {
+                    "displayname": "Private",
+                    "value": "private"
+                  }
+                ]
               }
             ],
             "architecture": {

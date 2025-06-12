@@ -4,9 +4,9 @@ offerings:
   - name: deploy-arch-ibm-eso
     kind: solution
     catalog_id: 7df1e4ca-d54c-4fd0-82ce-3d13247308cd
-    offering_id: 70e68cb4-7026-4329-9faa-8a1e56444aba
+    offering_id: 3745fd94-b05c-4720-9d0f-fc97e76d4850
     variations:
-      - name: standard
+      - name: fully-configurable
         mark_ready: true
         install_type: fullstack
         pre_validation: "tests/scripts/pre-validation-eso.sh"

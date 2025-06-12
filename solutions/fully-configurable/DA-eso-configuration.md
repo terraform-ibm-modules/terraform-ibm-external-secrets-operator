@@ -3,50 +3,7 @@
 In the Architecture configuration it is possible to configure the set of [Cluster Secrets Stores](https://external-secrets.io/latest/api/clustersecretstore/) and [Secrets Stores](https://external-secrets.io/latest/api/clustersecretstore/) to deploy on the cluster after the External Secrets Operator deployment and that are responsible to handle the integration of the operator components with the IBM Cloud Secrets Manager instance.
 The configuration of these stores is performed through the complex object `eso_secretsstores_configuration` and by specifying this input parameter when configuring the deployable architecture.
 
-Below the configuration of the input variable `eso_secretsstores_configuration` and the related options available:
-
-```
-variable "eso_secretsstores_configuration" {
-  description = "Configuration of the [cluster secrets stores](https://external-secrets.io/latest/api/clustersecretstore/) and [secrets stores](https://external-secrets.io/latest/api/secretstore/) to create"
-  type = object({
-    cluster_secrets_stores = map(object({
-      namespace = string
-      create_namespace = bool
-      existing_serviceid_id = string
-      serviceid_name = string
-      serviceid_description = string
-      existing_account_secrets_group_id = string
-      account_secrets_group_name = string
-      account_secrets_group_description = string
-      trusted_profile_name = string # if both the trusted_profile_name and the serviceid_name/existing_serviceid_id are set, the trusted_profile_name will be used
-      trusted_profile_description = string
-      existing_service_secrets_group_id_list = list(string)
-      service_secrets_groups_list = list(object({
-        name = string
-        description = string
-      }))
-    }))
-    secrets_stores = map(object({
-      create_namespace = bool
-      namespace = string
-      existing_serviceid_id = string
-      serviceid_name = string
-      serviceid_description = string
-      existing_account_secrets_group_id = string
-      account_secrets_group_name = string
-      account_secrets_group_description = string
-      trusted_profile_name = string # if both the trusted_profile_name and the serviceid_name/existing_serviceid_id are set, the trusted_profile_name will be used
-      trusted_profile_description = string
-      existing_service_secrets_group_id_list = list(string)
-      service_secrets_groups_list = list(object({
-        name = string
-        description = string
-      }))
-    }))
-  })
-  ```
-
-  - `cluster_secrets_stores` and `secrets_stores` are the keys of the input variable map and respectively collect the list of objects to define the cluster secrets stores and secrets stores. Each object in the two map's elements represent a secrets store. Each store's key is used also as name of the store.
+The input variable `eso_secretsstores_configuration` is a map with two keys, `cluster_secrets_stores` and `secrets_stores`, that respectively collect the list of objects to define the cluster secrets stores and secrets stores. Each object in the two map's elements represent a secrets store. Each store's key is used also as name of the store itself. Each store has the following attributes to define its configuration:
   - `namespace` is the namespace where the store is to be created, and `create_namespace` can be used to control if the namespace is to be created or it is already available on the cluster.
   - `serviceid_name` and `serviceid_description` provide the details to create the ServiceID to be entitled to read the secrets from Secrets Manager. As alternative, if already available, it is possible to specify `existing_serviceid_id` (no ServiceID is created in this case). The ServiceID (newly created or existing) will be provided with the IAM the policies to read the secrets for each of the Secrets Groups associated with the store.
   - `account_secrets_group_name` and `account_secrets_group_description` provide the details to create the Secrets Group (named Account Secrets Group in the context of ESO) where to create the secret to store the API key (called account API key starting from now) configured in the cluster to pull the secrets from Secrets Manager (and owned by the ServiceID defined through `serviceid_name` and `serviceid_description`). As alternative is possible to provide the ID of an already existing Account ServiceID through `existing_account_secrets_group_id`. In this case no Account ServiceID is created.
@@ -58,117 +15,112 @@ variable "eso_secretsstores_configuration" {
      - if an existing ServiceID is provided, it will be used to pull secrets from Secrets Manager (and will be provided with the entitlement to read secrets for all the Service Secrets Groups)
      - if an existing ServiceID isn't provided, the ServiceID created through `serviceid_name` and `serviceid_description` will be used
 
-Below an example to configure this input variable:
+Below an example that sets this input variable:
 
 ```
-ibmcloud_api_key = "******" # pragma: allowlist secret
-prefix="test-esoda"
-existing_cluster_crn="crn:v1:bluemix:public:containers-kubernetes:eu-de:a/abac0df06b644a9cabc6e44f55b3880e:d0e5mo7f0ngjpufiljug::"
-existing_resource_group_name="myresourcegroup"
-existing_secrets_manager_crn="crn:v1:bluemix:public:secrets-manager:us-south:a/abac0df06b644a9cabc6e44f55b3880e:79c6d411-c18f-4670-b009-b0044a238667::"
-eso_secretsstores_configuration = {
+{
   cluster_secrets_stores = {
     "cluster-secrets-store-1" = {
-        namespace = "eso-namespace-cs1"
-        create_namespace = true
-        existing_serviceid_id = null
-        serviceid_name = "esoda-test-cluster-secrets-store-1-serviceid"
-        serviceid_description = "esoda-test-cluster-secrets-store-1-serviceid description"
-        existing_account_secrets_group_id = ""
-        account_secrets_group_name = "esoda-test-cs-account-secrets-group-1"
-        account_secrets_group_description = "esoda-test-cs-account-secrets-group-1 description"
-        trusted_profile_name = ""
-        trusted_profile_description = null
-        existing_service_secrets_group_id_list = []
-        service_secrets_groups_list = [{
-            name = "esoda-test-cs-service1-secrets-group"
-            description = "Secrets group for secrets used by the ESO"
-        },{
-            name = "esoda-test-cs-service2-secrets-group"
-            description = "Secrets group 2 for secrets used by the ESO"
-        }]
-      },
-      "cluster-secrets-store-2" = {
-        namespace = "eso-namespace-cs2"
-        create_namespace = true
-        existing_serviceid_id = null
-        serviceid_name = ""
-        serviceid_description = ""
-        existing_account_secrets_group_id = "23cc32a3-d29e-688b-abe2-d7f7129f73f3"
-        account_secrets_group_name = "esoda-test-cs-account-secrets-group-2"
-        account_secrets_group_description = "esoda-test-cs-account-secrets-group-2 description"
-        trusted_profile_name = null
-        trusted_profile_description = null
-        existing_service_secrets_group_id_list = []
-        service_secrets_groups_list = [{
-            name = "esoda-test-cs-service3-secrets-group"
-            description = "Secrets group 3 for secrets used by the ESO"
-        },{
-            name = "esoda-test-cs-service4-secrets-group"
-            description = "Secrets group 4 for secrets used by the ESO"
-        }]
-      },
-      "cluster-secrets-store-3" = {
-        namespace = "eso-namespace-cs3"
-        create_namespace = true
-        existing_serviceid_id = null
-        serviceid_name = ""
-        serviceid_description = ""
-        existing_account_secrets_group_id = ""
-        account_secrets_group_name = "esoda-test-cs-account-secrets-group-2"
-        account_secrets_group_description = "esoda-test-cs-account-secrets-group-2 description"
-        trusted_profile_name = "cs3-trustedprofile"
-        trusted_profile_description = "Trusted profile to authenticate cs3"
-        existing_service_secrets_group_id_list = []
-        service_secrets_groups_list = [{
-            name = "esoda-test-cs-service5-secrets-group"
-            description = "Secrets group 5 for secrets used by the ESO"
-        },{
-            name = "esoda-test-cs-service6-secrets-group"
-            description = "Secrets group 6 for secrets used by the ESO"
-        }]
-      }
+      namespace = "eso-namespace-cs1"
+      create_namespace = true
+      existing_serviceid_id = null
+      serviceid_name = "esoda-test-cluster-secrets-store-1-serviceid"
+      serviceid_description = "esoda-test-cluster-secrets-store-1-serviceid description"
+      existing_account_secrets_group_id = ""
+      account_secrets_group_name = "esoda-test-cs-account-secrets-group-1"
+      account_secrets_group_description = "esoda-test-cs-account-secrets-group-1 description"
+      trusted_profile_name = ""
+      trusted_profile_description = null
+      existing_service_secrets_group_id_list = []
+      service_secrets_groups_list = [{
+          name = "esoda-test-cs-service1-secrets-group"
+          description = "Secrets group for secrets used by the ESO"
+      },{
+          name = "esoda-test-cs-service2-secrets-group"
+          description = "Secrets group 2 for secrets used by the ESO"
+      }]
+    },
+    "cluster-secrets-store-2" = {
+      namespace = "eso-namespace-cs2"
+      create_namespace = true
+      existing_serviceid_id = null
+      serviceid_name = ""
+      serviceid_description = ""
+      existing_account_secrets_group_id = "23cc32a3-d29e-688b-abe2-d7f7129f73f3"
+      account_secrets_group_name = "esoda-test-cs-account-secrets-group-2"
+      account_secrets_group_description = "esoda-test-cs-account-secrets-group-2 description"
+      trusted_profile_name = null
+      trusted_profile_description = null
+      existing_service_secrets_group_id_list = []
+      service_secrets_groups_list = [{
+          name = "esoda-test-cs-service3-secrets-group"
+          description = "Secrets group 3 for secrets used by the ESO"
+      },{
+          name = "esoda-test-cs-service4-secrets-group"
+          description = "Secrets group 4 for secrets used by the ESO"
+      }]
+    },
+    "cluster-secrets-store-3" = {
+      namespace = "eso-namespace-cs3"
+      create_namespace = true
+      existing_serviceid_id = null
+      serviceid_name = ""
+      serviceid_description = ""
+      existing_account_secrets_group_id = ""
+      account_secrets_group_name = "esoda-test-cs-account-secrets-group-2"
+      account_secrets_group_description = "esoda-test-cs-account-secrets-group-2 description"
+      trusted_profile_name = "cs3-trustedprofile"
+      trusted_profile_description = "Trusted profile to authenticate cs3"
+      existing_service_secrets_group_id_list = []
+      service_secrets_groups_list = [{
+          name = "esoda-test-cs-service5-secrets-group"
+          description = "Secrets group 5 for secrets used by the ESO"
+      },{
+          name = "esoda-test-cs-service6-secrets-group"
+          description = "Secrets group 6 for secrets used by the ESO"
+      }]
+    }
   }
   secrets_stores = {
     "secrets-store-1" = {
-        namespace = "eso-namespace-ss1"
-        create_namespace = true
-        existing_serviceid_id = "ServiceId-0ec46d95-c28d-4768-a912-5fcf73d4959e"
-        serviceid_name = ""
-        serviceid_description = ""
-        existing_account_secrets_group_id = ""
-        account_secrets_group_name = "esoda-test-ss-account-secrets-group-1"
-        account_secrets_group_description = "esoda-test-ss-account-secrets-group-1 description"
-        trusted_profile_name = ""
-        trusted_profile_description = null
-        existing_service_secrets_group_id_list = []
-        service_secrets_groups_list = [{
-            name = "esoda-test-ss-service1-secrets-group"
-            description = "Secrets group 1 for secrets used by the ESO"
-        },{
-            name = "esoda-test-ss-service2-secrets-group"
-            description = "Secrets group 2 for secrets used by the ESO"
-        }]
+      namespace = "eso-namespace-ss1"
+      create_namespace = true
+      existing_serviceid_id = "ServiceId-0ec46d95-c28d-4768-a912-5fcf73d4959e"
+      serviceid_name = ""
+      serviceid_description = ""
+      existing_account_secrets_group_id = ""
+      account_secrets_group_name = "esoda-test-ss-account-secrets-group-1"
+      account_secrets_group_description = "esoda-test-ss-account-secrets-group-1 description"
+      trusted_profile_name = ""
+      trusted_profile_description = null
+      existing_service_secrets_group_id_list = []
+      service_secrets_groups_list = [{
+          name = "esoda-test-ss-service1-secrets-group"
+          description = "Secrets group 1 for secrets used by the ESO"
+      },{
+          name = "esoda-test-ss-service2-secrets-group"
+          description = "Secrets group 2 for secrets used by the ESO"
+      }]
     },
     "secrets-store-2" = {
-        namespace = "eso-namespace-ss2"
-        create_namespace = true
-        existing_serviceid_id = null
-        serviceid_name = "esoda-test-secrets-store-2-serviceid"
-        serviceid_description = "esoda-test-secrets-store-2-serviceid description"
-        existing_account_secrets_group_id = ""
-        account_secrets_group_name = "esoda-test-ss-account-secrets-group-2"
-        account_secrets_group_description = "esoda-test-ss-account-secrets-group-2 description"
-        trusted_profile_name = null
-        trusted_profile_description = null
-        existing_service_secrets_group_id_list = []
-        service_secrets_groups_list = [{
-            name = "esoda-test-ss-service3-secrets-group"
-            description = "Secrets group 3 for secrets used by the ESO"
-        },{
-            name = "esoda-test-ss-service4-secrets-group"
-            description = "Secrets group 4 for secrets used by the ESO"
-        }]
+      namespace = "eso-namespace-ss2"
+      create_namespace = true
+      existing_serviceid_id = null
+      serviceid_name = "esoda-test-secrets-store-2-serviceid"
+      serviceid_description = "esoda-test-secrets-store-2-serviceid description"
+      existing_account_secrets_group_id = ""
+      account_secrets_group_name = "esoda-test-ss-account-secrets-group-2"
+      account_secrets_group_description = "esoda-test-ss-account-secrets-group-2 description"
+      trusted_profile_name = null
+      trusted_profile_description = null
+      existing_service_secrets_group_id_list = []
+      service_secrets_groups_list = [{
+          name = "esoda-test-ss-service3-secrets-group"
+          description = "Secrets group 3 for secrets used by the ESO"
+      },{
+          name = "esoda-test-ss-service4-secrets-group"
+          description = "Secrets group 4 for secrets used by the ESO"
+      }]
     }
   }
 }
