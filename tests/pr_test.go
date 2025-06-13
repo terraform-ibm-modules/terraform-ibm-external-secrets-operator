@@ -782,9 +782,6 @@ func TestRunFullConfigSolutionUpgradeSchematics(t *testing.T) {
 	// start main schematics test
 	options := setupSolutionSchematicOptions(t, "eso-fupg", fullConfigSolutionDir)
 
-	// TODO TO REMOVE
-	options.SkipTestTearDown = true
-
 	options.TerraformVars = getFullConfigSolutionTestVariables(options, existingResourceOptions)
 
 	err := options.RunSchematicUpgradeTest()

@@ -27,12 +27,6 @@ data "ibm_container_cluster_config" "cluster_config" {
   cluster_name_id = local.cluster_id
 }
 
-# Wait time to allow cluster refreshes components after provisioning
-resource "time_sleep" "wait_45_seconds" {
-  depends_on      = [data.ibm_container_cluster_config.cluster_config]
-  create_duration = "45s"
-}
-
 ##################################################################
 # ESO deployment configuration
 # Configures ESO and reloader deployments
