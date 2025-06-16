@@ -724,7 +724,8 @@ func getFullConfigSolutionTestVariables(mainOptions *testschematic.TestSchematic
 
 	logger.Log(mainOptions.Testing, "setupSolutionSchematicOptions - Using mainOptions.Prefix: ", mainOptions.Prefix)
 
-	logger.Log(mainOptions.Testing, "TEST TO REMOVE: ", mainOptions.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"])
+	test := mainOptions.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"][0:3]
+	logger.Log(mainOptions.Testing, "TEST TO REMOVE: ", test)
 
 	vars := []testschematic.TestSchematicTerraformVar{
 		{Name: "ibmcloud_api_key", Value: mainOptions.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
