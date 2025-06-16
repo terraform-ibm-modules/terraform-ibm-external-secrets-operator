@@ -103,6 +103,9 @@
                 "required": true
               },
               {
+                "key": "sm_ibmcloud_api_key"
+              },
+              {
                 "key": "eso_namespace"
               },
               {

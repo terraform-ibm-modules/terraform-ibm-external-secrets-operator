@@ -8,6 +8,11 @@ variable "ibmcloud_api_key" {
   sensitive   = true
 }
 
+variable "sm_ibmcloud_api_key" {
+  type        = string
+  description = "APIkey to authenticate on Secrets Manager instance. If null the ibmcloud_api_key will be used."
+}
+
 variable "provider_visibility" {
   description = "Set the visibility value for the IBM terraform provider. Supported values are `public`, `private`, `public-and-private`. [Learn more](https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/guides/custom-service-endpoints)."
   type        = string
@@ -311,36 +316,36 @@ variable "eso_secretsstores_configuration" {
     cluster_secrets_stores = map(object({
       namespace                              = string
       create_namespace                       = bool
-      existing_serviceid_id                  = string
-      serviceid_name                         = string
-      serviceid_description                  = string
-      existing_account_secrets_group_id      = string
-      account_secrets_group_name             = string
-      account_secrets_group_description      = string
-      trusted_profile_name                   = string # if both the trusted_profile_name and the serviceid_name/existing_serviceid_id are set, the trusted_profile_name will be used
-      trusted_profile_description            = string
-      existing_service_secrets_group_id_list = list(string)
-      service_secrets_groups_list = list(object({
+      existing_serviceid_id                  = optional(string, null)
+      serviceid_name                         = optional(string, null)
+      serviceid_description                  = optional(string, null)
+      existing_account_secrets_group_id      = optional(string, null)
+      account_secrets_group_name             = optional(string, null)
+      account_secrets_group_description      = optional(string, null)
+      trusted_profile_name                   = optional(string, null) # if both the trusted_profile_name and the serviceid_name/existing_serviceid_id are set, the trusted_profile_name will be used
+      trusted_profile_description            = optional(string, null)
+      existing_service_secrets_group_id_list = optional(list(string), [])
+      service_secrets_groups_list = optional(list(object({
         name        = string
         description = string
-      }))
+      })), [])
     }))
     secrets_stores = map(object({
       create_namespace                       = bool
-      namespace                              = string
-      existing_serviceid_id                  = string
-      serviceid_name                         = string
-      serviceid_description                  = string
-      existing_account_secrets_group_id      = string
-      account_secrets_group_name             = string
-      account_secrets_group_description      = string
-      trusted_profile_name                   = string # if both the trusted_profile_name and the serviceid_name/existing_serviceid_id are set, the trusted_profile_name will be used
-      trusted_profile_description            = string
-      existing_service_secrets_group_id_list = list(string)
-      service_secrets_groups_list = list(object({
+      namespace                              = optional(string, null)
+      existing_serviceid_id                  = optional(string, null)
+      serviceid_name                         = optional(string, null)
+      serviceid_description                  = optional(string, null)
+      existing_account_secrets_group_id      = optional(string, null)
+      account_secrets_group_name             = optional(string, null)
+      account_secrets_group_description      = optional(string, null)
+      trusted_profile_name                   = optional(string, null) # if both the trusted_profile_name and the serviceid_name/existing_serviceid_id are set, the trusted_profile_name will be used
+      trusted_profile_description            = optional(string, null)
+      existing_service_secrets_group_id_list = optional(list(string), [])
+      service_secrets_groups_list = optional(list(object({
         name        = string
         description = string
-      }))
+      })), [])
     }))
   })
   default = {

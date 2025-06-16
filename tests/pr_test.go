@@ -625,12 +625,12 @@ func getFullConfigSolutionTestVariables(mainOptions *testschematic.TestSchematic
 		"cluster_secrets_stores": map[string]any{
 
 			"css-1": map[string]any{
-				"namespace":                              "eso-namespace-cs1",
-				"create_namespace":                       true,
-				"existing_serviceid_id":                  "",
-				"serviceid_name":                         "esoda-test-css-1-serviceid",
-				"serviceid_description":                  "esoda-test-css-1-serviceid description",
-				"existing_account_secrets_group_id":      "",
+				"namespace":        "eso-namespace-cs1",
+				"create_namespace": true,
+				// "existing_serviceid_id":                  "",
+				"serviceid_name":        "esoda-test-css-1-serviceid",
+				"serviceid_description": "esoda-test-css-1-serviceid description",
+				// "existing_account_secrets_group_id":      "",
 				"account_secrets_group_name":             "esoda-test-cs-accsg-1",
 				"account_secrets_group_description":      "esoda-test-cs-accsg-1 description",
 				"trusted_profile_name":                   "",
@@ -648,16 +648,16 @@ func getFullConfigSolutionTestVariables(mainOptions *testschematic.TestSchematic
 				},
 			},
 			"css-2": map[string]any{
-				"namespace":                              "eso-namespace-cs2",
-				"create_namespace":                       true,
-				"existing_serviceid_id":                  "",
-				"serviceid_name":                         "esoda-test-css-3-serviceid",
-				"serviceid_description":                  "esoda-test-css-3-serviceid description",
-				"existing_account_secrets_group_id":      "",
-				"account_secrets_group_name":             "esoda-test-cs-accsg-3",
-				"account_secrets_group_description":      "esoda-test-cs-accsg-3 description",
-				"trusted_profile_name":                   "",
-				"trusted_profile_description":            "",
+				"namespace":                         "eso-namespace-cs2",
+				"create_namespace":                  true,
+				"existing_serviceid_id":             "",
+				"serviceid_name":                    "esoda-test-css-3-serviceid",
+				"serviceid_description":             "esoda-test-css-3-serviceid description",
+				"existing_account_secrets_group_id": "",
+				"account_secrets_group_name":        "esoda-test-cs-accsg-3",
+				"account_secrets_group_description": "esoda-test-cs-accsg-3 description",
+				// "trusted_profile_name":                   "",
+				// "trusted_profile_description":            "",
 				"existing_service_secrets_group_id_list": []string{},
 				"service_secrets_groups_list": []map[string]any{
 					{
@@ -674,16 +674,16 @@ func getFullConfigSolutionTestVariables(mainOptions *testschematic.TestSchematic
 		"secrets_stores": map[string]any{
 
 			"ss-1": map[string]any{
-				"namespace":                              "eso-namespace-ss1",
-				"create_namespace":                       true,
-				"existing_serviceid_id":                  "",
-				"serviceid_name":                         "esoda-test-ss-1-serviceid",
-				"serviceid_description":                  "esoda-test-ss-1-serviceid description",
-				"existing_account_secrets_group_id":      "",
-				"account_secrets_group_name":             "esoda-test-ss-accsg-1",
-				"account_secrets_group_description":      "esoda-test-ss-accsg-1 description",
-				"trusted_profile_name":                   "",
-				"trusted_profile_description":            "",
+				"namespace":                         "eso-namespace-ss1",
+				"create_namespace":                  true,
+				"existing_serviceid_id":             "",
+				"serviceid_name":                    "esoda-test-ss-1-serviceid",
+				"serviceid_description":             "esoda-test-ss-1-serviceid description",
+				"existing_account_secrets_group_id": "",
+				"account_secrets_group_name":        "esoda-test-ss-accsg-1",
+				"account_secrets_group_description": "esoda-test-ss-accsg-1 description",
+				// "trusted_profile_name":                   "",
+				// "trusted_profile_description":            "",
 				"existing_service_secrets_group_id_list": []string{},
 				"service_secrets_groups_list": []map[string]any{
 					{
@@ -697,12 +697,12 @@ func getFullConfigSolutionTestVariables(mainOptions *testschematic.TestSchematic
 				},
 			},
 			"ss-2": map[string]any{
-				"namespace":                              "eso-namespace-ss2",
-				"create_namespace":                       true,
-				"existing_serviceid_id":                  "",
-				"serviceid_name":                         "esoda-test-ss-2-serviceid",
-				"serviceid_description":                  "esoda-test-ss-2-serviceid description",
-				"existing_account_secrets_group_id":      "",
+				"namespace":        "eso-namespace-ss2",
+				"create_namespace": true,
+				// "existing_serviceid_id":                  "",
+				"serviceid_name":        "esoda-test-ss-2-serviceid",
+				"serviceid_description": "esoda-test-ss-2-serviceid description",
+				// "existing_account_secrets_group_id":      "",
 				"account_secrets_group_name":             "esoda-test-ss-accsg-2",
 				"account_secrets_group_description":      "esoda-test-ss-accsg-2 description",
 				"trusted_profile_name":                   "",
@@ -723,6 +723,8 @@ func getFullConfigSolutionTestVariables(mainOptions *testschematic.TestSchematic
 	}
 
 	logger.Log(mainOptions.Testing, "setupSolutionSchematicOptions - Using mainOptions.Prefix: ", mainOptions.Prefix)
+
+	logger.Log(mainOptions.Testing, "TEST TO REMOVE: ", mainOptions.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"])
 
 	vars := []testschematic.TestSchematicTerraformVar{
 		{Name: "ibmcloud_api_key", Value: mainOptions.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
