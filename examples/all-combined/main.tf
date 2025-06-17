@@ -52,7 +52,7 @@ locals {
       machine_type     = "bx2.4x16"
       workers_per_zone = 1
       labels           = { "dedicated" : "default" }
-      operating_system = "REDHAT_8_64"
+      operating_system = "RHEL_9_64"
     }
   ]
 
