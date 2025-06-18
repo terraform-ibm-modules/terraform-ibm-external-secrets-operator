@@ -21,7 +21,7 @@ locals {
   cluster_region      = module.crn_parser_cluster.region
   sm_region           = module.crn_parser_sm.region
   sm_guid             = module.crn_parser_sm.service_instance
-  sm_ibmcloud_api_key = var.sm_ibmcloud_api_key == null ? var.ibmcloud_api_key : var.sm_ibmcloud_api_key
+  sm_ibmcloud_api_key = var.secrets_manager_ibmcloud_api_key == null ? var.ibmcloud_api_key : var.secrets_manager_ibmcloud_api_key
 }
 
 data "ibm_container_cluster_config" "cluster_config" {

@@ -8,7 +8,7 @@ variable "ibmcloud_api_key" {
   sensitive   = true
 }
 
-variable "sm_ibmcloud_api_key" {
+variable "secrets_manager_ibmcloud_api_key" {
   type        = string
   description = "API key to authenticate on Secrets Manager instance. If null the ibmcloud_api_key will be used."
   default     = null
