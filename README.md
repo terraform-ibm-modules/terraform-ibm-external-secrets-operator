@@ -26,7 +26,7 @@ This module automates the installation and configuration of the [External Secret
 <!-- END OVERVIEW HOOK -->
 
 <!-- Match this heading to the name of the root level module (the repo name) -->
-## external-secrets-operator-module
+## External Secrets Operator module
 
 External Secrets Operator synchronizes secrets in the Kubernetes cluster with secrets that are mapped in [Secrets Manager](https://cloud.ibm.com/docs/secrets-manager).
 
@@ -288,11 +288,11 @@ For more information about IAM Trusted profiles and ESO Multitenancy configurati
 - [Setup of ESO as a Service from RedHat](https://cloud.redhat.com/blog/how-to-setup-external-secrets-operator-eso-as-a-service)
 - [ESO Multitenancy configuration from ESO Docs](https://external-secrets.io/latest/guides/multi-tenancy/)
 
-### _Important current limitation of ESO deployment_
+### _Important current architectural limitation of ESO deployment_
 
 The current ESO version doesn't allow to customise the default IAM endpoint (https://iam.cloud.ibm.com) it uses when authenticating through apikey (`api_key` authentication) for both ClusterSecretStore and SecretStore APIs.
 
-As a direct effect of this limitation, for a standard OCP cluster topology as defined by GoldenEye design (3 workers zones `edge` `private` and `transit`), an ESO deployment with `api_key` authentication configuration needs to be performed on the workers pool with access to the public network (`dedicated: edge` label in GE usual topology) to work fine. If the ESO deployment is performed on a workers pool without access to public network (i.e. to https://iam.cloud.ibm.com) the apikey authentication is expected to fail.
+As a direct effect of this limitation, for an OCP cluster topology designed with three different subnet layers `edge` `private` and `transit`, where only `edge` one has access to the public network, `private` is for business workload and `transit` for private networking, an ESO deployment with `api_key` authentication configuration needs to be performed on the workers pool with access to the public network (`dedicated: edge` label in GE usual topology) to work fine. If the ESO deployment is performed on a workers pool without access to public network (i.e. to https://iam.cloud.ibm.com) the apikey authentication is expected to fail, unless ESO is enrolled into RedHat Service Mesh (this module allows to add the expected resources annotations but the Mesh gateways configuration is out of the scope of the module) or a different networking solution is implemented.
 
 
 ### Pod Reloader
@@ -476,6 +476,18 @@ module "external_secrets_operator" {
 }
 ```
 
+## Required IAM access policies
+You need the following permissions to run this module.
+
+- Account Management
+    - IAM Services
+        - **Secrets Manager** service
+            - `Administrator` platform access
+            - `Manager` service access
+        - **Kubernetes** service
+            - `Administrator` platform access
+            - `Manager` service access
+
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ### Requirements
 
@@ -509,9 +521,9 @@ module "external_secrets_operator" {
 | <a name="input_eso_enroll_in_servicemesh"></a> [eso\_enroll\_in\_servicemesh](#input\_eso\_enroll\_in\_servicemesh) | Flag to enroll ESO into istio servicemesh | `bool` | `false` | no |
 | <a name="input_eso_image"></a> [eso\_image](#input\_eso\_image) | The External Secrets Operator image in the format of `[registry-url]/[namespace]/[image]`. | `string` | `"ghcr.io/external-secrets/external-secrets"` | no |
 | <a name="input_eso_image_version"></a> [eso\_image\_version](#input\_eso\_image\_version) | The version or digest for the external secrets image to deploy. If changing the value, ensure it is compatible with the chart version set in eso\_chart\_version. | `string` | `"v0.17.0-ubi@sha256:5c9f7750fb922fb09cfc3b430d5916923b85f17ba5099b244173344ab3046b53"` | no |
-| <a name="input_eso_namespace"></a> [eso\_namespace](#input\_eso\_namespace) | Namespace to create and be used to install ESO components including helm releases. If eso\_store\_scope == cluster, this will also be used to deploy ClusterSecretStore/cluster\_store in it | `string` | `null` | no |
+| <a name="input_eso_namespace"></a> [eso\_namespace](#input\_eso\_namespace) | Namespace to create and be used to install ESO components including helm releases. | `string` | `null` | no |
 | <a name="input_eso_pod_configuration"></a> [eso\_pod\_configuration](#input\_eso\_pod\_configuration) | Configuration to use to customise ESO deployment on specific pods. Setting appropriate values will result in customising ESO helm release. Default value is {} to keep ESO standard deployment. Ignore the key if not required. | <pre>object({<br/>    annotations = optional(object({<br/>      # The annotations for external secret controller pods.<br/>      external_secrets = optional(map(string), {})<br/>      # The annotations for external secret cert controller pods.<br/>      external_secrets_cert_controller = optional(map(string), {})<br/>      # The annotations for external secret controller pods.<br/>      external_secrets_webhook = optional(map(string), {})<br/>    }), {})<br/><br/>    labels = optional(object({<br/>      # The labels for external secret controller pods.<br/>      external_secrets = optional(map(string), {})<br/>      # The labels for external secret cert controller pods.<br/>      external_secrets_cert_controller = optional(map(string), {})<br/>      # The labels for external secret controller pods.<br/>      external_secrets_webhook = optional(map(string), {})<br/>    }), {})<br/>  })</pre> | `{}` | no |
-| <a name="input_existing_eso_namespace"></a> [existing\_eso\_namespace](#input\_existing\_eso\_namespace) | Existing Namespace to be used to install ESO components including helm releases. If eso\_store\_scope == cluster, this will also be used to deploy ClusterSecretStore/cluster\_store in it | `string` | `null` | no |
+| <a name="input_existing_eso_namespace"></a> [existing\_eso\_namespace](#input\_existing\_eso\_namespace) | Existing Namespace to be used to install ESO components including helm releases. | `string` | `null` | no |
 | <a name="input_reloader_chart_location"></a> [reloader\_chart\_location](#input\_reloader\_chart\_location) | The location of the Reloader Helm chart. | `string` | `"https://stakater.github.io/stakater-charts"` | no |
 | <a name="input_reloader_chart_version"></a> [reloader\_chart\_version](#input\_reloader\_chart\_version) | The version of the Reloader Helm chart. Ensure that the chart version is compatible with the image version specified in reloader\_image\_version. | `string` | `"2.1.4"` | no |
 | <a name="input_reloader_custom_values"></a> [reloader\_custom\_values](#input\_reloader\_custom\_values) | String containing custom values to be used for reloader helm chart. See https://github.com/stakater/Reloader/blob/master/deployments/kubernetes/chart/reloader/values.yaml | `string` | `null` | no |
