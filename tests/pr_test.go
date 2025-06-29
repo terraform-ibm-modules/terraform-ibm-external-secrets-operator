@@ -11,10 +11,13 @@ import (
 	"time"
 
 	"github.com/gruntwork-io/terratest/modules/k8s"
+	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/cloudinfo"
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/common"
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/testhelper"
+	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/testschematic"
 	"gopkg.in/yaml.v3"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -22,6 +25,10 @@ import (
 const resourceGroup = "geretain-test-ext-secrets-sync"
 const defaultExampleTerraformDir = "examples/all-combined"
 const basicExampleTerraformDir = "examples/basic"
+
+// schematics DA consts
+const fullConfigSolutionDir = "solutions/fully-configurable"
+const existingResourcesTerraformDir = "tests/existing-resources"
 
 // Define a struct with fields that match the structure of the YAML data
 const yamlLocation = "../common-dev-assets/common-go-assets/common-permanent-resources.yaml"
@@ -542,4 +549,241 @@ func extractDefaultValueFromFile(lines []string, variableName string) string {
 		}
 	}
 	return ""
+}
+
+// Schematics DA test
+
+func setupOptionsSchematics(t *testing.T, prefix string, dir string) *testhelper.TestOptions {
+	// Verify ibmcloud_api_key variable is set
+	checkVariable := "TF_VAR_ibmcloud_api_key"
+	val, present := os.LookupEnv(checkVariable)
+	require.True(t, present, checkVariable+" environment variable not set")
+	require.NotEqual(t, "", val, checkVariable+" environment variable is empty")
+
+	logger.Log(t, "variable "+checkVariable+" correctly set")
+
+	// Verify region variable is set, otherwise it computes it
+	region := ""
+	checkRegion := "TF_VAR_region"
+	valRegion, presentRegion := os.LookupEnv(checkRegion)
+	if presentRegion {
+		region = valRegion
+	} else {
+		// Programmatically determine region to use based on availability
+		region, _ = testhelper.GetBestVpcRegion(val, "../common-dev-assets/common-go-assets/cloudinfo-region-vpc-gen2-prefs.yaml", "eu-de")
+	}
+
+	logger.Log(t, "Using region: ", region)
+
+	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
+		Testing:      t,
+		TerraformDir: dir,
+		Prefix:       prefix,
+		IgnoreUpdates: testhelper.Exemptions{ // Ignore for consistency check
+			List: []string{},
+		},
+		Region:        region,
+		ResourceGroup: resourceGroup,
+	})
+	return options
+}
+
+// sets up options for solutions through schematics
+func setupSolutionSchematicOptions(t *testing.T, prefix string, dir string) *testschematic.TestSchematicOptions {
+
+	logger.Log(t, "setupSolutionSchematicOptions - Using prefix: ", prefix)
+
+	options := testschematic.TestSchematicOptionsDefault(&testschematic.TestSchematicOptions{
+		Testing: t,
+		TarIncludePatterns: []string{
+			"*.tf",
+			"chart/*.yaml",
+			"chart/raw/*.yaml",
+			"chart/raw/templates/*.yaml",
+			"chart/raw/templates/*.tpl",
+			"modules/eso-clusterstore/*.tf",
+			"modules/eso-secretstore/*.tf",
+			"modules/eso-trusted-profile/*.tf",
+			"modules/eso-external-secret/*.tf",
+			dir + "/*.tf",
+		},
+		TemplateFolder:         dir,
+		Tags:                   []string{"test-esoda-schematic"},
+		Prefix:                 prefix,
+		DeleteWorkspaceOnFail:  false,
+		WaitJobCompleteMinutes: 60,
+	})
+
+	return options
+}
+
+// helper function to set up inputs for full config solution test, will help keep it consistent
+// between normal and upgrade tests
+func getFullConfigSolutionTestVariables(mainOptions *testschematic.TestSchematicOptions, existingOptions *testhelper.TestOptions) []testschematic.TestSchematicTerraformVar {
+
+	eso_secretsstores_configuration := map[string]any{
+		"cluster_secrets_stores": map[string]any{
+
+			"css-1": map[string]any{
+				"namespace":        "eso-namespace-cs1",
+				"create_namespace": true,
+				// "existing_serviceid_id":                  "",
+				"serviceid_name":        "esoda-test-css-1-serviceid",
+				"serviceid_description": "esoda-test-css-1-serviceid description",
+				// "existing_account_secrets_group_id":      "",
+				"account_secrets_group_name":             "esoda-test-cs-accsg-1",
+				"account_secrets_group_description":      "esoda-test-cs-accsg-1 description",
+				"trusted_profile_name":                   "",
+				"trusted_profile_description":            "",
+				"existing_service_secrets_group_id_list": []string{},
+				"service_secrets_groups_list": []map[string]any{
+					{
+						"name":        "esoda-test-cs-s1-sg",
+						"description": "Secrets group 1 for secrets used by the ESO",
+					},
+					{
+						"name":        "esoda-test-cs-s2-sg",
+						"description": "Secrets group 2 for secrets used by the ESO",
+					},
+				},
+			},
+			"css-2": map[string]any{
+				"namespace":                         "eso-namespace-cs2",
+				"create_namespace":                  true,
+				"existing_serviceid_id":             "",
+				"serviceid_name":                    "esoda-test-css-3-serviceid",
+				"serviceid_description":             "esoda-test-css-3-serviceid description",
+				"existing_account_secrets_group_id": "",
+				"account_secrets_group_name":        "esoda-test-cs-accsg-3",
+				"account_secrets_group_description": "esoda-test-cs-accsg-3 description",
+				// "trusted_profile_name":                   "",
+				// "trusted_profile_description":            "",
+				"existing_service_secrets_group_id_list": []string{},
+				"service_secrets_groups_list": []map[string]any{
+					{
+						"name":        "esoda-test-cs-s3-sg",
+						"description": "Secrets group 3 for secrets used by the ESO",
+					},
+					{
+						"name":        "esoda-test-cs-s4-sg",
+						"description": "Secrets group 4 for secrets used by the ESO",
+					},
+				},
+			},
+		},
+		"secrets_stores": map[string]any{
+
+			"ss-1": map[string]any{
+				"namespace":                         "eso-namespace-ss1",
+				"create_namespace":                  true,
+				"existing_serviceid_id":             "",
+				"serviceid_name":                    "esoda-test-ss-1-serviceid",
+				"serviceid_description":             "esoda-test-ss-1-serviceid description",
+				"existing_account_secrets_group_id": "",
+				"account_secrets_group_name":        "esoda-test-ss-accsg-1",
+				"account_secrets_group_description": "esoda-test-ss-accsg-1 description",
+				// "trusted_profile_name":                   "",
+				// "trusted_profile_description":            "",
+				"existing_service_secrets_group_id_list": []string{},
+				"service_secrets_groups_list": []map[string]any{
+					{
+						"name":        "esoda-test-ss-s1-sg",
+						"description": "Secrets group 1 for secrets used by the ESO",
+					},
+					{
+						"name":        "esoda-test-ss-s2-sg",
+						"description": "Secrets group 2 for secrets used by the ESO",
+					},
+				},
+			},
+			"ss-2": map[string]any{
+				"namespace":        "eso-namespace-ss2",
+				"create_namespace": true,
+				// "existing_serviceid_id":                  "",
+				"serviceid_name":        "esoda-test-ss-2-serviceid",
+				"serviceid_description": "esoda-test-ss-2-serviceid description",
+				// "existing_account_secrets_group_id":      "",
+				"account_secrets_group_name":             "esoda-test-ss-accsg-2",
+				"account_secrets_group_description":      "esoda-test-ss-accsg-2 description",
+				"trusted_profile_name":                   "",
+				"trusted_profile_description":            "",
+				"existing_service_secrets_group_id_list": []string{},
+				"service_secrets_groups_list": []map[string]any{
+					{
+						"name":        "esoda-test-ss-s3-sg",
+						"description": "Secrets group 3 for secrets used by the ESO",
+					},
+					{
+						"name":        "esoda-test-ss-s4-sg",
+						"description": "Secrets group 4 for secrets used by the ESO",
+					},
+				},
+			},
+		},
+	}
+
+	logger.Log(mainOptions.Testing, "setupSolutionSchematicOptions - Using mainOptions.Prefix: ", mainOptions.Prefix)
+
+	vars := []testschematic.TestSchematicTerraformVar{
+		{Name: "ibmcloud_api_key", Value: mainOptions.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
+		{Name: "prefix", Value: mainOptions.Prefix, DataType: "string"},
+		{Name: "existing_secrets_manager_crn", Value: smCRN, DataType: "string"},
+		{Name: "existing_cluster_crn", Value: existingOptions.LastTestTerraformOutputs["cluster_crn"], DataType: "string"},
+
+		{Name: "eso_secretsstores_configuration", Value: eso_secretsstores_configuration, DataType: "object"},
+	}
+
+	return vars
+}
+
+func TestRunFullConfigSolutionSchematics(t *testing.T) {
+
+	// set up the options for existing resource deployment
+	// needed by solution
+	existingResourceOptions := setupOptionsSchematics(t, "eso-cluster-full", existingResourcesTerraformDir)
+
+	// Creates temp dirs and runs InitAndApply for existing resources
+	// outputs will be in options after apply
+
+	existingResourceOptions.SkipTestTearDown = true
+	_, existDeployErr := existingResourceOptions.RunTest()
+
+	defer existingResourceOptions.TestTearDown() // public function ignores skip above
+
+	// immediately fail and exit test if existing deployment failed (tear down is in a defer)
+	require.NoError(t, existDeployErr, "error creating needed existing resources")
+
+	// start main schematics test
+	options := setupSolutionSchematicOptions(t, "eso-full", fullConfigSolutionDir)
+
+	options.TerraformVars = getFullConfigSolutionTestVariables(options, existingResourceOptions)
+
+	err := options.RunSchematicTest()
+	assert.Nil(t, err, "This should not have errored")
+
+}
+
+func TestRunFullConfigSolutionUpgradeSchematics(t *testing.T) {
+
+	// set up the options for existing resource deployment
+	// needed by solution
+	existingResourceOptions := setupOptionsSchematics(t, "eso-cluster-fupg", existingResourcesTerraformDir)
+
+	// Creates temp dirs and runs InitAndApply for existing resources
+	// outputs will be in options after apply
+
+	existingResourceOptions.SkipTestTearDown = true
+	_, existDeployErr := existingResourceOptions.RunTest()
+	defer existingResourceOptions.TestTearDown() // public function ignores skip above
+
+	// immediately fail and exit test if existing deployment failed (tear down is in a defer)
+	require.NoError(t, existDeployErr, "error creating needed existing VPC resources")
+
+	// start main schematics test
+	options := setupSolutionSchematicOptions(t, "eso-fupg", fullConfigSolutionDir)
+
+	options.TerraformVars = getFullConfigSolutionTestVariables(options, existingResourceOptions)
+
+	err := options.RunSchematicUpgradeTest()
+	assert.Nil(t, err, "This should not have errored")
 }

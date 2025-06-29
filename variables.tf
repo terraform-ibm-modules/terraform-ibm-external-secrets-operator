@@ -3,13 +3,13 @@
 ############################################################################################################
 
 variable "eso_namespace" {
-  description = "Namespace to create and be used to install ESO components including helm releases. If eso_store_scope == cluster, this will also be used to deploy ClusterSecretStore/cluster_store in it"
+  description = "Namespace to create and be used to install ESO components including helm releases."
   type        = string
   default     = null
 }
 
 variable "existing_eso_namespace" {
-  description = "Existing Namespace to be used to install ESO components including helm releases. If eso_store_scope == cluster, this will also be used to deploy ClusterSecretStore/cluster_store in it"
+  description = "Existing Namespace to be used to install ESO components including helm releases."
   type        = string
   default     = null
 }

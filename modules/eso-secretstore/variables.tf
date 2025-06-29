@@ -5,12 +5,6 @@ variable "region" {
   type        = string
 }
 
-variable "sstore_helm_rls_name" {
-  description = "Name of helm release for external secret"
-  type        = string
-  default     = "external-secret-store"
-}
-
 variable "service_endpoints" {
   type        = string
   description = "The service endpoint type to communicate with the provided secrets manager instance. Possible values are `public` or `private`. This also will set the iam endpoint for containerAuth when enabling Trusted Profile/CR based authentication."
@@ -22,7 +16,7 @@ variable "service_endpoints" {
 }
 
 ##############################################################################
-# Authentication configuration for clusterstore that can be one of api_key or trusted_profile
+# Authentication configuration for secretsstore that can be one of api_key or trusted_profile
 ##############################################################################
 variable "eso_authentication" {
   type        = string
@@ -41,13 +35,13 @@ variable "eso_authentication" {
 ####### apikey authentication
 
 variable "sstore_secret_name" {
-  description = "Secret name to be used/referenced in the ESO secretstore to pull from Secrets Manager"
+  description = "Secret name to be used/referenced in the ESO secretsstore to pull from Secrets Manager"
   default     = "ibm-secret"
   type        = string
 }
 
 variable "sstore_secret_apikey" {
-  description = "APIkey to be stored into sstore_secret_name to authenticate on Secrets Manager instance"
+  description = "APIkey to be stored into var.sstore_secret_name secret to authenticate with Secrets Manager instance"
   type        = string
   default     = null
   validation {
@@ -60,25 +54,37 @@ variable "sstore_secret_apikey" {
   }
 }
 
-####### trusted profile
+####### trusted profile authentication
 
 variable "sstore_trusted_profile_name" {
   type        = string
-  description = "The name of the trusted profile to use for the secretstore. This allows ESO to use CRI based authentication to access secrets manager. The trusted profile must be created in advance"
+  description = "The name of the trusted profile to use for the secrets store. This allows ESO to use CRI based authentication to access secrets manager. The trusted profile must be created in advance"
   default     = null
 }
 
+####### secrets store configuration
+
 variable "sstore_secrets_manager_guid" {
   type        = string
-  description = "Secrets manager instance GUID for secretstore where secrets will be stored or fetched from"
+  description = "Secrets manager instance GUID for secrets store where secrets will be stored or fetched from"
 }
 
 variable "sstore_namespace" {
   type        = string
-  description = "Namespace to create the SecretStore. The namespace must exist as it is not created by this module"
+  description = "Namespace to create the secret store. The namespace must exist as it is not created by this module"
 }
 
 variable "sstore_store_name" {
   type        = string
   description = "Name of the SecretStore to create"
+  validation {
+    condition     = can(regex("^([a-z][-a-z0-9]*[a-z0-9])$", var.sstore_store_name))
+    error_message = "The secrets store name must start with a lowercase letter, can contain lowercase letters, numbers and hyphens, and must end with a lowercase letter."
+  }
+}
+
+variable "sstore_helm_rls_name" {
+  description = "Name of helm release for the secrets store"
+  type        = string
+  default     = "external-secret-store"
 }
