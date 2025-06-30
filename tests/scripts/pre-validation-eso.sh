@@ -33,7 +33,7 @@ TF_VARS_FILE="terraform.tfvars"
   existing_cluster_crn_var_name="existing_cluster_crn"
   prefix_var_name="prefix"
   prefix_var_value="$(terraform output -state=terraform.tfstate -raw prefix)"
-  existing_cluster_crn_var_value="$(terraform output -state=terraform.tfstate -raw existing_cluster_crn)"
+  existing_cluster_crn_var_value="$(terraform output -state=terraform.tfstate -raw cluster_crn)"
 
   echo "Appending '${prefix_var_name}', '${existing_cluster_crn_var_name}', '${existing_secrets_manager_crn_var_name}' input variable values to ${JSON_FILE}..."
 

@@ -16,8 +16,6 @@ module "resource_group" {
 
 locals {
 
-
-
   subnet_prefix = flatten([
     for k, v in module.zone_subnet_addrs : [
       for zone, cidr in v.network_cidr_blocks : {
