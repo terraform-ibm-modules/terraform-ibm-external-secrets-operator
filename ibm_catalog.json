@@ -1,0 +1,276 @@
+
+{
+    "products": [
+      {
+        "name": "deploy-arch-ibm-eso",
+        "label": "Cloud automation for External Secrets Operator",
+        "product_kind": "solution",
+        "tags": [
+          "ibm_created",
+          "target_terraform",
+          "terraform",
+          "solution",
+          "security"
+        ],
+        "keywords": [
+          "Secrets",
+          "Secrets Manager",
+          "IaC",
+          "infrastructure as code",
+          "terraform",
+          "solution"
+        ],
+        "short_description": "Deploys the External Secrets Operator (ESO) on an IBM Cloud Kubernetes Service (IKS) OpenShift cluster.",
+        "long_description": "This architecture allows to deploy the External Secrets Operator (ESO) and the related configuration on an IBM Cloud OpenShift Cluster to manage the secrets deployed on the cluster through IBM Cloud Secrets Manager. For more information about the External Secrets Operator, please refer to the [External Secrets Operator documentation](https://external-secrets.io/latest/).",
+        "offering_docs_url": "https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/blob/main/solutions/fully-configurable/README.md",
+        "offering_icon_url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/refs/heads/main/deploy-arch-ibm-eso.svg",
+        "provider_name": "IBM",
+        "features": [
+          {
+            "title": "Deploys the External Secrets Operator (ESO) in existing cluster",
+            "description": "This architecture allows to deploy the External Secrets Operator on an existing IBM Cloud OpenShift Cluster.<br/>For more details about the features and the options available please refer to this [page](https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/blob/main/solutions/fully-configurable/DA-details.md)"
+          },
+          {
+            "title": "Configures the External Secrets Operator (ESO) Cluster Secrets Stores and Secrets Stores with the related ServiceIDs, Secrets Groups and authentication methods",
+            "description": "Deploy and configure ESO Cluster Secret Store resources for cluster scoped secrets store and ESO Secret Store resources for namespace scoped secrets store.<br/>For more details about Cluster Secret Store please refer to this [documentation](https://external-secrets.io/latest/api/clustersecretstore/).<br/>For more details about Secret Store please refer to this [documentation](https://external-secrets.io/latest/api/secretstore/).<br/>Both the Secret Store types support two different authentication methods, IAM API key and Truster Profile.<br/>For more details about configuring the Stores through this architecture input please refer to this [page](https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/blob/main/solutions/fully-configurable/DA-eso-configuration.md)"
+          },
+          {
+            "title": "Deploys and configures Stakater Reloader into the cluster",
+            "description": "The architecture allows to optionally deploy Stakater Reloader into the cluster that helps with refreshing the cluster's secrets values by reloading pods when needed.<br/>For more information about Stakater Reloader, please refer to the [Stakater Reloader documentation](https://github.com/stakater/Reloader)."
+          }
+        ],
+        "support_details": "This product is in the community registry, as such support is handled through the originated repo. If you experience issues please open an issue [in this repository](https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/issues). Please note this product is not supported via the IBM Cloud Support Center.",
+        "flavors": [
+          {
+            "label": "Fully configurable",
+            "name": "fully-configurable",
+            "install_type": "fullstack",
+            "working_directory": "solutions/fully-configurable",
+            "iam_permissions": [
+            {
+              "role_crns": [
+                "crn:v1:bluemix:public:iam::::role:Administrator"
+              ],
+              "service_name": "iam-identity"
+            },
+            {
+              "service_name": "secrets-manager",
+              "role_crns": [
+                "crn:v1:bluemix:public:iam::::serviceRole:Administrator",
+                "crn:v1:bluemix:public:iam::::serviceRole:Manager"
+              ]
+            },
+            {
+              "service_name": "containers-kubernetes",
+              "role_crns": [
+                "crn:v1:bluemix:public:iam::::serviceRole:Manager",
+                "crn:v1:bluemix:public:iam::::role:Editor"
+              ]
+            }
+          ],
+            "configuration": [
+              {
+                "key": "ibmcloud_api_key"
+              },
+              {
+                "key": "prefix",
+                "required": true
+              },
+              {
+                "key": "provider_visibility",
+                "hidden": true,
+                "options": [
+                  {
+                    "displayname": "private",
+                    "value": "private"
+                  },
+                  {
+                    "displayname": "public",
+                    "value": "public"
+                  },
+                  {
+                    "displayname": "public-and-private",
+                    "value": "public-and-private"
+                  }
+                ]
+              },
+              {
+                "key": "existing_cluster_crn",
+                "required": true
+              },
+              {
+                "key": "existing_secrets_manager_crn",
+                "required": true
+              },
+              {
+                "key": "secrets_manager_ibmcloud_api_key"
+              },
+              {
+                "key": "eso_namespace"
+              },
+              {
+                "key": "existing_eso_namespace"
+              },
+              {
+                "key": "eso_cluster_nodes_configuration"
+              },
+              {
+                "key": "eso_pod_configuration"
+              },
+              {
+                "key": "eso_image"
+              },
+              {
+                "key": "eso_image_version"
+              },
+              {
+                "key": "eso_chart_location"
+              },
+              {
+                "key": "eso_chart_version"
+              },
+              {
+                "key": "eso_enroll_in_servicemesh"
+              },
+              {
+                "key": "reloader_deployed"
+              },
+              {
+                "key": "reloader_reload_strategy"
+              },
+              {
+                "key": "reloader_namespaces_to_ignore",
+                "type": "string",
+                "custom_config": {
+                  "type": "array",
+                  "grouping": "deployment",
+                  "original_grouping": "deployment",
+                  "config_constraints": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "key": "reloader_resources_to_ignore",
+                "custom_config": {
+                  "type": "array",
+                  "grouping": "deployment",
+                  "original_grouping": "deployment",
+                  "config_constraints": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "key": "reloader_namespaces_selector",
+                "custom_config": {
+                  "type": "array",
+                  "grouping": "deployment",
+                  "original_grouping": "deployment",
+                  "config_constraints": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "key": "reloader_resource_label_selector",
+                "custom_config": {
+                  "type": "array",
+                  "grouping": "deployment",
+                  "original_grouping": "deployment",
+                  "config_constraints": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "key": "reloader_ignore_secrets"
+              },
+              {
+                "key": "reloader_ignore_configmaps"
+              },
+              {
+                "key": "reloader_is_openshift"
+              },
+              {
+                "key": "reloader_is_argo_rollouts"
+              },
+              {
+                "key": "reloader_reload_on_create"
+              },
+              {
+                "key": "reloader_sync_after_restart"
+              },
+              {
+                "key": "reloader_pod_monitor_metrics"
+              },
+              {
+                "key": "reloader_log_format"
+              },
+              {
+                "key": "reloader_custom_values"
+              },
+              {
+                "key": "reloader_image"
+              },
+              {
+                "key": "reloader_image_version"
+              },
+              {
+                "key": "reloader_chart_location"
+              },
+              {
+                "key": "reloader_chart_version"
+              },
+              {
+                "key": "eso_secretsstores_configuration",
+                "type": "string",
+                "custom_config": {
+                  "type": "json_editor",
+                  "grouping": "deployment",
+                  "original_grouping": "deployment",
+                  "config_constraints": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "key": "service_endpoints",
+                "options": [
+                  {
+                    "displayname": "Public",
+                    "value": "public"
+                  },
+                  {
+                    "displayname": "Private",
+                    "value": "private"
+                  }
+                ]
+              }
+            ],
+            "architecture": {
+              "features": [
+                {
+                  "title": " ",
+                  "description": "Configured to use IBM secure by default standards, but can be edited to fit your use case."
+                }
+              ],
+              "diagrams": [
+                {
+                  "diagram": {
+                    "caption": "External Secrets Operator architecture on IBM Cloud OpenShift cluster",
+                    "url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/main/reference-architecture/reference-architecture/eso.svg",
+                    "type": "image/svg+xml"
+                  },
+                  "description": "This architecture supports deploying External Secrets Operator on IBM Cloud OpenShift cluster."
+                }
+              ]
+            },
+            "dependencies": [],
+            "dependency_version_2": true,
+            "terraform_version": "1.10.5"
+          }
+        ]
+      }
+    ]
+  }

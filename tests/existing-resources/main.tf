@@ -16,8 +16,6 @@ module "resource_group" {
 
 locals {
 
-
-
   subnet_prefix = flatten([
     for k, v in module.zone_subnet_addrs : [
       for zone, cidr in v.network_cidr_blocks : {
@@ -186,7 +184,7 @@ module "network_acl" {
 # OCP CLUSTER creation
 module "ocp_base" {
   source               = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  version              = "3.49.1"
+  version              = "3.46.16"
   cluster_name         = "${var.prefix}-vpc"
   resource_group_id    = module.resource_group.resource_group_id
   region               = var.region
@@ -198,100 +196,4 @@ module "ocp_base" {
   use_existing_cos     = false
   # outbound required by cluster proxy
   disable_outbound_traffic_protection = true
-}
-
-
-##############################################################################
-# Init cluster config for helm and kubernetes providers
-##############################################################################
-
-data "ibm_container_cluster_config" "cluster_config" {
-  cluster_name_id   = module.ocp_base.cluster_id
-  resource_group_id = module.resource_group.resource_group_id
-}
-
-# Wait time to allow cluster refreshes components after provisioning
-resource "time_sleep" "wait_45_seconds" {
-  depends_on      = [data.ibm_container_cluster_config.cluster_config]
-  create_duration = "45s"
-}
-
-########################################
-## CIS to own public certificate
-########################################
-
-data "ibm_cis" "cis_instance" {
-  name              = var.existing_cis_instance_name
-  resource_group_id = var.existing_cis_instance_resource_group_id
-}
-
-######################################
-# VPEs creation in the case of private for service endpoint
-######################################
-
-module "vpes" {
-  source   = "terraform-ibm-modules/vpe-gateway/ibm"
-  version  = "4.6.6"
-  count    = var.service_endpoints == "private" ? 1 : 0
-  region   = var.region
-  prefix   = "vpe"
-  vpc_name = "${var.prefix}-vpc"
-  vpc_id   = module.vpc.vpc.vpc_id
-  subnet_zone_list = [
-    for index, subnet in local.subnets.default : {
-      name           = "${local.sm_region}-${index}"
-      zone           = subnet.zone
-      id             = subnet.id
-      acl_name       = "acl"
-      public_gateway = true
-    }
-  ]
-  resource_group_id = module.resource_group.resource_group_id # pragma: allowlist secret
-  cloud_services    = []
-  cloud_service_by_crn = [
-    {
-      name = "iam-${var.region}"
-      crn  = "crn:v1:bluemix:public:iam-svcs:global:::endpoint:private.iam.cloud.ibm.com"
-    },
-    {
-      name = "sm-${var.region}"
-      crn  = local.sm_crn
-    }
-  ]
-  service_endpoints = "private"
-  depends_on        = [ibm_resource_instance.secrets_manager]
-}
-
-##################################################################
-# ESO deployment
-##################################################################
-
-module "external_secrets_operator" {
-  source        = "../../"
-  eso_namespace = var.eso_namespace
-  depends_on = [
-    kubernetes_namespace.apikey_namespaces, kubernetes_namespace.tp_namespaces
-  ]
-}
-
-##################################################################
-# Preliminary creation of namespaces to use for
-# clusterstore and namespaced secretstores (to be configured with apikey authentication)
-##################################################################
-
-# Creating the namespaces for apikey authentication secrets stores
-resource "kubernetes_namespace" "apikey_namespaces" {
-  count = length(var.es_namespaces_apikey)
-  metadata {
-    name = var.es_namespaces_apikey[count.index]
-  }
-  lifecycle {
-    ignore_changes = [
-      metadata[0].annotations,
-      metadata[0].labels
-    ]
-  }
-  depends_on = [
-    time_sleep.wait_45_seconds
-  ]
 }
