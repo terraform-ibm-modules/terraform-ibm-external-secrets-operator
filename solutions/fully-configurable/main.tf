@@ -617,7 +617,7 @@ module "eso_clustersecretsstore" {
   service_endpoints                 = var.service_endpoints
   clusterstore_trusted_profile_name = each.value.trusted_profile_name != null && each.value.trusted_profile_name != "" ? each.value.trusted_profile_name : null
   depends_on = [
-    module.external_secrets_operator
+    module.external_secrets_operator, module.cluster_secrets_store_namespace
   ]
 }
 
@@ -633,7 +633,7 @@ module "eso_secretsstore" {
       "namespace" : secrets_store.namespace
     }
   })
-  depends_on                  = [module.external_secrets_operator]
+  depends_on                  = [module.external_secrets_operator, module.secrets_store_namespace]
   source                      = "../../modules/eso-secretstore"
   eso_authentication          = each.value.authentication
   region                      = local.sm_region
