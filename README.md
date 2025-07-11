@@ -117,7 +117,6 @@ The resulting helm release configuration, according to the `terraform plan` outp
 
 ```bash
 
-
 (...)
 # module.external_secrets_operator.helm_release.external_secrets_operator[0] will be created
   + resource "helm_release" "external_secrets_operator" {
