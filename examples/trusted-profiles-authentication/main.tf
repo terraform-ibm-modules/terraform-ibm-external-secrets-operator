@@ -1,6 +1,6 @@
 module "resource_group" {
   source  = "terraform-ibm-modules/resource-group/ibm"
-  version = "1.2.0"
+  version = "1.2.1"
   # if an existing resource group is not set (null) create a new one using prefix
   resource_group_name          = var.resource_group == null ? "${var.prefix}-resource-group" : null
   existing_resource_group_name = var.resource_group
@@ -41,7 +41,7 @@ resource "ibm_resource_instance" "secrets_manager" {
 
 module "secrets_manager_groups" {
   source               = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version              = "1.3.7"
+  version              = "1.3.9"
   count                = length(kubernetes_namespace.examples)
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
