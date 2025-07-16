@@ -579,8 +579,11 @@ func setupOptionsSchematics(t *testing.T, prefix string, dir string) *testhelper
 		Testing:      t,
 		TerraformDir: dir,
 		Prefix:       prefix,
-		IgnoreUpdates: testhelper.Exemptions{ // Ignore for consistency check
-			List: []string{},
+		IgnoreUpdates: testhelper.Exemptions{ // Ignore for update check the helm releases updates to avoid failures during images updates
+			List: []string{
+				"module.external_secrets_operator.helm_release.external_secrets_operator",
+				"module.external_secrets_operator.helm_release.pod_reloader[0]",
+			},
 		},
 		Region:        region,
 		ResourceGroup: resourceGroup,
@@ -607,10 +610,16 @@ func setupSolutionSchematicOptions(t *testing.T, prefix string, dir string) *tes
 			"modules/eso-external-secret/*.tf",
 			dir + "/*.tf",
 		},
-		TemplateFolder:         dir,
-		Tags:                   []string{"test-esoda-schematic"},
-		Prefix:                 prefix,
-		DeleteWorkspaceOnFail:  false,
+		TemplateFolder:        dir,
+		Tags:                  []string{"test-esoda-schematic"},
+		Prefix:                prefix,
+		DeleteWorkspaceOnFail: false,
+		IgnoreUpdates: testhelper.Exemptions{ // Ignore for update check the helm releases updates to avoid failures during images updates
+			List: []string{
+				"module.external_secrets_operator.helm_release.external_secrets_operator",
+				"module.external_secrets_operator.helm_release.pod_reloader[0]",
+			},
+		},
 		WaitJobCompleteMinutes: 60,
 	})
 
