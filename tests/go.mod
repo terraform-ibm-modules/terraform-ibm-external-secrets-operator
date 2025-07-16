@@ -9,7 +9,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper v1.55.5
 	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/apimachinery v0.33.2
+	k8s.io/apimachinery v0.33.3
 )
 
 require (
