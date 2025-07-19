@@ -186,7 +186,7 @@ module "network_acl" {
 # OCP CLUSTER creation
 module "ocp_base" {
   source               = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  version              = "3.52.0"
+  version              = "3.52.2"
   cluster_name         = "${var.prefix}-vpc"
   resource_group_id    = module.resource_group.resource_group_id
   region               = var.region
@@ -231,7 +231,7 @@ data "ibm_cis" "cis_instance" {
 
 module "vpes" {
   source   = "terraform-ibm-modules/vpe-gateway/ibm"
-  version  = "4.6.6"
+  version  = "4.6.7"
   count    = var.service_endpoints == "private" ? 1 : 0
   region   = var.region
   prefix   = "vpe"
