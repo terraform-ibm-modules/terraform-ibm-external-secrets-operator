@@ -107,7 +107,7 @@ module "cluster_secrets_stores_service_secrets_groups" {
     for idx, element in local.cluster_secrets_stores_service_secrets_groups_list : element.key => element
   })
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.3.10"
+  version                  = "1.3.11"
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = each.value.name        # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
@@ -167,7 +167,7 @@ module "cluster_secrets_stores_account_secrets_groups" {
     } if(cluster_secrets_store.existing_account_secrets_group_id == null || cluster_secrets_store.existing_account_secrets_group_id == "") && cluster_secrets_store.account_secrets_group_name != null
   })
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.3.10"
+  version                  = "1.3.11"
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = each.value.name        # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
@@ -366,7 +366,7 @@ module "secrets_stores_service_secrets_groups" {
     for idx, element in local.secrets_stores_service_secrets_groups_list : element.key => element
   })
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.3.10"
+  version                  = "1.3.11"
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = each.value.name        # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
@@ -426,7 +426,7 @@ module "secrets_stores_account_secrets_groups" {
     } if(secrets_store.existing_account_secrets_group_id == null || secrets_store.existing_account_secrets_group_id == "") && secrets_store.account_secrets_group_name != null
   })
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.3.10"
+  version                  = "1.3.11"
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = each.value.name        # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
