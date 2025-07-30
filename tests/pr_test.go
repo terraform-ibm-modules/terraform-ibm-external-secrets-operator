@@ -563,20 +563,15 @@ func setupOptionsSchematics(t *testing.T, prefix string, dir string) *testhelper
 	logger.Log(t, "variable "+checkVariable+" correctly set")
 
 	// Verify region variable is set, otherwise it computes it
-	// region := ""
-	// checkRegion := "TF_VAR_region"
-	// valRegion, presentRegion := os.LookupEnv(checkRegion)
-	// if presentRegion {
-	// 	region = valRegion
-	// } else {
-	// 	// Programmatically determine region to use based on availability
-	// 	region, _ = testhelper.GetBestVpcRegion(val, "../common-dev-assets/common-go-assets/cloudinfo-region-vpc-gen2-prefs.yaml", "eu-de")
-	// }
-
-	// # Temp workaround for : https://watson.service-now.com/nav_to.do?uri=sn_customerservice_case.do?sys_id=a9dbcdef47bae2504fc04c4a516d4372%26sysparm_view=case
-	// if region == "eu-gb" {
-	region := "us-east"
-	// }
+	region := ""
+	checkRegion := "TF_VAR_region"
+	valRegion, presentRegion := os.LookupEnv(checkRegion)
+	if presentRegion {
+		region = valRegion
+	} else {
+		// Programmatically determine region to use based on availability
+		region, _ = testhelper.GetBestVpcRegion(val, "../common-dev-assets/common-go-assets/cloudinfo-region-vpc-gen2-prefs.yaml", "eu-de")
+	}
 
 	logger.Log(t, "Using region: ", region)
 
