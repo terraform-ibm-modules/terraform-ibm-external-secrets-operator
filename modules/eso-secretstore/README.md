@@ -16,8 +16,8 @@ For more information about Trusted Profiles refer to the IBM Cloud documentation
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
-| <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 2.8.0 |
-| <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | >= 2.16.1, <3.0.0 |
+| <a name="requirement_helm"></a> [helm](#requirement\_helm) | 3.0.2 |
+| <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | 2.38.0 |
 
 ### Modules
 
@@ -27,9 +27,9 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [helm_release.external_secret_store_apikey](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [helm_release.external_secret_store_tp](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [kubernetes_secret.eso_secretsstore_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
+| [helm_release.external_secret_store_apikey](https://registry.terraform.io/providers/hashicorp/helm/3.0.2/docs/resources/release) | resource |
+| [helm_release.external_secret_store_tp](https://registry.terraform.io/providers/hashicorp/helm/3.0.2/docs/resources/release) | resource |
+| [kubernetes_secret.eso_secretsstore_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/2.38.0/docs/resources/secret) | resource |
 
 ### Inputs
 

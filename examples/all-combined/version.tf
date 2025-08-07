@@ -3,23 +3,23 @@ terraform {
   required_providers {
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = ">= 2.16.1"
+      version = "2.38.0"
     }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 2.11.0"
+      version = "3.0.2"
     }
     time = {
       source  = "hashicorp/time"
-      version = ">= 0.9.1"
+      version = "0.13.1"
     }
     ibm = {
       source  = "IBM-Cloud/ibm"
-      version = ">= 1.62.0"
+      version = "1.81.1"
     }
     null = {
       source  = "hashicorp/null"
-      version = ">= 3.2.1, < 4.0.0"
+      version = "3.2.4"
     }
   }
 }

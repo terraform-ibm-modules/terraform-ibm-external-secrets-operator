@@ -494,8 +494,8 @@ You need the following permissions to run this module.
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
-| <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 2.11.0, < 3.0.0 |
-| <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | >= 2.16.1, < 3.0.0 |
+| <a name="requirement_helm"></a> [helm](#requirement\_helm) | 2.17.0 |
+| <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | 2.38.0 |
 
 ### Modules
 
@@ -507,9 +507,9 @@ You need the following permissions to run this module.
 
 | Name | Type |
 |------|------|
-| [helm_release.external_secrets_operator](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [helm_release.pod_reloader](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [kubernetes_namespace.existing_eso_namespace](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/data-sources/namespace) | data source |
+| [helm_release.external_secrets_operator](https://registry.terraform.io/providers/hashicorp/helm/2.17.0/docs/resources/release) | resource |
+| [helm_release.pod_reloader](https://registry.terraform.io/providers/hashicorp/helm/2.17.0/docs/resources/release) | resource |
+| [kubernetes_namespace.existing_eso_namespace](https://registry.terraform.io/providers/hashicorp/kubernetes/2.38.0/docs/data-sources/namespace) | data source |
 
 ### Inputs
 

@@ -10,7 +10,7 @@ For more information about Trusted Profiles refer to the IBM Cloud documentation
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
-| <a name="requirement_ibm"></a> [ibm](#requirement\_ibm) | >= 1.51.0 |
+| <a name="requirement_ibm"></a> [ibm](#requirement\_ibm) | 1.81.1 |
 
 ### Modules
 
@@ -20,10 +20,10 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [ibm_iam_trusted_profile.trusted_profile](https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/iam_trusted_profile) | resource |
-| [ibm_iam_trusted_profile_claim_rule.claim_rule](https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/iam_trusted_profile_claim_rule) | resource |
-| [ibm_iam_trusted_profile_policy.policy](https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/iam_trusted_profile_policy) | resource |
-| [ibm_iam_trusted_profile_policy.policy_multiple_secrets_groups](https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/iam_trusted_profile_policy) | resource |
+| [ibm_iam_trusted_profile.trusted_profile](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.81.1/docs/resources/iam_trusted_profile) | resource |
+| [ibm_iam_trusted_profile_claim_rule.claim_rule](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.81.1/docs/resources/iam_trusted_profile_claim_rule) | resource |
+| [ibm_iam_trusted_profile_policy.policy](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.81.1/docs/resources/iam_trusted_profile_policy) | resource |
+| [ibm_iam_trusted_profile_policy.policy_multiple_secrets_groups](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.81.1/docs/resources/iam_trusted_profile_policy) | resource |
 
 ### Inputs
 

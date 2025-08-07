@@ -15,7 +15,7 @@ For more information about ExternalSecrets on ESO please refer to the ESO docume
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
-| <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 2.8.0 |
+| <a name="requirement_helm"></a> [helm](#requirement\_helm) | 3.0.2 |
 
 ### Modules
 
@@ -25,12 +25,12 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [helm_release.kubernetes_secret](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [helm_release.kubernetes_secret_certificate](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [helm_release.kubernetes_secret_chain_list](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [helm_release.kubernetes_secret_kv_all](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [helm_release.kubernetes_secret_kv_key](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [helm_release.kubernetes_secret_user_pw](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [helm_release.kubernetes_secret](https://registry.terraform.io/providers/hashicorp/helm/3.0.2/docs/resources/release) | resource |
+| [helm_release.kubernetes_secret_certificate](https://registry.terraform.io/providers/hashicorp/helm/3.0.2/docs/resources/release) | resource |
+| [helm_release.kubernetes_secret_chain_list](https://registry.terraform.io/providers/hashicorp/helm/3.0.2/docs/resources/release) | resource |
+| [helm_release.kubernetes_secret_kv_all](https://registry.terraform.io/providers/hashicorp/helm/3.0.2/docs/resources/release) | resource |
+| [helm_release.kubernetes_secret_kv_key](https://registry.terraform.io/providers/hashicorp/helm/3.0.2/docs/resources/release) | resource |
+| [helm_release.kubernetes_secret_user_pw](https://registry.terraform.io/providers/hashicorp/helm/3.0.2/docs/resources/release) | resource |
 
 ### Inputs
 

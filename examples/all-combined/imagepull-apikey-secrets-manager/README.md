@@ -8,8 +8,8 @@ This module generate and store a service ID API key in IBM Cloud Secrets Manager
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= v1.0.0 |
-| <a name="requirement_ibm"></a> [ibm](#requirement\_ibm) | >= 1.51.0, < 2.0.0 |
-| <a name="requirement_time"></a> [time](#requirement\_time) | >= 0.9.1, < 1.0.0 |
+| <a name="requirement_ibm"></a> [ibm](#requirement\_ibm) | 1.81.1 |
+| <a name="requirement_time"></a> [time](#requirement\_time) | 0.13.1 |
 
 ### Modules
 
@@ -21,10 +21,10 @@ This module generate and store a service ID API key in IBM Cloud Secrets Manager
 
 | Name | Type |
 |------|------|
-| [ibm_iam_service_id.image_secret_pull_service_id](https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/iam_service_id) | resource |
-| [ibm_iam_service_policy.cr_policy](https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/iam_service_policy) | resource |
-| [time_sleep.wait_30_seconds_for_creation](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
-| [time_sleep.wait_30_seconds_for_destruction](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
+| [ibm_iam_service_id.image_secret_pull_service_id](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.81.1/docs/resources/iam_service_id) | resource |
+| [ibm_iam_service_policy.cr_policy](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.81.1/docs/resources/iam_service_policy) | resource |
+| [time_sleep.wait_30_seconds_for_creation](https://registry.terraform.io/providers/hashicorp/time/0.13.1/docs/resources/sleep) | resource |
+| [time_sleep.wait_30_seconds_for_destruction](https://registry.terraform.io/providers/hashicorp/time/0.13.1/docs/resources/sleep) | resource |
 
 ### Inputs
 
