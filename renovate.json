@@ -29,14 +29,5 @@
       "datasourceTemplate": "helm",
       "registryUrlTemplate": "https://charts.external-secrets.io"
     }
-  ],
-  "packageRules": [
-    {
-      "description": "Bundle ESO and Reloader images + helm chart updates into the same PR",
-      "matchPackageNames": ["external-secrets/external-secrets", "stakater/Reloader", "ghcr.io/external-secrets/external-secrets", "ghcr.io/stakater/reloader", "external-secrets", "reloader"],
-      "groupName": "Charts and Images",
-      "commitMessageExtra": "to latest",
-      "group": true
-    }
   ]
 }
