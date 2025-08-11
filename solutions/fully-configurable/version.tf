@@ -7,11 +7,11 @@ terraform {
     }
     helm = {
       source  = "hashicorp/helm"
-      version = "2.17.0"
+      version = "3.0.2"
     }
     ibm = {
       source  = "IBM-Cloud/ibm"
-      version = "1.80.4"
+      version = "1.81.1"
     }
   }
 }
