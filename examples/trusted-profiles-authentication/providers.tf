@@ -30,7 +30,7 @@ provider "kubernetes" {
 
 
 provider "helm" {
-  kubernetes {
+  kubernetes = {
     client_certificate     = data.ibm_container_cluster_config.cluster_config.admin_certificate
     client_key             = data.ibm_container_cluster_config.cluster_config.admin_key
     cluster_ca_certificate = data.ibm_container_cluster_config.cluster_config.ca_certificate

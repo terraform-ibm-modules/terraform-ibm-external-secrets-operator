@@ -178,44 +178,58 @@ resource "helm_release" "external_secrets_operator" {
   wait       = true
   repository = var.eso_chart_location
 
-  set {
+  set = [{
     name  = "image.repository"
     type  = "string"
     value = var.eso_image
-  }
-
-  set {
-    name  = "image.tag"
-    type  = "string"
-    value = var.eso_image_version
-  }
-
-  set {
-    name  = "webhook.image.repository"
-    type  = "string"
-    value = var.eso_image
-  }
-
-  set {
-    name  = "webhook.image.tag"
-    type  = "string"
-    value = var.eso_image_version
-  }
-
-  set {
-    name  = "certController.image.repository"
-    type  = "string"
-    value = var.eso_image
-  }
-
-  set {
-    name  = "certController.image.tag"
-    type  = "string"
-    value = var.eso_image_version
-  }
+    },
+    {
+      name  = "image.tag"
+      type  = "string"
+      value = var.eso_image_version
+    },
+    {
+      name  = "webhook.image.repository"
+      type  = "string"
+      value = var.eso_image
+    },
+    {
+      name  = "webhook.image.tag"
+      type  = "string"
+      value = var.eso_image_version
+    },
+    {
+      name  = "certController.image.repository"
+      type  = "string"
+      value = var.eso_image
+    },
+    {
+      name  = "certController.image.tag"
+      type  = "string"
+      value = var.eso_image_version
+  }]
 
   # The following mounts are needed for the CRI based authentication with Trusted Profiles
   values = [local.eso_helm_release_values_cri, local.eso_helm_release_values_workerselector]
+}
+
+locals {
+  reloader_namespaces_to_ignore = var.reloader_namespaces_to_ignore != null ? [{
+    name  = "reloader.namespacesToIgnore"
+    value = var.reloader_namespaces_to_ignore
+  }] : []
+  reloader_resources_to_ignore = var.reloader_resources_to_ignore != null ? [{
+    name  = "reloader.resourcesToIgnore"
+    value = var.reloader_resources_to_ignore
+  }] : []
+  reloader_is_openshift = var.reloader_is_openshift ? [{
+    name  = "reloader.deployment.securityContext.runAsUser"
+    value = "null"
+  }] : []
+  reloader_log_format = var.reloader_log_format == "json" ? [{
+    name  = "reloader.logFormat"
+    value = var.reloader_log_format
+  }] : []
 }
 
 resource "helm_release" "pod_reloader" {
@@ -228,100 +242,68 @@ resource "helm_release" "pod_reloader" {
   version    = var.reloader_chart_version
   wait       = true
 
-  set {
-    name  = "image.repository"
-    type  = "string"
-    value = var.reloader_image
-  }
-
-  set {
-    name  = "image.tag"
-    type  = "string"
-    value = var.reloader_image_version
-  }
-
-  # Set reload strategy
-  set {
-    name  = "reloader.reloadStrategy"
-    type  = "string"
-    value = var.reloader_reload_strategy
-  }
-
-  # Set namespaces to ignore
-  dynamic "set" {
-    for_each = var.reloader_namespaces_to_ignore != null ? [1] : []
-    content {
-      name  = "reloader.namespacesToIgnore"
-      value = var.reloader_namespaces_to_ignore
+  set = concat([
+    {
+      name  = "image.repository"
+      type  = "string"
+      value = var.reloader_image
+    },
+    {
+      name  = "image.tag"
+      type  = "string"
+      value = var.reloader_image_version
+    },
+    # Set reload strategy
+    {
+      name  = "reloader.reloadStrategy"
+      type  = "string"
+      value = var.reloader_reload_strategy
+    },
+    # Set watchGlobally based on conditions
+    {
+      name  = "reloader.watchGlobally"
+      value = var.reloader_namespaces_selector == null && var.reloader_resource_label_selector == null ? true : false
+    },
+    # Set ignoreSecrets and ignoreConfigMaps
+    {
+      name  = "reloader.ignoreSecrets"
+      value = var.reloader_ignore_secrets
+    },
+    {
+      name  = "reloader.ignoreConfigMaps"
+      value = var.reloader_ignore_configmaps
+    },
+    # Set OpenShift and Argo Rollouts options
+    {
+      name  = "reloader.isOpenshift"
+      value = var.reloader_is_openshift
+    },
+    {
+      name  = "reloader.podMonitor.enabled"
+      value = var.reloader_pod_monitor_metrics
+    },
+    {
+      name  = "reloader.isArgoRollouts"
+      value = var.reloader_is_argo_rollouts
+    },
+    # Set reloadOnCreate and syncAfterRestart options
+    {
+      name  = "reloader.reloadOnCreate"
+      value = var.reloader_reload_on_create
+    },
+    {
+      name  = "reloader.syncAfterRestart"
+      value = var.reloader_sync_after_restart
     }
-  }
-
-  # Set resources to ignore
-  dynamic "set" {
-    for_each = var.reloader_resources_to_ignore != null ? [1] : []
-    content {
-      name  = "reloader.resourcesToIgnore"
-      value = var.reloader_resources_to_ignore
-    }
-  }
-
-  # Set watchGlobally based on conditions
-  set {
-    name  = "reloader.watchGlobally"
-    value = var.reloader_namespaces_selector == null && var.reloader_resource_label_selector == null ? true : false
-  }
-
-  # Set ignoreSecrets and ignoreConfigMaps
-  set {
-    name  = "reloader.ignoreSecrets"
-    value = var.reloader_ignore_secrets
-  }
-
-  set {
-    name  = "reloader.ignoreConfigMaps"
-    value = var.reloader_ignore_configmaps
-  }
-
-  # Set OpenShift and Argo Rollouts options
-  set {
-    name  = "reloader.isOpenshift"
-    value = var.reloader_is_openshift
-  }
-  # Set runAsUser to null if isOpenShift is true
-  dynamic "set" {
-    for_each = var.reloader_is_openshift ? [1] : []
-    content {
-      name  = "reloader.deployment.securityContext.runAsUser"
-      value = "null"
-    }
-  }
-
-  set {
-    name  = "reloader.podMonitor.enabled"
-    value = var.reloader_pod_monitor_metrics
-  }
-  dynamic "set" {
-    for_each = var.reloader_log_format == "json" ? [1] : []
-    content {
-      name  = "reloader.logFormat"
-      value = var.reloader_log_format
-    }
-  }
-  set {
-    name  = "reloader.isArgoRollouts"
-    value = var.reloader_is_argo_rollouts
-  }
-
-  # Set reloadOnCreate and syncAfterRestart options
-  set {
-    name  = "reloader.reloadOnCreate"
-    value = var.reloader_reload_on_create
-  }
-
-  set {
-    name  = "reloader.syncAfterRestart"
-    value = var.reloader_sync_after_restart
-  }
+    ],
+    # Set namespaces to ignore
+    local.reloader_namespaces_to_ignore,
+    # Set resources to ignore
+    local.reloader_resources_to_ignore,
+    # Set runAsUser to null if isOpenShift is true
+    local.reloader_is_openshift,
+    local.reloader_log_format
+  )
 
   # Set the values attribute conditionally
   values = var.reloader_custom_values != null ? yamldecode(var.reloader_custom_values) : []
