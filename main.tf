@@ -306,5 +306,5 @@ resource "helm_release" "pod_reloader" {
   )
 
   # Set the values attribute conditionally
-  values = var.reloader_custom_values != null ? yamldecode(var.reloader_custom_values) : []
+  values = var.reloader_custom_values != null ? [var.reloader_custom_values] : []
 }
