@@ -2,14 +2,14 @@ module github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator
 
 go 1.24.0
 
-toolchain go1.24.6
+toolchain go1.25.0
 
 require (
 	github.com/gruntwork-io/terratest v0.50.0
 	github.com/stretchr/testify v1.10.0
-	github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper v1.58.10
+	github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper v1.58.11
 	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/apimachinery v0.33.3
+	k8s.io/apimachinery v0.33.4
 )
 
 require (
@@ -111,7 +111,7 @@ require (
 	github.com/hashicorp/go-safetemp v1.0.0 // indirect
 	github.com/hashicorp/go-version v1.7.0 // indirect
 	github.com/hashicorp/hcl/v2 v2.22.0 // indirect
-	github.com/hashicorp/terraform-json v0.25.0 // indirect
+	github.com/hashicorp/terraform-json v0.26.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/pgx/v5 v5.7.1 // indirect
@@ -151,7 +151,7 @@ require (
 	github.com/urfave/cli v1.22.16 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
-	github.com/zclconf/go-cty v1.16.2 // indirect
+	github.com/zclconf/go-cty v1.16.3 // indirect
 	go.mongodb.org/mongo-driver v1.17.3 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/otel v1.35.0 // indirect
