@@ -226,7 +226,7 @@ To configure a set of tenants to be configured in their proper namespace (to ach
 ```hcl
 module "external_secrets_operator" {
   source               = "terraform-ibm-modules/external-secrets-operator/ibm"
-  version              = "1.0.0"
+  version              = <<the latest version of the module>>
   eso_namespace     = var.eso_namespace # namespace to deploy ESO
   service_endpoints = var.service_endpoints # use public or private endpoints for IAM and Secrets Manager
   eso_cluster_nodes_configuration = <<the eso configuration for specific cluster nodes selection if needed - read above>>
