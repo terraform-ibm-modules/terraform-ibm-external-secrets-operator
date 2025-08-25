@@ -226,7 +226,7 @@
               "key": "eso_secretsstores_configuration",
               "type": "string",
               "custom_config": {
-                "type": "json_editor",
+                "type": "code_editor",
                 "grouping": "deployment",
                 "original_grouping": "deployment",
                 "config_constraints": {
