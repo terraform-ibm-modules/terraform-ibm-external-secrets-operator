@@ -12,6 +12,7 @@ variable "secrets_manager_ibmcloud_api_key" {
   type        = string
   description = "API key to authenticate on Secrets Manager instance. If null the ibmcloud_api_key will be used."
   default     = null
+  sensitive   = true
 }
 
 variable "provider_visibility" {

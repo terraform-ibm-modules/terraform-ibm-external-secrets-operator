@@ -44,6 +44,7 @@ variable "sstore_secret_apikey" {
   description = "APIkey to be stored into var.sstore_secret_name secret to authenticate with Secrets Manager instance"
   type        = string
   default     = null
+  sensitive   = true
   validation {
     condition     = var.eso_authentication == "api_key" ? var.sstore_secret_apikey != null : true
     error_message = "API Key authentication is enabled and scope for store is cluster, therefore sstore_secret_apikey must be provided."
