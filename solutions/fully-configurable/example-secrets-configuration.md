@@ -29,8 +29,8 @@ module "sm_userpass_secret" {
   #tfsec:ignore:general-secrets-no-plaintext-exposure
   secret_username               = "artifactory-user" # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
   secret_auto_rotation          = false
-  secret_auto_rotation_interval = 0
-  secret_auto_rotation_unit     = null
+  secret_auto_rotation_interval = 1
+  secret_auto_rotation_unit     = "day"
   providers = {
     ibm = ibm.ibm-sm
   }
