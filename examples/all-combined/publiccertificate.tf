@@ -8,7 +8,7 @@
 module "secrets_manager_public_cert_engine" {
   count                                     = (var.acme_letsencrypt_private_key != null || (var.acme_letsencrypt_private_key_sm_id != null && var.acme_letsencrypt_private_key_secret_id != null && var.acme_letsencrypt_private_key_sm_region != null)) ? 1 : 0
   source                                    = "terraform-ibm-modules/secrets-manager-public-cert-engine/ibm"
-  version                                   = "1.1.9"
+  version                                   = "1.1.14"
   secrets_manager_guid                      = local.sm_guid
   region                                    = local.sm_region
   internet_services_crn                     = data.ibm_cis.cis_instance.id

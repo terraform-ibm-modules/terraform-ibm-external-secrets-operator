@@ -77,7 +77,7 @@ module "zone_subnet_addrs" {
 
 module "vpc" {
   source                      = "terraform-ibm-modules/vpc/ibm"
-  version                     = "1.5.1"
+  version                     = "1.5.2"
   vpc_name                    = "${var.prefix}-vpc"
   resource_group_id           = module.resource_group.resource_group_id
   locations                   = []
@@ -94,7 +94,7 @@ module "vpc" {
 
 module "subnet_prefix" {
   source   = "terraform-ibm-modules/vpc/ibm//modules/vpc-address-prefix"
-  version  = "1.5.1"
+  version  = "1.5.2"
   count    = length(local.subnet_prefix)
   name     = "${var.prefix}-z-${local.subnet_prefix[count.index].label}-${split("-", local.subnet_prefix[count.index].zone)[2]}"
   location = local.subnet_prefix[count.index].zone
@@ -106,7 +106,7 @@ module "subnet_prefix" {
 module "subnets" {
   depends_on                 = [module.subnet_prefix]
   source                     = "terraform-ibm-modules/vpc/ibm//modules/subnet"
-  version                    = "1.5.1"
+  version                    = "1.5.2"
   count                      = length(local.subnet_prefix)
   location                   = local.subnet_prefix[count.index].zone
   vpc_id                     = module.vpc.vpc.vpc_id
@@ -118,7 +118,7 @@ module "subnets" {
 
 module "public_gateways" {
   source            = "terraform-ibm-modules/vpc/ibm//modules/public-gateway"
-  version           = "1.5.1"
+  version           = "1.5.2"
   count             = length(var.zones)
   vpc_id            = module.vpc.vpc.vpc_id
   location          = "${var.region}-${var.zones[count.index]}"
@@ -128,7 +128,7 @@ module "public_gateways" {
 
 module "security_group" {
   source                = "terraform-ibm-modules/vpc/ibm//modules/security-group"
-  version               = "1.5.1"
+  version               = "1.5.2"
   depends_on            = [module.vpc]
   create_security_group = false
   resource_group_id     = module.resource_group.resource_group_id
@@ -174,7 +174,7 @@ locals {
 
 module "network_acl" {
   source            = "terraform-ibm-modules/vpc/ibm//modules/network-acl"
-  version           = "1.5.1"
+  version           = "1.5.2"
   name              = "${var.prefix}-vpc-acl"
   vpc_id            = module.vpc.vpc.vpc_id
   resource_group_id = module.resource_group.resource_group_id
@@ -184,7 +184,7 @@ module "network_acl" {
 # OCP CLUSTER creation
 module "ocp_base" {
   source               = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  version              = "3.55.4"
+  version              = "3.60.0"
   cluster_name         = "${var.prefix}-vpc"
   resource_group_id    = module.resource_group.resource_group_id
   region               = var.region
