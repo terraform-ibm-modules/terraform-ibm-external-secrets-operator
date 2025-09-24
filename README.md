@@ -32,7 +32,7 @@ External Secrets Operator synchronizes secrets in the Kubernetes cluster with se
 
 The module provides the following features:
 - Install and configure External Secrets Operator (ESO).
-- Customise External Secret Operator deployment on specific cluster workers by configuration approriate NodeSelector and Tolerations in the ESO helm release [More details below](#customise-eso-deployment-on-specific-cluster-nodes)
+- Customise External Secret Operator deployment on specific cluster workers by configuration appropriate NodeSelector and Tolerations in the ESO helm release [More details below](#customise-eso-deployment-on-specific-cluster-nodes)
 
 The submodules automate the configuration of an operator, providing the following features:
 - Deploy and configure [ClusterSecretStore](https://external-secrets.io/latest/api/clustersecretstore/) resources for cluster scope secrets store [eso-clusterstore](./eso-clusterstore/README.md)
@@ -116,7 +116,6 @@ will make the External Secret Operator to run on clusters nodes labeled with `de
 The resulting helm release configuration, according to the `terraform plan` output would be like
 
 ```bash
-
 (...)
 # module.external_secrets_operator.helm_release.external_secrets_operator[0] will be created
   + resource "helm_release" "external_secrets_operator" {
