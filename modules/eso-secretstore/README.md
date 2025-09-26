@@ -10,6 +10,24 @@ This module supports SecretStore two authentication configurations to pull/push 
 
 For more information about Trusted Profiles refer to the IBM Cloud documentation available [here](https://cloud.ibm.com/docs/account?topic=account-create-trusted-profile&interface=ui)
 
+## Usage
+
+```hcl
+# Replace "master" with a GIT release version to lock into a specific release
+module "eso_apikey_secretstore" {
+  source                      = "git::https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator.git//modules/eso-secretstore?ref=master"
+  eso_authentication          = "api_key"
+  region                      = local.sm_region
+  sstore_namespace            = kubernetes_namespace.apikey_namespaces.metadata[0].name
+  sstore_secrets_manager_guid = local.sm_guid
+  sstore_store_name           = "${var.es_namespaces_apikey}-store"
+  sstore_secret_apikey        = data.ibm_sm_iam_credentials_secret.secret_puller_secret.api_key # pragma: allowlist secret
+  service_endpoints           = var.service_endpoints
+  sstore_helm_rls_name        = "es-store"
+  sstore_secret_name          = "generic-cluster-api-key"
+}
+```
+
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ### Requirements
 

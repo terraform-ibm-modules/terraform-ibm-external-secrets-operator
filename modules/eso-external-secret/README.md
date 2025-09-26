@@ -9,6 +9,23 @@ by correctly setting the related input variable `eso_store_scope`
 
 For more information about ExternalSecrets on ESO please refer to the ESO documentation available [here](https://external-secrets.io/v0.8.3/guides/introduction/)
 
+## Usage
+
+```hcl
+# Replace "master" with a GIT release version to lock into a specific release
+module "external_secret_usr_pass" {
+  source                    = "git::https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator.git//modules/eso-external-secret?ref=master"
+  es_kubernetes_secret_type = "dockerconfigjson"
+  sm_secret_type            = "username_password"
+  sm_secret_id              = module.sm_userpass_secret.secret_id
+  es_kubernetes_namespace   = kubernetes_namespace.apikey_namespaces[0].metadata[0].name
+  eso_store_name            = "cluster-store"
+  es_container_registry     = "example-registry-local.artifactory.com"
+  es_kubernetes_secret_name = "dockerconfigjson-uc"
+  es_helm_rls_name          = "es-docker-uc"
+}
+```
+
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ### Requirements
 
