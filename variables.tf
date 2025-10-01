@@ -95,7 +95,7 @@ variable "eso_chart_location" {
 variable "eso_chart_version" {
   type        = string
   description = "The version of the External Secrets Operator Helm chart. Ensure that the chart version is compatible with the image version specified in eso_image_version."
-  default     = "0.19.2" # registryUrl: charts.external-secrets.io
+  default     = "0.20.1" # registryUrl: charts.external-secrets.io
   nullable    = false
 }
 
