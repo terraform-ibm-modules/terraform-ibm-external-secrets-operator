@@ -279,7 +279,7 @@ locals {
 # Create policy to allow new service id to pull secrets from secrets manager
 resource "ibm_iam_service_policy" "cluster_secrets_store_secrets_puller_policy" {
   for_each       = local.cluster_secrets_stores_policies_to_create_map
-  iam_service_id = each.value.accountServiceID
+  iam_id = each.value.accountServiceID
   roles          = ["Viewer", "SecretsReader"]
   resources {
     service              = "secrets-manager"
@@ -538,7 +538,7 @@ locals {
 # Create policy to allow new service id to pull secrets from secrets manager
 resource "ibm_iam_service_policy" "secrets_store_secrets_puller_policy" {
   for_each       = local.secrets_stores_policies_to_create_map
-  iam_service_id = each.value.accountServiceID
+  iam_id = each.value.accountServiceID
   roles          = ["Viewer", "SecretsReader"]
   resources {
     service              = "secrets-manager"
