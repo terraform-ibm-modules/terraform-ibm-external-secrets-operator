@@ -15,7 +15,7 @@ resource "ibm_iam_service_policy" "cr_policy" {
 
 
   iam_id = ibm_iam_service_id.image_secret_pull_service_id.id
-  roles          = ["Reader"]
+  roles  = ["Reader"]
 
   resources {
     service           = "container-registry"
