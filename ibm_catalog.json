@@ -259,7 +259,7 @@
               {
                 "diagram": {
                   "caption": "External Secrets Operator architecture on IBM Cloud OpenShift cluster",
-                  "url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/main/reference-architecture/reference-architecture/eso.svg",
+                  "url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/main/reference-architectures/reference-architectures/eso.svg",
                   "type": "image/svg+xml"
                 },
                 "description": "This architecture supports deploying External Secrets Operator on IBM Cloud OpenShift cluster."
