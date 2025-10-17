@@ -30,7 +30,7 @@ module "secrets_manager_private_secret_engine" {
 module "secrets_manager_private_certificate" {
   depends_on             = [module.secrets_manager_private_secret_engine]
   source                 = "terraform-ibm-modules/secrets-manager-private-cert/ibm"
-  version                = "1.5.3"
+  version                = "1.6.0"
   cert_name              = "${var.prefix}-sm-private-cert"
   cert_description       = "Private certificate for ${local.pvt_cert_common_name}"
   cert_secrets_group_id  = module.secrets_manager_group.secret_group_id
