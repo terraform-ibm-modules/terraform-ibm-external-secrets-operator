@@ -11,7 +11,7 @@ terraform {
     }
     ibm = {
       source  = "IBM-Cloud/ibm"
-      version = "1.83.3"
+      version = "1.84.0"
     }
   }
 }
