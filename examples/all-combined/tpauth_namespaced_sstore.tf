@@ -67,7 +67,7 @@ module "external_secrets_trusted_profiles" {
 module "sm_arbitrary_secrets_tp" {
   count                = length(var.es_namespaces_tp)
   source               = "terraform-ibm-modules/secrets-manager-secret/ibm"
-  version              = "1.9.0"
+  version              = "1.9.1"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   secret_group_id      = module.tp_secrets_manager_groups[count.index].secret_group_id
@@ -165,7 +165,7 @@ module "tp_secrets_manager_group_multi_2" {
 # arbitrary secret for secrets group 1
 module "sm_arbitrary_secret_tp_multisg_1" {
   source               = "terraform-ibm-modules/secrets-manager-secret/ibm"
-  version              = "1.9.0"
+  version              = "1.9.1"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   secret_group_id      = module.tp_secrets_manager_group_multi_1.secret_group_id
@@ -182,7 +182,7 @@ module "sm_arbitrary_secret_tp_multisg_1" {
 # arbitrary secret for secrets group 2
 module "sm_arbitrary_secret_tp_multisg_2" {
   source               = "terraform-ibm-modules/secrets-manager-secret/ibm"
-  version              = "1.9.0"
+  version              = "1.9.1"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   secret_group_id      = module.tp_secrets_manager_group_multi_2.secret_group_id
@@ -298,7 +298,7 @@ module "tp_secrets_manager_group_not_for_policy" {
 # arbitrary secret to use with external secret with auth using TP and policy not restricted to secrets group
 module "sm_arbitrary_secret_tp_nosecgroup" {
   source               = "terraform-ibm-modules/secrets-manager-secret/ibm"
-  version              = "1.9.0"
+  version              = "1.9.1"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   secret_group_id      = module.tp_secrets_manager_group_not_for_policy.secret_group_id
