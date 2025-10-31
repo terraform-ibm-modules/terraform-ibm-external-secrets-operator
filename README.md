@@ -293,7 +293,6 @@ The current ESO version doesn't allow to customise the default IAM endpoint (htt
 
 As a direct effect of this limitation, for an OCP cluster topology designed with three different subnet layers `edge` `private` and `transit`, where only `edge` one has access to the public network, `private` is for business workload and `transit` for private networking, an ESO deployment with `api_key` authentication configuration needs to be performed on the workers pool with access to the public network (`dedicated: edge` label in GE usual topology) to work fine. If the ESO deployment is performed on a workers pool without access to public network (i.e. to https://iam.cloud.ibm.com) the apikey authentication is expected to fail, unless ESO is enrolled into RedHat Service Mesh (this module allows to add the expected resources annotations but the Mesh gateways configuration is out of the scope of the module) or a different networking solution is implemented.
 
-
 ### Pod Reloader
 
 When secrets are updated, depending on you configuration pods may need to be restarted to pick up the new secrets. To do this you can use the [Stakater Reloader](https://github.com/stakater/Reloader).
