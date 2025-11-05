@@ -204,7 +204,7 @@ variable "reloader_image" {
 variable "reloader_image_version" {
   type        = string
   description = "The version or digest for the reloader image to deploy. If changing the value, ensure it is compatible with the chart version set in reloader_chart_version."
-  default     = "v1.4.9-ubi@sha256:0521557d10f98a4a1d686874b88997495821be087c2e5a896c3efc7698c4db8e" # datasource: ghcr.io/stakater/reloader
+  default     = "v1.4.10-ubi@sha256:438abc837d99521c4ff2b74ab4df60dd2c49a106fbef50f760210be37c6ffcbb" # datasource: ghcr.io/stakater/reloader
   nullable    = false
   validation {
     condition     = can(regex("(^v\\d+\\.\\d+.\\d+(\\-\\w+)?(\\@sha256\\:\\w+){0,1})$", var.reloader_image_version))
