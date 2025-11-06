@@ -306,7 +306,7 @@ variable "reloader_chart_location" {
 variable "reloader_chart_version" {
   type        = string
   description = "The version of the Reloader Helm chart. Ensure that the chart version is compatible with the image version specified in reloader_image_version."
-  default     = "2.2.4" # registryUrl: stakater.github.io/stakater-charts
+  default     = "2.2.5" # registryUrl: stakater.github.io/stakater-charts
   nullable    = false
 }
 
