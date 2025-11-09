@@ -267,7 +267,7 @@ resource "ibm_resource_instance" "secrets_manager" {
 # Additional Secrets-Manager Secret-Group for SERVICE level secrets
 module "secrets_manager_group_acct" {
   source               = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version              = "1.3.15"
+  version              = "1.3.16"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   #tfsec:ignore:general-secrets-no-plaintext-exposure
