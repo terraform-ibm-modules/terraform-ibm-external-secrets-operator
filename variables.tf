@@ -77,7 +77,7 @@ variable "eso_image" {
 variable "eso_image_version" {
   type        = string
   description = "The version or digest for the external secrets image to deploy. If changing the value, ensure it is compatible with the chart version set in eso_chart_version."
-  default     = "v0.20.4-ubi@sha256:f62f18055a1e0b3cad889e2837e6e14220a5119519e2bd213de583d98d5a7cc1" # datasource: ghcr.io/external-secrets/external-secrets
+  default     = "v1.0.0-ubi@sha256:b7a6c7ea483ca1aa1ee4199bc2708338f1385f5a22d7405068f1393d9d6b6dd5" # datasource: ghcr.io/external-secrets/external-secrets
   nullable    = false
   validation {
     condition     = can(regex("(^v\\d+\\.\\d+.\\d+(\\-\\w+)?(\\@sha256\\:\\w+){0,1})$", var.eso_image_version))
@@ -95,7 +95,7 @@ variable "eso_chart_location" {
 variable "eso_chart_version" {
   type        = string
   description = "The version of the External Secrets Operator Helm chart. Ensure that the chart version is compatible with the image version specified in eso_image_version."
-  default     = "0.20.4" # registryUrl: charts.external-secrets.io
+  default     = "1.0.0" # registryUrl: charts.external-secrets.io
   nullable    = false
 }
 
@@ -222,6 +222,6 @@ variable "reloader_chart_location" {
 variable "reloader_chart_version" {
   type        = string
   description = "The version of the Reloader Helm chart. Ensure that the chart version is compatible with the image version specified in reloader_image_version."
-  default     = "2.2.4" # registryUrl: stakater.github.io/stakater-charts
+  default     = "2.2.5" # registryUrl: stakater.github.io/stakater-charts
   nullable    = false
 }
