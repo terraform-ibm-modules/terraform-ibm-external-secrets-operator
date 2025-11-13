@@ -112,7 +112,7 @@
                 {
                   "type": "regex",
                   "description": "The value provided for 'existing_cluster_crn' is not valid.",
-                  "value": "^crn:v1:bluemix:[^:]+:containers-kubernetes:[^:]+:a/[0-9a-fA-F]{32}:[a-z0-9]+::$"
+                  "value": "^crn:v\\d:(.*:){2}{3}containers-kubernetes:(.*:)([aos]\\/[\\w_\\-]+):[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}::$"
                 }
               ]
             },
@@ -123,7 +123,7 @@
                 {
                   "type": "regex",
                   "description": "The value provided for 'existing_secrets_manager_crn' is not valid.",
-                  "value": "^__NULL__$|^crn:(.*:){3}secrets-manager:(.*:){2}[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}::$"
+                  "value": "^__NULL__$|^crn:v\\d:(.*:){2}{3}secrets-manager:(.*:)([aos]\\/[\\w_\\-]+):[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}::$"
                 }
               ]
             },
