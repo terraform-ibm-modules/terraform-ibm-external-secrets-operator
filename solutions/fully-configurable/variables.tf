@@ -57,12 +57,28 @@ variable "existing_cluster_crn" {
   type        = string
   description = "The CRN of the to deploy ESO operator onto. This value cannot be null."
   nullable    = false
+
+  validation {
+    condition = anytrue([
+      can(regex("^crn:v\\d:(.*:){2}containers-kubernetes:(.*:)([aos]\\/[\\w_\\-]+):[0-9a-fA-F]{20}::$", var.existing_cluster_crn)),
+      var.existing_cluster_crn == null,
+    ])
+    error_message = "The value provided for 'existing_cluster_crn' is not valid."
+  }
 }
 
 variable "existing_secrets_manager_crn" {
   type        = string
   description = "The CRN of the existing Secrets Manager instance to use. This value cannot be null."
   nullable    = false
+
+  validation {
+    condition = anytrue([
+      can(regex("^crn:v\\d:(.*:){2}secrets-manager:(.*:)([aos]\\/[\\w_\\-]+):[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}::$", var.existing_secrets_manager_crn)),
+      var.existing_secrets_manager_crn == null,
+    ])
+    error_message = "The value provided for 'existing_secrets_manager_crn' is not valid."
+  }
 }
 
 ############################################################################################################
