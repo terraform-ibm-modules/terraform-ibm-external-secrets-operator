@@ -1,6 +1,6 @@
 module "resource_group" {
   source  = "terraform-ibm-modules/resource-group/ibm"
-  version = "1.3.0"
+  version = "1.4.0"
   # if an existing resource group is not set (null) create a new one using prefix
   resource_group_name          = var.resource_group == null ? "${var.prefix}-resource-group" : null
   existing_resource_group_name = var.resource_group
@@ -41,7 +41,7 @@ resource "ibm_resource_instance" "secrets_manager" {
 
 module "secrets_manager_groups" {
   source               = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version              = "1.3.15"
+  version              = "1.3.18"
   count                = length(kubernetes_namespace.examples)
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
@@ -71,7 +71,7 @@ resource "kubernetes_namespace" "examples" {
 module "sm_arbitrary_secrets" {
   count                = length(kubernetes_namespace.examples)
   source               = "terraform-ibm-modules/secrets-manager-secret/ibm"
-  version              = "1.9.0"
+  version              = "1.9.1"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   secret_group_id      = module.secrets_manager_groups[count.index].secret_group_id
@@ -166,7 +166,7 @@ module "external_secrets" {
 
 module "vpes" {
   source   = "terraform-ibm-modules/vpe-gateway/ibm"
-  version  = "4.7.10"
+  version  = "4.8.4"
   count    = var.service_endpoints == "private" ? 1 : 0
   region   = var.region
   prefix   = "vpe"
