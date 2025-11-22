@@ -60,7 +60,7 @@ variable "existing_cluster_crn" {
 
   validation {
     condition = anytrue([
-      can(regex("^crn:v\\d:(.*:){2}containers-kubernetes:(.*:)([aos]\\/[\\w_\\-]+):[0-9a-fA-F]{20}::$", var.existing_cluster_crn)),
+      can(regex("^crn:v\\d:(.*:){2}containers-kubernetes:(.*:)([aos]\\/[\\w_\\-]+):[a-z0-9]{20}::$", var.existing_cluster_crn)),
       var.existing_cluster_crn == null,
     ])
     error_message = "The value provided for 'existing_cluster_crn' is not valid."
