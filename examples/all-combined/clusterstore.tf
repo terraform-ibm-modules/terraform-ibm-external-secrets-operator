@@ -39,7 +39,7 @@ locals {
 # Create username_password secret and store in secret manager
 module "sm_userpass_secret" {
   source               = "terraform-ibm-modules/secrets-manager-secret/ibm"
-  version              = "1.9.0"
+  version              = "1.9.1"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   secret_group_id      = module.secrets_manager_group.secret_group_id
@@ -51,8 +51,8 @@ module "sm_userpass_secret" {
   #tfsec:ignore:general-secrets-no-plaintext-exposure
   secret_username               = "artifactory-user" # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
   secret_auto_rotation          = false
-  secret_auto_rotation_interval = 0
-  secret_auto_rotation_unit     = null
+  secret_auto_rotation_interval = 1
+  secret_auto_rotation_unit     = "day"
   providers = {
     ibm = ibm.ibm-sm
   }

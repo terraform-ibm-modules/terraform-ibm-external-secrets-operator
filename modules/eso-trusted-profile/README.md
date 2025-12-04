@@ -4,6 +4,21 @@ This module allows to create and configure an Trusted Profile to authenticate wi
 
 For more information about Trusted Profiles refer to the IBM Cloud documentation available [here](https://cloud.ibm.com/docs/account?topic=account-create-trusted-profile&interface=ui)
 
+## Usage
+
+```hcl
+# Replace "master" with a GIT release version to lock into a specific release
+module "clusterstore_trusted_profile" {
+  source                          = "git::https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator.git//modules/eso-trusted-profile?ref=master"
+  trusted_profile_name            = local.cstore_trusted_profile_name
+  secrets_manager_guid            = local.sm_guid
+  secret_groups_id                = [module.tp_clusterstore_secrets_manager_group.secret_group_id]
+  tp_cluster_crn                  = module.ocp_base.cluster_crn
+  trusted_profile_claim_rule_type = "ROKS_SA"
+  tp_namespace                    = var.eso_namespace
+}
+```
+
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ### Requirements
 

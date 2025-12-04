@@ -10,6 +10,24 @@ This module supports ClusterSecretStore two authentication configurations to pul
 
 For more information about Trusted Profiles refer to the IBM Cloud documentation available [here](https://cloud.ibm.com/docs/account?topic=account-create-trusted-profile&interface=ui)
 
+## Usage
+
+```hcl
+# Replace "master" with a GIT release version to lock into a specific release
+module "eso_clusterstore" {
+  source                            = "git::https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator.git//modules/eso-clusterstore?ref=master"
+  eso_authentication                = "api_key"
+  clusterstore_secret_apikey        = data.ibm_sm_iam_credentials_secret.secret_puller_secret.api_key # pragma: allowlist secret
+  region                            = local.sm_region
+  clusterstore_helm_rls_name        = "cluster-store"
+  clusterstore_secret_name          = "generic-cluster-api-key"
+  clusterstore_name                 = "cluster-store"
+  clusterstore_secrets_manager_guid = local.sm_guid
+  eso_namespace                     = var.eso_namespace
+  service_endpoints                 = var.service_endpoints
+}
+```
+
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ### Requirements
 

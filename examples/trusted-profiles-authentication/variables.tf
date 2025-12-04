@@ -6,7 +6,7 @@ variable "ibmcloud_api_key" {
 
 variable "cluster_name_id" {
   type        = string
-  description = "Cluser Name or ID where resources will be created"
+  description = "Cluster Name or ID where resources will be created"
 }
 
 variable "resource_group" {
