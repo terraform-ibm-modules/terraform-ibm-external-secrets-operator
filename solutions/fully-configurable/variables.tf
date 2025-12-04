@@ -29,7 +29,7 @@ variable "provider_visibility" {
 variable "prefix" {
   type        = string
   nullable    = true
-  description = "The prefix to be added to all resources created by this solution. To skip using a prefix, set this value to null or an empty string. The prefix must begin with a lowercase letter and may contain only lowercase letters, digits, and hyphens '-'. It should not exceed 16 characters, must not end with a hyphen('-'), and can not contain consecutive hyphens ('--'). Example: prod-0205. [Learn more](https://terraform-ibm-modules.github.io/documentation/#/prefix.md)."
+  description = "The prefix to add to all resources that this solution creates (e.g `prod`, `test`, `dev`). To skip using a prefix, set this value to null or an empty string. [Learn more](https://terraform-ibm-modules.github.io/documentation/#/prefix.md)."
 
   validation {
     # - null and empty string is allowed
@@ -57,12 +57,28 @@ variable "existing_cluster_crn" {
   type        = string
   description = "The CRN of the to deploy ESO operator onto. This value cannot be null."
   nullable    = false
+
+  validation {
+    condition = anytrue([
+      can(regex("^crn:v\\d:(.*:){2}containers-kubernetes:(.*:)([aos]\\/[\\w_\\-]+):[a-z0-9]{20}::$", var.existing_cluster_crn)),
+      var.existing_cluster_crn == null,
+    ])
+    error_message = "The value provided for 'existing_cluster_crn' is not valid."
+  }
 }
 
 variable "existing_secrets_manager_crn" {
   type        = string
   description = "The CRN of the existing Secrets Manager instance to use. This value cannot be null."
   nullable    = false
+
+  validation {
+    condition = anytrue([
+      can(regex("^crn:v\\d:(.*:){2}secrets-manager:(.*:)([aos]\\/[\\w_\\-]+):[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}::$", var.existing_secrets_manager_crn)),
+      var.existing_secrets_manager_crn == null,
+    ])
+    error_message = "The value provided for 'existing_secrets_manager_crn' is not valid."
+  }
 }
 
 ############################################################################################################
