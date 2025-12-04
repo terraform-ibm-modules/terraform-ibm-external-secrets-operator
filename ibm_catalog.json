@@ -50,6 +50,7 @@
           "name": "fully-configurable",
           "install_type": "fullstack",
           "working_directory": "solutions/fully-configurable",
+          "short_description": "Automate the deployment of External Secrets Operator (ESO) on an IBM Cloud Kubernetes Service (IKS) OpenShift cluster.",
           "iam_permissions": [
             {
               "role_crns": [

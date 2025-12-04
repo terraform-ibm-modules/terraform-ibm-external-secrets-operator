@@ -348,7 +348,7 @@ func TestReloaderOperational(t *testing.T) {
 
 						// Check the image and version
 						// Get reloader pods - use the correct labels and namespace
-						esoNamespace := "apikeynspace1" // staticly set in locals of basic example
+						esoNamespace := "apikeynspace1" // statically set in locals of basic example
 
 						// assert all values are set
 						if !assert.NotEmpty(t, reloaderImage, "Reloader image is empty") {
