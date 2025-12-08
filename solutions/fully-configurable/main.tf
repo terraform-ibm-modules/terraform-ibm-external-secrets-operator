@@ -176,7 +176,7 @@ module "cluster_secrets_stores_account_secrets_groups" {
     ibm = ibm.ibm-sm
   }
 }
-
+#data lookup for iam id
 data "ibm_iam_service_id" "existing_serviceid" {
   for_each = {
     for k, v in var.eso_secretsstores_configuration.cluster_secrets_stores :
@@ -187,7 +187,9 @@ data "ibm_iam_service_id" "existing_serviceid" {
   name = each.value.serviceid_name
 
 }
-data "ibm_iam_service_id" "existing_serviceid" {
+
+#data lookup for iam id
+data "ibm_iam_service_id" "existing_serviceid_secrets" {
   for_each = {
     for k, v in var.eso_secretsstores_configuration.secrets_stores :
     k => v
@@ -532,7 +534,7 @@ locals {
     for secrets_store_key, secrets_store in var.eso_secretsstores_configuration.secrets_stores :
     secrets_store_key => {
       # if the existing_serviceid_id is null it collects the service id created otherwise will use the existing one
-      "accountServiceID" : (secrets_store.existing_serviceid_id == null || secrets_store.existing_serviceid_id == "") ? ibm_iam_service_id.secrets_stores_secret_puller[secrets_store_key].iam_id : data.ibm_iam_service_id.existing_serviceid[secrets_store_key].iam_id
+      "accountServiceID" : (secrets_store.existing_serviceid_id == null || secrets_store.existing_serviceid_id == "") ? ibm_iam_service_id.secrets_stores_secret_puller[secrets_store_key].iam_id : data.ibm_iam_service_id.existing_serviceid_secrets[secrets_store_key].iam_id
       "service_secrets_groups_IDs" : local.secrets_stores_service_secrets_groups_fulllist[secrets_store_key]
     }
   })
