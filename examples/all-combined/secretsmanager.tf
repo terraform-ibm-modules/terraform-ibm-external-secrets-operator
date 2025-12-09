@@ -72,8 +72,8 @@ resource "ibm_iam_service_id" "secret_puller" {
 
 # Create policy to allow new service id to pull secrets from secrets manager
 resource "ibm_iam_service_policy" "secret_puller_policy" {
-  iam_service_id = ibm_iam_service_id.secret_puller.id
-  roles          = ["Viewer", "SecretsReader"]
+  iam_id = ibm_iam_service_id.secret_puller.iam_id
+  roles  = ["Viewer", "SecretsReader"]
 
   resources {
     service              = "secrets-manager"
