@@ -50,6 +50,7 @@
           "name": "fully-configurable",
           "install_type": "fullstack",
           "working_directory": "solutions/fully-configurable",
+          "short_description": "Ideal for users who want flexibility with a reliable starting point.",
           "iam_permissions": [
             {
               "role_crns": [
