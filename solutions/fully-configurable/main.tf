@@ -176,6 +176,29 @@ module "cluster_secrets_stores_account_secrets_groups" {
     ibm = ibm.ibm-sm
   }
 }
+#data lookup for iam id
+data "ibm_iam_service_id" "existing_serviceid" {
+  for_each = {
+    for k, v in var.eso_secretsstores_configuration.cluster_secrets_stores :
+    k => v
+    if v.existing_serviceid_id != null && v.existing_serviceid_id != ""
+  }
+
+  name = each.value.serviceid_name
+
+}
+
+#data lookup for iam id
+data "ibm_iam_service_id" "existing_serviceid_secrets" {
+  for_each = {
+    for k, v in var.eso_secretsstores_configuration.secrets_stores :
+    k => v
+    if v.existing_serviceid_id != null && v.existing_serviceid_id != ""
+  }
+
+  name = each.value.serviceid_name
+
+}
 
 locals {
   # map of cluster secrets stores account secrets groups enriched with the created secrets groups details
@@ -252,7 +275,7 @@ locals {
     for cluster_secrets_store_key, cluster_secrets_store in var.eso_secretsstores_configuration.cluster_secrets_stores :
     cluster_secrets_store_key => {
       # if the existing_serviceid_id is null it collects the service id created otherwise will use the existing one
-      "accountServiceID" : (cluster_secrets_store.existing_serviceid_id == null || cluster_secrets_store.existing_serviceid_id == "") ? ibm_iam_service_id.cluster_secrets_stores_secret_puller[cluster_secrets_store_key].id : cluster_secrets_store.existing_serviceid_id
+      "accountServiceID" : (cluster_secrets_store.existing_serviceid_id == null || cluster_secrets_store.existing_serviceid_id == "") ? ibm_iam_service_id.cluster_secrets_stores_secret_puller[cluster_secrets_store_key].iam_id : data.ibm_iam_service_id.existing_serviceid[cluster_secrets_store_key].iam_id
       "service_secrets_groups_IDs" : local.cluster_secrets_stores_service_secrets_groups_fulllist[cluster_secrets_store_key]
     }
   })
@@ -278,9 +301,9 @@ locals {
 
 # Create policy to allow new service id to pull secrets from secrets manager
 resource "ibm_iam_service_policy" "cluster_secrets_store_secrets_puller_policy" {
-  for_each       = local.cluster_secrets_stores_policies_to_create_map
-  iam_service_id = each.value.accountServiceID
-  roles          = ["Viewer", "SecretsReader"]
+  for_each = local.cluster_secrets_stores_policies_to_create_map
+  iam_id   = each.value.accountServiceID
+  roles    = ["Viewer", "SecretsReader"]
   resources {
     service              = "secrets-manager"
     resource_instance_id = local.sm_guid
@@ -511,7 +534,7 @@ locals {
     for secrets_store_key, secrets_store in var.eso_secretsstores_configuration.secrets_stores :
     secrets_store_key => {
       # if the existing_serviceid_id is null it collects the service id created otherwise will use the existing one
-      "accountServiceID" : (secrets_store.existing_serviceid_id == null || secrets_store.existing_serviceid_id == "") ? ibm_iam_service_id.secrets_stores_secret_puller[secrets_store_key].id : secrets_store.existing_serviceid_id
+      "accountServiceID" : (secrets_store.existing_serviceid_id == null || secrets_store.existing_serviceid_id == "") ? ibm_iam_service_id.secrets_stores_secret_puller[secrets_store_key].iam_id : data.ibm_iam_service_id.existing_serviceid_secrets[secrets_store_key].iam_id
       "service_secrets_groups_IDs" : local.secrets_stores_service_secrets_groups_fulllist[secrets_store_key]
     }
   })
@@ -537,9 +560,9 @@ locals {
 
 # Create policy to allow new service id to pull secrets from secrets manager
 resource "ibm_iam_service_policy" "secrets_store_secrets_puller_policy" {
-  for_each       = local.secrets_stores_policies_to_create_map
-  iam_service_id = each.value.accountServiceID
-  roles          = ["Viewer", "SecretsReader"]
+  for_each = local.secrets_stores_policies_to_create_map
+  iam_id   = each.value.accountServiceID
+  roles    = ["Viewer", "SecretsReader"]
   resources {
     service              = "secrets-manager"
     resource_instance_id = local.sm_guid
