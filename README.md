@@ -493,13 +493,13 @@ You need the following permissions to run this module.
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.0.0, <4.0.0 |
-| <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | >= 2.16.1, < 3.0.0 |
+| <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | >= 3.0.0, < 4.0.0 |
 
 ### Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_eso_namespace"></a> [eso\_namespace](#module\_eso\_namespace) | terraform-ibm-modules/namespace/ibm | 1.0.3 |
+| <a name="module_eso_namespace"></a> [eso\_namespace](#module\_eso\_namespace) | git::https://github.com/terraform-ibm-modules/terraform-ibm-namespace.git | k8s_v3 |
 
 ### Resources
 

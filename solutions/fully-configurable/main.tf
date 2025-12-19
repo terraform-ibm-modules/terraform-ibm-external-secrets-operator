@@ -244,8 +244,11 @@ module "cluster_secrets_store_namespace" {
       "namespace" : cluster_secrets_store.namespace
     } if cluster_secrets_store.create_namespace == true
   })
-  source  = "terraform-ibm-modules/namespace/ibm"
-  version = "1.0.3"
+  # TO UPDATE THE MODULE REFERENCE WHEN THE NEW VERSION FROM THE BRANCH IS PUBLISHED
+  # source  = "terraform-ibm-modules/namespace/ibm"
+  # version = "1.0.3"
+  #checkov:skip=CKV_TF_2 using branch fix_renovate_122025 until next module release https://github.com/terraform-ibm-modules/terraform-ibm-namespace/pull/172
+  source = "git::https://github.com/terraform-ibm-modules/terraform-ibm-namespace.git?ref=k8s_v3"
   namespaces = [
     {
       name = each.value.namespace
@@ -503,8 +506,11 @@ module "secrets_store_namespace" {
       "namespace" : secrets_store.namespace
     } if secrets_store.create_namespace == true
   })
-  source  = "terraform-ibm-modules/namespace/ibm"
-  version = "1.0.3"
+  # TO UPDATE THE MODULE REFERENCE WHEN THE NEW VERSION FROM THE BRANCH IS PUBLISHED
+  # source  = "terraform-ibm-modules/namespace/ibm"
+  # version = "1.0.3"
+  #checkov:skip=CKV_TF_2 using branch fix_renovate_122025 until next module release https://github.com/terraform-ibm-modules/terraform-ibm-namespace/pull/172
+  source = "git::https://github.com/terraform-ibm-modules/terraform-ibm-namespace.git?ref=k8s_v3"
   namespaces = [
     {
       name = each.value.namespace
