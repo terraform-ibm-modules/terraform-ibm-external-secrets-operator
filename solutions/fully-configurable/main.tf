@@ -87,7 +87,7 @@ module "external_secrets_operator" {
 
 locals {
 
-  # list of service secrets groups to create for each cluster secrets store - each element of the map has a key with the name of the clustersecretsstore contatenated to the secrets group name (using "." as separator) to keep the keys unique
+  # list of service secrets groups to create for each cluster secrets store - each element of the map has a key with the name of the clustersecretsstore concatenated to the secrets group name (using "." as separator) to keep the keys unique
   # flatten ensures that this local value is a flat list of objects, rather than a list of lists of objects
   cluster_secrets_stores_service_secrets_groups_list = flatten([
     for cluster_secrets_store_key, cluster_secrets_store in var.eso_secretsstores_configuration.cluster_secrets_stores : [
@@ -107,7 +107,7 @@ module "cluster_secrets_stores_service_secrets_groups" {
     for idx, element in local.cluster_secrets_stores_service_secrets_groups_list : element.key => element
   })
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.3.18"
+  version                  = "1.3.19"
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = each.value.name        # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
@@ -167,7 +167,7 @@ module "cluster_secrets_stores_account_secrets_groups" {
     } if(cluster_secrets_store.existing_account_secrets_group_id == null || cluster_secrets_store.existing_account_secrets_group_id == "") && cluster_secrets_store.account_secrets_group_name != null
   })
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.3.18"
+  version                  = "1.3.19"
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = each.value.name        # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
@@ -244,8 +244,11 @@ module "cluster_secrets_store_namespace" {
       "namespace" : cluster_secrets_store.namespace
     } if cluster_secrets_store.create_namespace == true
   })
-  source  = "terraform-ibm-modules/namespace/ibm"
-  version = "1.0.3"
+  # TO UPDATE THE MODULE REFERENCE WHEN THE NEW VERSION FROM THE BRANCH IS PUBLISHED
+  # source  = "terraform-ibm-modules/namespace/ibm"
+  # version = "1.0.3"
+  #checkov:skip=CKV_TF_2 using branch fix_renovate_122025 until next module release https://github.com/terraform-ibm-modules/terraform-ibm-namespace/pull/172
+  source = "git::https://github.com/terraform-ibm-modules/terraform-ibm-namespace.git?ref=k8s_v3"
   namespaces = [
     {
       name = each.value.namespace
@@ -368,7 +371,7 @@ locals {
 # 4. the service id to read the secrets from the secrets manager if any
 
 locals {
-  # list of service secrets groups to create for each secrets store - each element of the map has a key with the name of the secretsstore contatenated to the secrets group name (using "." as separator) to keep the keys unique
+  # list of service secrets groups to create for each secrets store - each element of the map has a key with the name of the secretsstore concatenated to the secrets group name (using "." as separator) to keep the keys unique
   # flatten ensures that this local value is a flat list of objects, rather than a list of lists of objects
 
   secrets_stores_service_secrets_groups_list = flatten([
@@ -389,7 +392,7 @@ module "secrets_stores_service_secrets_groups" {
     for idx, element in local.secrets_stores_service_secrets_groups_list : element.key => element
   })
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.3.18"
+  version                  = "1.3.19"
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = each.value.name        # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
@@ -449,7 +452,7 @@ module "secrets_stores_account_secrets_groups" {
     } if(secrets_store.existing_account_secrets_group_id == null || secrets_store.existing_account_secrets_group_id == "") && secrets_store.account_secrets_group_name != null
   })
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.3.18"
+  version                  = "1.3.19"
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = each.value.name        # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
@@ -503,8 +506,11 @@ module "secrets_store_namespace" {
       "namespace" : secrets_store.namespace
     } if secrets_store.create_namespace == true
   })
-  source  = "terraform-ibm-modules/namespace/ibm"
-  version = "1.0.3"
+  # TO UPDATE THE MODULE REFERENCE WHEN THE NEW VERSION FROM THE BRANCH IS PUBLISHED
+  # source  = "terraform-ibm-modules/namespace/ibm"
+  # version = "1.0.3"
+  #checkov:skip=CKV_TF_2 using branch fix_renovate_122025 until next module release https://github.com/terraform-ibm-modules/terraform-ibm-namespace/pull/172
+  source = "git::https://github.com/terraform-ibm-modules/terraform-ibm-namespace.git?ref=k8s_v3"
   namespaces = [
     {
       name = each.value.namespace
