@@ -18,7 +18,7 @@ locals {
 
 module "resource_group" {
   source  = "terraform-ibm-modules/resource-group/ibm"
-  version = "1.4.0"
+  version = "1.4.7"
   # if an existing resource group is not set (null) create a new one using prefix
   resource_group_name          = var.resource_group == null ? "${var.prefix}-resource-group" : null
   existing_resource_group_name = var.resource_group
@@ -198,7 +198,7 @@ module "network_acl" {
 # OCP CLUSTER creation
 module "ocp_base" {
   source               = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  version              = "3.73.2"
+  version              = "3.76.3"
   cluster_name         = "${var.prefix}-vpc"
   resource_group_id    = module.resource_group.resource_group_id
   region               = var.region
@@ -267,7 +267,7 @@ resource "ibm_resource_instance" "secrets_manager" {
 # Additional Secrets-Manager Secret-Group for SERVICE level secrets
 module "secrets_manager_group_acct" {
   source               = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version              = "1.3.18"
+  version              = "1.3.36"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   #tfsec:ignore:general-secrets-no-plaintext-exposure
@@ -316,7 +316,7 @@ module "external_secrets_operator" {
 ## Create dynamic Service ID API key and add to secret manager
 module "dynamic_serviceid_apikey1" {
   source  = "terraform-ibm-modules/iam-serviceid-apikey-secrets-manager/ibm"
-  version = "1.2.0"
+  version = "1.2.19"
   region  = local.sm_region
   #tfsec:ignore:general-secrets-no-plaintext-exposure
   sm_iam_secret_name        = "${var.prefix}-${var.sm_iam_secret_name}"
@@ -370,7 +370,7 @@ locals {
 # Create username_password secret and store in secret manager
 module "sm_userpass_secret" {
   source               = "terraform-ibm-modules/secrets-manager-secret/ibm"
-  version              = "1.9.1"
+  version              = "1.9.12"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   secret_group_id      = module.secrets_manager_group_acct.secret_group_id
