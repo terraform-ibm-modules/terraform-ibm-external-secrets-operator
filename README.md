@@ -289,7 +289,7 @@ For more information about IAM Trusted profiles and ESO Multitenancy configurati
 
 ### Public and Private Service Endpoints
 
-Starting from version `v2.4.0` of this module, it is possible to customise the default IAM endpoint (https://iam.cloud.ibm.com) when authenticating through apikey (`api_key` authentication) and through Truster Profile (`trusted_profile` authentication) for both ClusterSecretStore and SecretStore APIs (for version prior to `v2.4.0` this was supported only for Trusted Profile authentication).
+Starting from version `v2.4.0`, it is possible to customise the default IAM endpoint (https://iam.cloud.ibm.com) when authenticating through apikey (`api_key` authentication) and through Truster Profile (`trusted_profile` authentication) for both ClusterSecretStore and SecretStore APIs (for version prior to `v2.4.0` this was supported only for Trusted Profile authentication).
 
 ### Pod Reloader
 
