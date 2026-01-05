@@ -46,6 +46,7 @@ resource "helm_release" "cluster_secret_store_apikey" {
               serviceUrl: "https://${local.cluster_store_secrets_manager_endpoint}"
               auth:
                 secretRef:
+                  iamEndpoint: "https://${local.iam_endpoint}"
                   secretApiKeySecretRef:
                     name: "${var.clusterstore_secret_name}"
                     key: apiKey

@@ -231,7 +231,7 @@ variable "existing_sm_instance_region" {
 
 variable "service_endpoints" {
   type        = string
-  description = "The service endpoint type to communicate with the provided secrets manager instance. Possible values are `public` or `private`. This also will set the iam endpoint for containerAuth when enabling Trusted Profile/CR based authentication."
+  description = "The service endpoint type to communicate with the provided secrets manager instance. Possible values are `public` or `private`. This also will set the iam endpoint type for IAM API key and for TrustedProfile containerAuth based authentication."
   default     = "public"
 }
 
