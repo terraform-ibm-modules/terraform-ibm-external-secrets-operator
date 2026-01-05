@@ -323,7 +323,7 @@ module "external_secrets_trusted_profile_nosecgroup" {
   tp_namespace                    = var.eso_namespace
 }
 
-# eso externalsecret object with trusted profile authentication without secrects group in the policy
+# eso externalsecret object with trusted profile authentication without secrets group in the policy
 module "external_secret_tp_nosg" {
   depends_on = [
     module.eso_tp_namespace_secretstore_nosecgroup

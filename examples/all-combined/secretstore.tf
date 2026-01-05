@@ -1,6 +1,6 @@
 ##############################################################################
 # This template shows how to create ESO secretstores, a secrets store namespace scoped, with api key authentication
-# Two different secretstores are created in two different namespaces, allowing to achive namespace isolation
+# Two different secretstores are created in two different namespaces, allowing to achieve namespace isolation
 # Two different secret types
 # - arbitrary (to store image pull API key)
 # - Image pull API key secret using imagepull-apikey-secrets-manager-module

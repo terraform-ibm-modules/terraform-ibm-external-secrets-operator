@@ -87,7 +87,7 @@ module "external_secrets_operator" {
 
 locals {
 
-  # list of service secrets groups to create for each cluster secrets store - each element of the map has a key with the name of the clustersecretsstore contatenated to the secrets group name (using "." as separator) to keep the keys unique
+  # list of service secrets groups to create for each cluster secrets store - each element of the map has a key with the name of the clustersecretsstore concatenated to the secrets group name (using "." as separator) to keep the keys unique
   # flatten ensures that this local value is a flat list of objects, rather than a list of lists of objects
   cluster_secrets_stores_service_secrets_groups_list = flatten([
     for cluster_secrets_store_key, cluster_secrets_store in var.eso_secretsstores_configuration.cluster_secrets_stores : [
@@ -368,7 +368,7 @@ locals {
 # 4. the service id to read the secrets from the secrets manager if any
 
 locals {
-  # list of service secrets groups to create for each secrets store - each element of the map has a key with the name of the secretsstore contatenated to the secrets group name (using "." as separator) to keep the keys unique
+  # list of service secrets groups to create for each secrets store - each element of the map has a key with the name of the secretsstore concatenated to the secrets group name (using "." as separator) to keep the keys unique
   # flatten ensures that this local value is a flat list of objects, rather than a list of lists of objects
 
   secrets_stores_service_secrets_groups_list = flatten([
