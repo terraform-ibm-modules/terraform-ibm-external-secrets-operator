@@ -162,7 +162,7 @@ variable "eso_image" {
 variable "eso_image_version" {
   type        = string
   description = "The version or digest for the external secrets image to deploy. If changing the value, ensure it is compatible with the chart version set in eso_chart_version."
-  default     = "v1.0.0-ubi@sha256:b7a6c7ea483ca1aa1ee4199bc2708338f1385f5a22d7405068f1393d9d6b6dd5" # datasource: ghcr.io/external-secrets/external-secrets
+  default     = "v1.2.1-ubi@sha256:467441728e66e113d0dabb60e983230e8c9d7c03e57b02a21483df9376dfca72" # datasource: ghcr.io/external-secrets/external-secrets
   nullable    = false
   validation {
     condition     = can(regex("(^v\\d+\\.\\d+.\\d+(\\-\\w+)?(\\@sha256\\:\\w+){0,1})$", var.eso_image_version))
@@ -180,7 +180,7 @@ variable "eso_chart_location" {
 variable "eso_chart_version" {
   type        = string
   description = "The version of the External Secrets Operator Helm chart. Ensure that the chart version is compatible with the image version specified in eso_image_version."
-  default     = "1.0.0" # registryUrl: charts.external-secrets.io
+  default     = "1.2.1" # registryUrl: charts.external-secrets.io
   nullable    = false
 }
 
@@ -304,7 +304,7 @@ variable "reloader_image" {
 variable "reloader_image_version" {
   type        = string
   description = "The version or digest for the reloader image to deploy. If changing the value, ensure it is compatible with the chart version set in reloader_chart_version."
-  default     = "v1.4.10-ubi@sha256:438abc837d99521c4ff2b74ab4df60dd2c49a106fbef50f760210be37c6ffcbb" # datasource: ghcr.io/stakater/reloader
+  default     = "v1.4.12-ubi@sha256:bfd348922b44630783b092de36de0afc0a87182d595e0c6d6b27997bc41e242e" # datasource: ghcr.io/stakater/reloader
   nullable    = false
   validation {
     condition     = can(regex("(^v\\d+\\.\\d+.\\d+(\\-\\w+)?(\\@sha256\\:\\w+){0,1})$", var.reloader_image_version))
@@ -322,7 +322,7 @@ variable "reloader_chart_location" {
 variable "reloader_chart_version" {
   type        = string
   description = "The version of the Reloader Helm chart. Ensure that the chart version is compatible with the image version specified in reloader_image_version."
-  default     = "2.2.5" # registryUrl: stakater.github.io/stakater-charts
+  default     = "2.2.7" # registryUrl: stakater.github.io/stakater-charts
   nullable    = false
 }
 

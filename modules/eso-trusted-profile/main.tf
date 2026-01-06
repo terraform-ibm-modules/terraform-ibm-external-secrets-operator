@@ -7,7 +7,7 @@ resource "ibm_iam_trusted_profile" "trusted_profile" {
 }
 
 # The following Rule allows incoming requests from
-# the external-secrets SA in external-secrets namespce in the
+# the external-secrets SA in external-secrets namespace in the
 # target cluster with the retrieved cluster's CRN.
 resource "ibm_iam_trusted_profile_claim_rule" "claim_rule" {
   profile_id = ibm_iam_trusted_profile.trusted_profile.id
@@ -67,7 +67,7 @@ resource "ibm_iam_trusted_profile_policy" "policy" {
   }
 }
 
-# This Trusted Profile policy grants acccess to the provided secrets
+# This Trusted Profile policy grants access to the provided secrets
 # manager instance, if two or more secrets groups id are provided to restrict the access to the Secrets Manager instance
 resource "ibm_iam_trusted_profile_policy" "policy_multiple_secrets_groups" {
   count       = length(var.secret_groups_id) > 1 ? length(var.secret_groups_id) : 0
