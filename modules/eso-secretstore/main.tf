@@ -42,6 +42,7 @@ resource "helm_release" "external_secret_store_apikey" {
               serviceUrl: "https://${var.sstore_secrets_manager_guid}.${local.regional_endpoint}.secrets-manager.appdomain.cloud"
               auth:
                 secretRef:
+                  iamEndpoint: "https://${local.iam_endpoint}"
                   secretApiKeySecretRef:
                     name: "${var.sstore_secret_name}"
                     key: apiKey
