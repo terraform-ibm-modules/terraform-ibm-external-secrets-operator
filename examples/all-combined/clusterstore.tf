@@ -69,7 +69,7 @@ module "external_secret_usr_pass" {
   es_kubernetes_secret_type = "dockerconfigjson"  #checkov:skip=CKV_SECRET_6
   sm_secret_type            = "username_password" #checkov:skip=CKV_SECRET_6
   sm_secret_id              = module.sm_userpass_secret.secret_id
-  es_kubernetes_namespace   = kubernetes_namespace.apikey_namespaces[0].metadata[0].name
+  es_kubernetes_namespace   = kubernetes_namespace_v1.apikey_namespaces[0].metadata[0].name
   eso_store_name            = "cluster-store"
   es_container_registry     = "example-registry-local.artifactory.com"
   es_kubernetes_secret_name = "dockerconfigjson-uc" #checkov:skip=CKV_SECRET_6

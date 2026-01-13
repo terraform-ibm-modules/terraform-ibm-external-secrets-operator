@@ -7,7 +7,7 @@ locals {
 }
 
 ### creating secret to store apikey to authenticate on secretsmanager for apikey authentication
-resource "kubernetes_secret" "eso_secretsstore_secret" {
+resource "kubernetes_secret_v1" "eso_secretsstore_secret" {
   count = var.eso_authentication == "api_key" ? 1 : 0
   metadata {
     name      = var.sstore_secret_name

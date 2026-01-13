@@ -245,7 +245,7 @@ module "cluster_secrets_store_namespace" {
     } if cluster_secrets_store.create_namespace == true
   })
   source  = "terraform-ibm-modules/namespace/ibm"
-  version = "1.0.3"
+  version = "2.0.0"
   namespaces = [
     {
       name = each.value.namespace
@@ -504,7 +504,7 @@ module "secrets_store_namespace" {
     } if secrets_store.create_namespace == true
   })
   source  = "terraform-ibm-modules/namespace/ibm"
-  version = "1.0.3"
+  version = "2.0.0"
   namespaces = [
     {
       name = each.value.namespace

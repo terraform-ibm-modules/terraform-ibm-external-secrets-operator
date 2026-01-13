@@ -42,7 +42,7 @@ resource "ibm_resource_instance" "secrets_manager" {
 module "secrets_manager_groups" {
   source               = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
   version              = "1.3.36"
-  count                = length(kubernetes_namespace.examples)
+  count                = length(kubernetes_namespace_v1.examples)
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   #tfsec:ignore:general-secrets-no-plaintext-exposure
@@ -61,7 +61,7 @@ data "ibm_container_vpc_cluster" "cluster" {
 ##################################################################
 
 # creating the namespace to create the ES resources and the dummy secrets
-resource "kubernetes_namespace" "examples" {
+resource "kubernetes_namespace_v1" "examples" {
   count = length(local.es_kubernetes_namespaces)
   metadata {
     name = local.es_kubernetes_namespaces[count.index]
@@ -69,7 +69,7 @@ resource "kubernetes_namespace" "examples" {
 }
 
 module "sm_arbitrary_secrets" {
-  count                = length(kubernetes_namespace.examples)
+  count                = length(kubernetes_namespace_v1.examples)
   source               = "terraform-ibm-modules/secrets-manager-secret/ibm"
   version              = "1.9.12"
   region               = local.sm_region
@@ -84,7 +84,7 @@ module "sm_arbitrary_secrets" {
 
 # creating trusted profiles
 module "external_secrets_trusted_profiles" {
-  count                           = length(kubernetes_namespace.examples)
+  count                           = length(kubernetes_namespace_v1.examples)
   source                          = "../../modules/eso-trusted-profile"
   trusted_profile_name            = "${local.trusted_profile_name}_${count.index}"
   secrets_manager_guid            = local.sm_guid
@@ -120,16 +120,16 @@ module "external_secrets_operator" {
 ########################################################################
 
 module "eso_namespace_secretstores" {
-  count = length(kubernetes_namespace.examples)
+  count = length(kubernetes_namespace_v1.examples)
   depends_on = [
     module.external_secrets_operator
   ]
   source                      = "../../modules/eso-secretstore"
   eso_authentication          = "trusted_profile"
   region                      = local.sm_region
-  sstore_namespace            = kubernetes_namespace.examples[count.index].metadata[0].name
+  sstore_namespace            = kubernetes_namespace_v1.examples[count.index].metadata[0].name
   sstore_secrets_manager_guid = local.sm_guid
-  sstore_store_name           = "${kubernetes_namespace.examples[count.index].metadata[0].name}-store" # each store created with the name of the namespace with "-store" as suffix
+  sstore_store_name           = "${kubernetes_namespace_v1.examples[count.index].metadata[0].name}-store" # each store created with the name of the namespace with "-store" as suffix
   sstore_trusted_profile_name = module.external_secrets_trusted_profiles[count.index].trusted_profile_name
   service_endpoints           = var.service_endpoints
   sstore_helm_rls_name        = "es-store-${count.index}"
@@ -144,17 +144,17 @@ module "external_secrets" {
   depends_on = [
     module.eso_namespace_secretstores
   ]
-  count                         = length(kubernetes_namespace.examples)
+  count                         = length(kubernetes_namespace_v1.examples)
   source                        = "../../modules/eso-external-secret"
   eso_store_scope               = "namespace"
-  es_kubernetes_namespace       = kubernetes_namespace.examples[count.index].metadata[0].name
+  es_kubernetes_namespace       = kubernetes_namespace_v1.examples[count.index].metadata[0].name
   es_kubernetes_secret_name     = "${var.prefix}-arbitrary-arb-${count.index}"       #checkov:skip=CKV_SECRET_6
   sm_secret_type                = "arbitrary"                                        #checkov:skip=CKV_SECRET_6
   sm_secret_id                  = module.sm_arbitrary_secrets[count.index].secret_id #checkov:skip=CKV_SECRET_6
   es_kubernetes_secret_type     = "opaque"
   es_kubernetes_secret_data_key = "apikey"
   es_refresh_interval           = "5m"
-  eso_store_name                = "${kubernetes_namespace.examples[count.index].metadata[0].name}-store" # each store created with the name of the namespace with "-store" as suffix
+  eso_store_name                = "${kubernetes_namespace_v1.examples[count.index].metadata[0].name}-store" # each store created with the name of the namespace with "-store" as suffix
   es_container_registry         = "us.icr.io"
   es_container_registry_email   = "user@company.com"
   es_helm_rls_name              = "es-${count.index}"

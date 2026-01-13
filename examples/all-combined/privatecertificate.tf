@@ -53,7 +53,7 @@ module "external_secret_private_certificate" {
   es_kubernetes_secret_type = "tls"          #checkov:skip=CKV_SECRET_6
   sm_secret_type            = "private_cert" #tfsec:ignore:general-secrets-no-plaintext-exposure
   sm_secret_id              = module.secrets_manager_private_certificate.secret_id
-  es_kubernetes_namespace   = kubernetes_namespace.apikey_namespaces[2].metadata[0].name
+  es_kubernetes_namespace   = kubernetes_namespace_v1.apikey_namespaces[2].metadata[0].name
   eso_store_name            = "${var.es_namespaces_apikey[2]}-store"
   es_refresh_interval       = var.es_refresh_interval
   es_kubernetes_secret_name = "pvtcertificate-tls" #tfsec:ignore:general-secrets-no-plaintext-exposure #checkov:skip=CKV_SECRET_6

@@ -9,7 +9,7 @@ locals {
 }
 
 ### creating secret to store apikey to authenticate on secretsmanager for apikey authentication
-resource "kubernetes_secret" "eso_clusterstore_secret" {
+resource "kubernetes_secret_v1" "eso_clusterstore_secret" {
   count = var.eso_authentication == "api_key" ? 1 : 0
   metadata {
     name      = var.clusterstore_secret_name
@@ -55,7 +55,7 @@ resource "helm_release" "cluster_secret_store_apikey" {
   ]
 
   depends_on = [
-    kubernetes_secret.eso_clusterstore_secret
+    kubernetes_secret_v1.eso_clusterstore_secret
   ]
 }
 

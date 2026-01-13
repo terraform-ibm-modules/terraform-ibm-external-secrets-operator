@@ -68,7 +68,7 @@ module "sm_cstore_arbitrary_secret_tp" {
 }
 
 # Creating the namespaces for TP authentication clusterstore to store the secrets
-resource "kubernetes_namespace" "clusterstore_tpauth_secrets_namespace" {
+resource "kubernetes_namespace_v1" "clusterstore_tpauth_secrets_namespace" {
   metadata {
     name = local.cstore_tp_namespace
   }
@@ -88,7 +88,7 @@ module "cstore_external_secret_tp" {
   depends_on                    = [module.eso_clusterstore_tpauth]
   source                        = "../../modules/eso-external-secret"
   eso_store_scope               = "cluster"
-  es_kubernetes_namespace       = kubernetes_namespace.clusterstore_tpauth_secrets_namespace.metadata[0].name
+  es_kubernetes_namespace       = kubernetes_namespace_v1.clusterstore_tpauth_secrets_namespace.metadata[0].name
   es_kubernetes_secret_name     = "${var.prefix}-arbitrary-arb-cstore-tp"        #checkov:skip=CKV_SECRET_6
   sm_secret_type                = "arbitrary"                                    #checkov:skip=CKV_SECRET_6
   sm_secret_id                  = module.sm_cstore_arbitrary_secret_tp.secret_id #checkov:skip=CKV_SECRET_6

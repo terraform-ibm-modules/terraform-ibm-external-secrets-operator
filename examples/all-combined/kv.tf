@@ -44,7 +44,7 @@ module "external_secret_kv_singlekey" {
   es_kubernetes_secret_type = "opaque" #checkov:skip=CKV_SECRET_6
   sm_secret_type            = "kv"     #tfsec:ignore:general-secrets-no-plaintext-exposure
   sm_secret_id              = ibm_sm_kv_secret.secrets_manager_kv_secret_singlekey.secret_id
-  es_kubernetes_namespace   = kubernetes_namespace.apikey_namespaces[3].metadata[0].name
+  es_kubernetes_namespace   = kubernetes_namespace_v1.apikey_namespaces[3].metadata[0].name
   eso_store_name            = "${var.es_namespaces_apikey[3]}-store"
   es_refresh_interval       = var.es_refresh_interval
   es_kubernetes_secret_name = "kv-single-key" #tfsec:ignore:general-secrets-no-plaintext-exposure #checkov:skip=CKV_SECRET_6
@@ -62,7 +62,7 @@ module "external_secret_kv_multiplekeys" {
   es_kubernetes_secret_type = "opaque" #checkov:skip=CKV_SECRET_6
   sm_secret_type            = "kv"     #tfsec:ignore:general-secrets-no-plaintext-exposure
   sm_secret_id              = ibm_sm_kv_secret.secrets_manager_kv_secret_multiplekeys.secret_id
-  es_kubernetes_namespace   = kubernetes_namespace.apikey_namespaces[3].metadata[0].name
+  es_kubernetes_namespace   = kubernetes_namespace_v1.apikey_namespaces[3].metadata[0].name
   eso_store_name            = "${var.es_namespaces_apikey[3]}-store"
   es_refresh_interval       = var.es_refresh_interval
   es_kubernetes_secret_name = "kv-multiple-keys" #tfsec:ignore:general-secrets-no-plaintext-exposure #checkov:skip=CKV_SECRET_6

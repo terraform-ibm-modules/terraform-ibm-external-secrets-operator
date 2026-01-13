@@ -5,7 +5,7 @@
 ####################################################################################
 
 # Create namespaces for trusted profile auth secretsstores
-resource "kubernetes_namespace" "tp_namespaces" {
+resource "kubernetes_namespace_v1" "tp_namespaces" {
   count = length(var.es_namespaces_tp)
   metadata {
     name = var.es_namespaces_tp[count.index]
@@ -28,7 +28,7 @@ module "eso_tp_namespace_secretstores" {
   source                      = "../../modules/eso-secretstore"
   eso_authentication          = "trusted_profile"
   region                      = local.sm_region
-  sstore_namespace            = kubernetes_namespace.tp_namespaces[count.index].metadata[0].name
+  sstore_namespace            = kubernetes_namespace_v1.tp_namespaces[count.index].metadata[0].name
   sstore_secrets_manager_guid = local.sm_guid
   sstore_store_name           = "${var.es_namespaces_tp[count.index]}-store" # each store created with the name of the namespace with "-store" as suffix
   sstore_trusted_profile_name = module.external_secrets_trusted_profiles[count.index].trusted_profile_name
@@ -89,7 +89,7 @@ module "external_secret_tp" {
   count                         = length(var.es_namespaces_tp)
   source                        = "../../modules/eso-external-secret"
   eso_store_scope               = "namespace"
-  es_kubernetes_namespace       = kubernetes_namespace.tp_namespaces[count.index].metadata[0].name
+  es_kubernetes_namespace       = kubernetes_namespace_v1.tp_namespaces[count.index].metadata[0].name
   es_kubernetes_secret_name     = "${var.prefix}-arbitrary-arb-tp-${count.index}"       #checkov:skip=CKV_SECRET_6
   sm_secret_type                = "arbitrary"                                           #checkov:skip=CKV_SECRET_6
   sm_secret_id                  = module.sm_arbitrary_secrets_tp[count.index].secret_id #checkov:skip=CKV_SECRET_6
@@ -107,7 +107,7 @@ module "external_secret_tp" {
 ######################################################################################################
 
 # Create namespace for tp auth with policy for multiple secrets groups
-resource "kubernetes_namespace" "tp_namespace_multisg" {
+resource "kubernetes_namespace_v1" "tp_namespace_multisg" {
   metadata {
     name = var.es_namespace_tp_multi_sg
   }
@@ -128,7 +128,7 @@ module "eso_tp_namespace_secretstore_multisg" {
   source                      = "../../modules/eso-secretstore"
   eso_authentication          = "trusted_profile"
   region                      = local.sm_region
-  sstore_namespace            = kubernetes_namespace.tp_namespace_multisg.metadata[0].name
+  sstore_namespace            = kubernetes_namespace_v1.tp_namespace_multisg.metadata[0].name
   sstore_secrets_manager_guid = local.sm_guid
   sstore_store_name           = "${var.es_namespace_tp_multi_sg}-store" # each store created with the name of the namespace with "-store" as suffix
   sstore_trusted_profile_name = module.external_secrets_trusted_profile_multisg.trusted_profile_name
@@ -214,7 +214,7 @@ module "external_secret_tp_multisg_1" {
   ]
   source                        = "../../modules/eso-external-secret"
   eso_store_scope               = "namespace"
-  es_kubernetes_namespace       = kubernetes_namespace.tp_namespace_multisg.metadata[0].name
+  es_kubernetes_namespace       = kubernetes_namespace_v1.tp_namespace_multisg.metadata[0].name
   es_kubernetes_secret_name     = "${var.prefix}-arbitrary-arb-tp-multisg-1"        #checkov:skip=CKV_SECRET_6
   sm_secret_type                = "arbitrary"                                       #checkov:skip=CKV_SECRET_6
   sm_secret_id                  = module.sm_arbitrary_secret_tp_multisg_1.secret_id #checkov:skip=CKV_SECRET_6
@@ -234,7 +234,7 @@ module "external_secret_tp_multisg_2" {
   ]
   source                        = "../../modules/eso-external-secret"
   eso_store_scope               = "namespace"
-  es_kubernetes_namespace       = kubernetes_namespace.tp_namespace_multisg.metadata[0].name
+  es_kubernetes_namespace       = kubernetes_namespace_v1.tp_namespace_multisg.metadata[0].name
   es_kubernetes_secret_name     = "${var.prefix}-arbitrary-arb-tp-multisg-2"        #checkov:skip=CKV_SECRET_6
   sm_secret_type                = "arbitrary"                                       #checkov:skip=CKV_SECRET_6
   sm_secret_id                  = module.sm_arbitrary_secret_tp_multisg_2.secret_id #checkov:skip=CKV_SECRET_6
@@ -252,7 +252,7 @@ module "external_secret_tp_multisg_2" {
 ######################################################################################################
 
 # Create namespace for trusted profile authentication with policy without secrets group
-resource "kubernetes_namespace" "tp_namespace_tpnosg" {
+resource "kubernetes_namespace_v1" "tp_namespace_tpnosg" {
   metadata {
     name = var.es_namespace_tp_no_sg
   }
@@ -273,7 +273,7 @@ module "eso_tp_namespace_secretstore_nosecgroup" {
   source                      = "../../modules/eso-secretstore"
   eso_authentication          = "trusted_profile"
   region                      = local.sm_region
-  sstore_namespace            = kubernetes_namespace.tp_namespace_tpnosg.metadata[0].name
+  sstore_namespace            = kubernetes_namespace_v1.tp_namespace_tpnosg.metadata[0].name
   sstore_secrets_manager_guid = local.sm_guid
   sstore_store_name           = "${var.es_namespace_tp_no_sg}-store" # each store created with the name of the namespace with "-store" as suffix
   sstore_trusted_profile_name = module.external_secrets_trusted_profile_nosecgroup.trusted_profile_name
@@ -330,7 +330,7 @@ module "external_secret_tp_nosg" {
   ]
   source                        = "../../modules/eso-external-secret"
   eso_store_scope               = "namespace"
-  es_kubernetes_namespace       = kubernetes_namespace.tp_namespace_tpnosg.metadata[0].name
+  es_kubernetes_namespace       = kubernetes_namespace_v1.tp_namespace_tpnosg.metadata[0].name
   es_kubernetes_secret_name     = "${var.prefix}-arbitrary-arb-tp-nosg"              #checkov:skip=CKV_SECRET_6
   sm_secret_type                = "arbitrary"                                        #checkov:skip=CKV_SECRET_6
   sm_secret_id                  = module.sm_arbitrary_secret_tp_nosecgroup.secret_id #checkov:skip=CKV_SECRET_6
