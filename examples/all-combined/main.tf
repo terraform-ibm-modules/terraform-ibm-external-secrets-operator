@@ -186,7 +186,7 @@ module "network_acl" {
 # OCP CLUSTER creation
 module "ocp_base" {
   source               = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  version              = "3.74.0"
+  version              = "3.77.4"
   cluster_name         = "${var.prefix}-vpc"
   resource_group_id    = module.resource_group.resource_group_id
   region               = var.region
@@ -270,7 +270,7 @@ module "external_secrets_operator" {
   source        = "../../"
   eso_namespace = var.eso_namespace
   depends_on = [
-    kubernetes_namespace.apikey_namespaces, kubernetes_namespace.tp_namespaces
+    kubernetes_namespace_v1.apikey_namespaces, kubernetes_namespace_v1.tp_namespaces
   ]
 }
 
@@ -280,7 +280,7 @@ module "external_secrets_operator" {
 ##################################################################
 
 # Creating the namespaces for apikey authentication secrets stores
-resource "kubernetes_namespace" "apikey_namespaces" {
+resource "kubernetes_namespace_v1" "apikey_namespaces" {
   count = length(var.es_namespaces_apikey)
   metadata {
     name = var.es_namespaces_apikey[count.index]

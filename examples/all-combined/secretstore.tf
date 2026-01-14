@@ -15,7 +15,7 @@ module "eso_apikey_namespace_secretstore_1" {
   source                      = "../../modules/eso-secretstore"
   eso_authentication          = "api_key"
   region                      = local.sm_region
-  sstore_namespace            = kubernetes_namespace.apikey_namespaces[2].metadata[0].name
+  sstore_namespace            = kubernetes_namespace_v1.apikey_namespaces[2].metadata[0].name
   sstore_secrets_manager_guid = local.sm_guid
   sstore_store_name           = "${var.es_namespaces_apikey[2]}-store"
   sstore_secret_apikey        = data.ibm_sm_iam_credentials_secret.secret_puller_secret.api_key
@@ -29,7 +29,7 @@ module "eso_apikey_namespace_secretstore_2" {
   source                      = "../../modules/eso-secretstore"
   eso_authentication          = "api_key"
   region                      = local.sm_region
-  sstore_namespace            = kubernetes_namespace.apikey_namespaces[3].metadata[0].name
+  sstore_namespace            = kubernetes_namespace_v1.apikey_namespaces[3].metadata[0].name
   sstore_secrets_manager_guid = local.sm_guid
   sstore_store_name           = "${var.es_namespaces_apikey[3]}-store"
   sstore_secret_apikey        = data.ibm_sm_iam_credentials_secret.secret_puller_secret.api_key
@@ -75,7 +75,7 @@ module "external_secret_arbitrary_cr_registry" {
   es_kubernetes_secret_type   = "dockerconfigjson" #checkov:skip=CKV_SECRET_6
   sm_secret_type              = "arbitrary"
   sm_secret_id                = module.sm_arbitrary_imagepull_secret.secret_id
-  es_kubernetes_namespace     = kubernetes_namespace.apikey_namespaces[2].metadata[0].name
+  es_kubernetes_namespace     = kubernetes_namespace_v1.apikey_namespaces[2].metadata[0].name
   es_container_registry       = "test.icr.com"
   es_container_registry_email = "terraform@ibm.com"
   eso_store_name              = "${var.es_namespaces_apikey[2]}-store"
@@ -114,7 +114,7 @@ module "external_secret_secret_image_pull" {
   es_kubernetes_secret_type   = "dockerconfigjson" #checkov:skip=CKV_SECRET_6
   sm_secret_type              = "iam_credentials"  #tfsec:ignore:general-secrets-no-plaintext-exposure
   sm_secret_id                = module.image_pull.serviceid_apikey_secret_id
-  es_kubernetes_namespace     = kubernetes_namespace.apikey_namespaces[3].metadata[0].name
+  es_kubernetes_namespace     = kubernetes_namespace_v1.apikey_namespaces[3].metadata[0].name
   es_container_registry       = "test.icr.com"
   es_container_registry_email = "terraform@ibm.com"
   es_refresh_interval         = var.es_refresh_interval
@@ -185,7 +185,7 @@ module "external_secret_secret_image_pull_chain" {
   eso_store_name            = "${var.es_namespaces_apikey[3]}-store"
   es_kubernetes_secret_name = "dockerconfigjson-chain"
   es_helm_rls_name          = "es-docker-iam-chain"
-  es_kubernetes_namespace   = kubernetes_namespace.apikey_namespaces[3].metadata[0].name
+  es_kubernetes_namespace   = kubernetes_namespace_v1.apikey_namespaces[3].metadata[0].name
   sm_secret_id              = null # null is accepted only in the case of a dockerjsonconfig secret with secrets chain
   es_container_registry_secrets_chain = [
     {

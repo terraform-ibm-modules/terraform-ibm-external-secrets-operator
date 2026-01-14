@@ -198,7 +198,7 @@ module "network_acl" {
 # OCP CLUSTER creation
 module "ocp_base" {
   source               = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  version              = "3.74.0"
+  version              = "3.77.4"
   cluster_name         = "${var.prefix}-vpc"
   resource_group_id    = module.resource_group.resource_group_id
   region               = var.region
@@ -229,7 +229,7 @@ resource "time_sleep" "wait_45_seconds" {
 }
 
 # Create namespace for apikey auth
-resource "kubernetes_namespace" "apikey_namespace" {
+resource "kubernetes_namespace_v1" "apikey_namespace" {
 
   metadata {
     name = local.es_namespace_apikey
@@ -309,7 +309,7 @@ module "external_secrets_operator" {
   source        = "../../"
   eso_namespace = local.eso_namespace
   depends_on = [
-    kubernetes_namespace.apikey_namespace
+    kubernetes_namespace_v1.apikey_namespace
   ]
 }
 #
@@ -400,7 +400,7 @@ module "external_secret_usr_pass" {
   es_kubernetes_secret_type = "dockerconfigjson"  #checkov:skip=CKV_SECRET_6
   sm_secret_type            = "username_password" #checkov:skip=CKV_SECRET_6
   sm_secret_id              = module.sm_userpass_secret.secret_id
-  es_kubernetes_namespace   = kubernetes_namespace.apikey_namespace.metadata[0].name
+  es_kubernetes_namespace   = kubernetes_namespace_v1.apikey_namespace.metadata[0].name
   eso_store_name            = "cluster-store"
   es_container_registry     = "example-registry-local.artifactory.com"
   es_kubernetes_secret_name = "dockerconfigjson-uc" #checkov:skip=CKV_SECRET_6
