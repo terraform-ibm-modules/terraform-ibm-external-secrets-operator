@@ -2,8 +2,11 @@
 package test
 
 import (
+	"bytes"
+	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -69,6 +72,36 @@ var acmeLEPrivateKeySecretId string
 
 // terraform vars for all-combined test (including Upgrade one)
 var allCombinedTerraformVars map[string]interface{}
+
+// temporary functions to handle workaround for IKS API key issue
+// https://github.com/terraform-ibm-modules/terraform-ibm-base-ocp-vpc?tab=readme-ov-file#the-specified-api-key-could-not-be-found
+
+func validateEnvVariable(t *testing.T, varName string) string {
+	val, present := os.LookupEnv(varName)
+	require.True(t, present, "%s environment variable not set", varName)
+	require.NotEqual(t, "", val, "%s environment variable is empty", varName)
+	return val
+}
+
+func createContainersApikey(t *testing.T, region string, rg string) {
+
+	err := os.Setenv("IBMCLOUD_API_KEY", validateEnvVariable(t, "TF_VAR_ibmcloud_api_key"))
+	require.NoError(t, err, "Failed to set IBMCLOUD_API_KEY environment variable")
+	scriptPath := "../common-dev-assets/scripts/iks-api-key-reset/reset_iks_api_key.sh"
+	cmd := exec.Command("bash", scriptPath, region, rg)
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	// Execute the command
+	if err := cmd.Run(); err != nil {
+		log.Fatalf("Failed to execute script: %v\nStderr: %s", err, stderr.String())
+	}
+	// Print script output
+	fmt.Println(stdout.String())
+}
+
+// end of temporary workaround functions
 
 // TestMain will be run before any parallel tests, used to read data from yaml for use with tests
 func TestMain(m *testing.M) {
@@ -195,6 +228,9 @@ func TestRunDefaultExample(t *testing.T) {
 
 	options := setupOptions(t, "eso", defaultExampleTerraformDir, allCombinedTerraformVars)
 
+	// Temp workaround for https://github.com/terraform-ibm-modules/terraform-ibm-base-ocp-vpc?tab=readme-ov-file#the-specified-api-key-could-not-be-found
+	createContainersApikey(t, options.Region, resourceGroup)
+
 	options.SkipTestTearDown = true
 	defer func() {
 		options.TestTearDown()
@@ -264,6 +300,10 @@ func TestRunUpgradeExample(t *testing.T) {
 	t.Parallel()
 
 	options := setupOptions(t, "eso-upg", defaultExampleTerraformDir, allCombinedTerraformVars)
+
+	// Temp workaround for https://github.com/terraform-ibm-modules/terraform-ibm-base-ocp-vpc?tab=readme-ov-file#the-specified-api-key-could-not-be-found
+	createContainersApikey(t, options.Region, resourceGroup)
+
 	output, err := options.RunTestUpgrade()
 	if !options.UpgradeTestSkipped {
 		assert.Nil(t, err, "This should not have errored")
@@ -280,6 +320,9 @@ func TestReloaderOperational(t *testing.T) {
 	reloaderTerraformVars["existing_sm_instance_region"] = smRegion
 
 	options := setupOptions(t, "reloader", basicExampleTerraformDir, reloaderTerraformVars)
+
+	// Temp workaround for https://github.com/terraform-ibm-modules/terraform-ibm-base-ocp-vpc?tab=readme-ov-file#the-specified-api-key-could-not-be-found
+	createContainersApikey(t, options.Region, resourceGroup)
 
 	options.SkipTestTearDown = true
 	defer func() {
@@ -751,6 +794,9 @@ func TestRunFullConfigSolutionSchematics(t *testing.T) {
 	// needed by solution
 	existingResourceOptions := setupOptionsSchematics(t, "eso-cluster-full", existingResourcesTerraformDir)
 
+	// Temp workaround for https://github.com/terraform-ibm-modules/terraform-ibm-base-ocp-vpc?tab=readme-ov-file#the-specified-api-key-could-not-be-found
+	createContainersApikey(t, existingResourceOptions.Region, resourceGroup)
+
 	// Creates temp dirs and runs InitAndApply for existing resources
 	// outputs will be in options after apply
 
@@ -777,6 +823,9 @@ func TestRunFullConfigSolutionUpgradeSchematics(t *testing.T) {
 	// set up the options for existing resource deployment
 	// needed by solution
 	existingResourceOptions := setupOptionsSchematics(t, "eso-cluster-fupg", existingResourcesTerraformDir)
+
+	// Temp workaround for https://github.com/terraform-ibm-modules/terraform-ibm-base-ocp-vpc?tab=readme-ov-file#the-specified-api-key-could-not-be-found
+	createContainersApikey(t, existingResourceOptions.Region, resourceGroup)
 
 	// Creates temp dirs and runs InitAndApply for existing resources
 	// outputs will be in options after apply
