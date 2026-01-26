@@ -215,6 +215,7 @@ func setupOptions(t *testing.T, prefix string, terraformDir string, terraformVar
 			List: []string{
 				// adding resources to ignore for modules version update - to be removed after the merge
 				"module.ocp_base.time_sleep.wait_operators",
+				"module.ocp_base.null_resource.install_required_binaries[0]",
 			},
 		},
 		CheckApplyResultForUpgrade: true,
