@@ -306,7 +306,7 @@ resource "ibm_iam_service_policy" "secret_puller_policy" {
 ##################################################################
 
 module "external_secrets_operator" {
-  source        = "../../"
+  source        = "git::https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator.git?ref=main"
   eso_namespace = local.eso_namespace
   depends_on = [
     kubernetes_namespace_v1.apikey_namespace
