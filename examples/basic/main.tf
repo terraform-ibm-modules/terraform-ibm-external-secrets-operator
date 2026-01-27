@@ -342,7 +342,7 @@ data "ibm_sm_iam_credentials_secret" "secret_puller_secret" {
 # ESO ClusterStore creation with apikey authentication
 ##################################################################
 module "eso_clusterstore" {
-  source                            = "../../modules/eso-clusterstore"
+  source                            = "./modules/eso-clusterstore"
   eso_authentication                = "api_key"
   clusterstore_secret_apikey        = data.ibm_sm_iam_credentials_secret.secret_puller_secret.api_key
   region                            = local.sm_region
@@ -396,7 +396,7 @@ module "sm_userpass_secret" {
 # ESO externalsecret with cluster scope creating a dockerconfigjson type secret
 module "external_secret_usr_pass" {
   depends_on                = [module.external_secrets_operator]
-  source                    = "../../modules/eso-external-secret"
+  source                    = "./modules/eso-external-secret"
   es_kubernetes_secret_type = "dockerconfigjson"  #checkov:skip=CKV_SECRET_6
   sm_secret_type            = "username_password" #checkov:skip=CKV_SECRET_6
   sm_secret_id              = module.sm_userpass_secret.secret_id

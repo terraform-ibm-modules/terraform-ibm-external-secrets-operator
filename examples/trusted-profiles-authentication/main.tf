@@ -85,7 +85,7 @@ module "sm_arbitrary_secrets" {
 # creating trusted profiles
 module "external_secrets_trusted_profiles" {
   count                           = length(kubernetes_namespace_v1.examples)
-  source                          = "../../modules/eso-trusted-profile"
+  source                          = "./modules/eso-trusted-profile"
   trusted_profile_name            = "${local.trusted_profile_name}_${count.index}"
   secrets_manager_guid            = local.sm_guid
   secret_groups_id                = [module.secrets_manager_groups[count.index].secret_group_id]
