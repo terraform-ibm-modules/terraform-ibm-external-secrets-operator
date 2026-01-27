@@ -36,7 +36,7 @@ resource "ibm_resource_instance" "secrets_manager" {
 # create secrets group for secrets
 module "secrets_manager_group" {
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.3.36"
+  version                  = "1.3.39"
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = "${var.prefix}-secret-group"                   #checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
@@ -49,7 +49,7 @@ module "secrets_manager_group" {
 # additional secrets manager secret group for service level secrets
 module "secrets_manager_group_acct" {
   source               = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version              = "1.3.36"
+  version              = "1.3.39"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   #tfsec:ignore:general-secrets-no-plaintext-exposure
@@ -86,7 +86,7 @@ resource "ibm_iam_service_policy" "secret_puller_policy" {
 # create dynamic Service ID API key and add to secret manager
 module "dynamic_serviceid_apikey1" {
   source  = "terraform-ibm-modules/iam-serviceid-apikey-secrets-manager/ibm"
-  version = "1.2.19"
+  version = "1.2.20"
   region  = local.sm_region
   #tfsec:ignore:general-secrets-no-plaintext-exposure
   sm_iam_secret_name        = "${var.prefix}-${var.sm_iam_secret_name}"
