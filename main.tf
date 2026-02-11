@@ -9,7 +9,7 @@
 module "eso_namespace" {
   count   = var.eso_namespace != null ? 1 : 0
   source  = "terraform-ibm-modules/namespace/ibm"
-  version = "2.0.0"
+  version = "2.0.1"
   namespaces = [
     {
       name = var.eso_namespace

@@ -38,7 +38,7 @@ resource "time_sleep" "wait_30_seconds_for_creation" {
 
 module "dynamic_serviceid_apikey" {
   source  = "terraform-ibm-modules/iam-serviceid-apikey-secrets-manager/ibm"
-  version = "1.2.20"
+  version = "1.2.21"
   region  = var.region
   #tfsec:ignore:general-secrets-no-plaintext-exposure
   sm_iam_secret_name                = var.service_id_secret_name
