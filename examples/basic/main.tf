@@ -316,7 +316,7 @@ module "external_secrets_operator" {
 ## Create dynamic Service ID API key and add to secret manager
 module "dynamic_serviceid_apikey1" {
   source  = "terraform-ibm-modules/iam-serviceid-apikey-secrets-manager/ibm"
-  version = "1.2.21"
+  version = "1.3.0"
   region  = local.sm_region
   #tfsec:ignore:general-secrets-no-plaintext-exposure
   sm_iam_secret_name        = "${var.prefix}-${var.sm_iam_secret_name}"

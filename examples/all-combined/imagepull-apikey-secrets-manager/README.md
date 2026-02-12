@@ -15,7 +15,7 @@ This module generate and store a service ID API key in IBM Cloud Secrets Manager
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_dynamic_serviceid_apikey"></a> [dynamic\_serviceid\_apikey](#module\_dynamic\_serviceid\_apikey) | terraform-ibm-modules/iam-serviceid-apikey-secrets-manager/ibm | 1.2.21 |
+| <a name="module_dynamic_serviceid_apikey"></a> [dynamic\_serviceid\_apikey](#module\_dynamic\_serviceid\_apikey) | terraform-ibm-modules/iam-serviceid-apikey-secrets-manager/ibm | 1.3.0 |
 
 ### Resources
 

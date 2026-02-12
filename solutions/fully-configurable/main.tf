@@ -322,7 +322,7 @@ module "cluster_secrets_store_account_serviceid_apikey" {
     }
   })
   source  = "terraform-ibm-modules/iam-serviceid-apikey-secrets-manager/ibm"
-  version = "1.2.21"
+  version = "1.3.0"
   region  = local.sm_region
   #tfsec:ignore:general-secrets-no-plaintext-exposure
   sm_iam_secret_name        = try("${local.prefix}-${each.key}-${each.value.accountServiceID}-apikey", "${each.key}-${each.value.accountServiceID}-apikey")
@@ -581,7 +581,7 @@ module "secrets_store_account_serviceid_apikey" {
     }
   })
   source  = "terraform-ibm-modules/iam-serviceid-apikey-secrets-manager/ibm"
-  version = "1.2.21"
+  version = "1.3.0"
   region  = local.sm_region
   #tfsec:ignore:general-secrets-no-plaintext-exposure
   sm_iam_secret_name        = try("${local.prefix}-${each.key}-${each.value.accountServiceID}-apikey", "${each.key}-${each.value.accountServiceID}-apikey")
