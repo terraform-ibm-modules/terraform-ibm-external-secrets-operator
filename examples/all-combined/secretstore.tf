@@ -50,7 +50,7 @@ locals {
 # create the arbitrary secret and store in secret manager
 module "sm_arbitrary_imagepull_secret" {
   source               = "terraform-ibm-modules/secrets-manager-secret/ibm"
-  version              = "1.9.13"
+  version              = "1.9.14"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   secret_group_id      = module.secrets_manager_group.secret_group_id
