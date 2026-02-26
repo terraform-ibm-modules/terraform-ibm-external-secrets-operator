@@ -1,11 +1,11 @@
 module github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator
 
-go 1.26
+go 1.26.0
 
 require (
 	github.com/gruntwork-io/terratest v0.56.0
 	github.com/stretchr/testify v1.11.1
-	github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper v1.68.2
+	github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper v1.69.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/apimachinery v0.35.1
 )
