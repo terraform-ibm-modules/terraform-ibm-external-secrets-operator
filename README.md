@@ -9,7 +9,6 @@
 
 This module automates the installation and configuration of the [External Secrets Operator](https://external-secrets.io/) in a cluster.
 
-
 <!-- Below content is automatically populated via pre-commit hook -->
 <!-- BEGIN OVERVIEW HOOK -->
 ## Overview
