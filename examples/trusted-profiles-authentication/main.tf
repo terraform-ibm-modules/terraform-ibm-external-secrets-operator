@@ -41,7 +41,7 @@ resource "ibm_resource_instance" "secrets_manager" {
 
 module "secrets_manager_groups" {
   source               = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version              = "1.4.5"
+  version              = "1.4.6"
   count                = length(kubernetes_namespace_v1.examples)
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
