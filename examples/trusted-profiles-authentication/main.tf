@@ -41,7 +41,7 @@ resource "ibm_resource_instance" "secrets_manager" {
 
 module "secrets_manager_groups" {
   source               = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version              = "1.4.6"
+  version              = "1.4.7"
   count                = length(kubernetes_namespace_v1.examples)
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
@@ -166,7 +166,7 @@ module "external_secrets" {
 
 module "vpes" {
   source   = "terraform-ibm-modules/vpe-gateway/ibm"
-  version  = "5.0.5"
+  version  = "5.0.6"
   count    = var.service_endpoints == "private" ? 1 : 0
   region   = var.region
   prefix   = "vpe"
