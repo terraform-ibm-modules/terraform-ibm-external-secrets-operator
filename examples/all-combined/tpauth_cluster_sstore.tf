@@ -7,7 +7,7 @@
 # creating a secrets group for clustersecretstore with trustedprofile auth
 module "tp_clusterstore_secrets_manager_group" {
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.4.6"
+  version                  = "1.4.7"
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = "${var.prefix}-cpstore-tp-secret-group"                                           #checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
