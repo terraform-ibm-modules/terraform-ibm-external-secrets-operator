@@ -33,6 +33,7 @@ resource "helm_release" "cluster_secret_store_apikey" {
   chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
   version   = local.helm_raw_chart_version
   timeout   = 600
+  atomic    = true
   values = [
     <<-EOF
     resources:
@@ -68,6 +69,7 @@ resource "helm_release" "cluster_secret_store_tp" {
   chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
   version   = local.helm_raw_chart_version
   timeout   = 600
+  atomic    = true
   values = [
     <<-EOF
     resources:
