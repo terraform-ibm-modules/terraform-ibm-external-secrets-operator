@@ -103,7 +103,7 @@ module "vpc" {
   create_gateway              = true
   public_gateway_name_prefix  = "${var.prefix}-pw"
   number_of_addresses         = 16
-  auto_assign_address_prefix  = false
+  auto_assign_address_prefix  = true
 }
 
 module "subnet_prefix" {
