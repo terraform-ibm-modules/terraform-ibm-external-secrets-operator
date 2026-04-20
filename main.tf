@@ -5,7 +5,7 @@
 ##############################################################################
 
 
-# creating namespace to deploy ESO into RedHat ServiceMesh
+# creating namespace to deploy ESO in RedHat ServiceMesh
 module "eso_namespace" {
   count   = var.eso_namespace != null ? 1 : 0
   source  = "terraform-ibm-modules/namespace/ibm"
