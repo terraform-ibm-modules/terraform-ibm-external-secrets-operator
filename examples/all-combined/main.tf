@@ -4,7 +4,7 @@
 
 module "resource_group" {
   source  = "terraform-ibm-modules/resource-group/ibm"
-  version = "1.4.8"
+  version = "1.6.0"
   # if an existing resource group is not set (null) create a new one using prefix
   resource_group_name          = var.resource_group == null ? "${var.prefix}-resource-group" : null
   existing_resource_group_name = var.resource_group
@@ -79,7 +79,7 @@ module "zone_subnet_addrs" {
 
 module "vpc" {
   source                      = "terraform-ibm-modules/vpc/ibm"
-  version                     = "1.5.4"
+  version                     = "1.6.0"
   vpc_name                    = "${var.prefix}-vpc"
   resource_group_id           = module.resource_group.resource_group_id
   locations                   = []
@@ -91,12 +91,12 @@ module "vpc" {
   create_gateway              = true
   public_gateway_name_prefix  = "${var.prefix}-pw"
   number_of_addresses         = 16
-  auto_assign_address_prefix  = false
+  auto_assign_address_prefix  = true
 }
 
 module "subnet_prefix" {
   source   = "terraform-ibm-modules/vpc/ibm//modules/vpc-address-prefix"
-  version  = "1.5.4"
+  version  = "1.6.0"
   count    = length(local.subnet_prefix)
   name     = "${var.prefix}-z-${local.subnet_prefix[count.index].label}-${split("-", local.subnet_prefix[count.index].zone)[2]}"
   location = local.subnet_prefix[count.index].zone
@@ -108,7 +108,7 @@ module "subnet_prefix" {
 module "subnets" {
   depends_on                 = [module.subnet_prefix]
   source                     = "terraform-ibm-modules/vpc/ibm//modules/subnet"
-  version                    = "1.5.4"
+  version                    = "1.6.0"
   count                      = length(local.subnet_prefix)
   location                   = local.subnet_prefix[count.index].zone
   vpc_id                     = module.vpc.vpc.vpc_id
@@ -120,7 +120,7 @@ module "subnets" {
 
 module "public_gateways" {
   source            = "terraform-ibm-modules/vpc/ibm//modules/public-gateway"
-  version           = "1.5.4"
+  version           = "1.6.0"
   count             = length(var.zones)
   vpc_id            = module.vpc.vpc.vpc_id
   location          = "${var.region}-${var.zones[count.index]}"
@@ -130,7 +130,7 @@ module "public_gateways" {
 
 module "security_group" {
   source                = "terraform-ibm-modules/vpc/ibm//modules/security-group"
-  version               = "1.5.4"
+  version               = "1.6.0"
   depends_on            = [module.vpc]
   create_security_group = false
   resource_group_id     = module.resource_group.resource_group_id
@@ -176,7 +176,7 @@ locals {
 
 module "network_acl" {
   source            = "terraform-ibm-modules/vpc/ibm//modules/network-acl"
-  version           = "1.5.4"
+  version           = "1.6.0"
   name              = "${var.prefix}-vpc-acl"
   vpc_id            = module.vpc.vpc.vpc_id
   resource_group_id = module.resource_group.resource_group_id
@@ -186,7 +186,7 @@ module "network_acl" {
 # OCP CLUSTER creation
 module "ocp_base" {
   source               = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  version              = "3.82.3"
+  version              = "3.84.0"
   cluster_name         = "${var.prefix}-vpc"
   resource_group_id    = module.resource_group.resource_group_id
   region               = var.region
@@ -208,6 +208,7 @@ module "ocp_base" {
 data "ibm_container_cluster_config" "cluster_config" {
   cluster_name_id   = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
+  config_dir        = "${path.module}/kubeconfig"
 }
 
 # Wait time to allow cluster refreshes components after provisioning
@@ -231,7 +232,7 @@ data "ibm_cis" "cis_instance" {
 
 module "vpes" {
   source   = "terraform-ibm-modules/vpe-gateway/ibm"
-  version  = "5.1.0"
+  version  = "5.2.0"
   count    = var.service_endpoints == "private" ? 1 : 0
   region   = var.region
   prefix   = "vpe"
