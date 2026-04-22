@@ -176,7 +176,7 @@ resource "helm_release" "external_secrets_operator" {
   chart      = "external-secrets"
   version    = var.eso_chart_version
   wait       = true
-  atomic     = true
+  atomic     = var.rollback_on_failure
   repository = var.eso_chart_location
 
   set = [{
@@ -242,7 +242,7 @@ resource "helm_release" "pod_reloader" {
   repository = var.reloader_chart_location
   version    = var.reloader_chart_version
   wait       = true
-  atomic     = true
+  atomic     = var.rollback_on_failure
 
   set = concat([
     {

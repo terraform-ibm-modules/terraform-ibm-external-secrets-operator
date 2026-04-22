@@ -566,6 +566,7 @@ You need the following permissions to run this module.
 | <a name="input_reloader_resource_label_selector"></a> [reloader\_resource\_label\_selector](#input\_reloader\_resource\_label\_selector) | List of comma separated label selectors, if multiple are provided they are combined with the AND operator | `string` | `null` | no |
 | <a name="input_reloader_resources_to_ignore"></a> [reloader\_resources\_to\_ignore](#input\_reloader\_resources\_to\_ignore) | List of comma separated resources to ignore for reloader. If multiple are provided they are combined with the AND operator | `string` | `null` | no |
 | <a name="input_reloader_sync_after_restart"></a> [reloader\_sync\_after\_restart](#input\_reloader\_sync\_after\_restart) | Enable sync after Reloader restarts for Add events, works only when reloadOnCreate is true | `bool` | `true` | no |
+| <a name="input_rollback_on_failure"></a> [rollback\_on\_failure](#input\_rollback\_on\_failure) | Flag to automatically rollback the helm chart on installation failure. | `bool` | `true` | no |
 
 ### Outputs
 
