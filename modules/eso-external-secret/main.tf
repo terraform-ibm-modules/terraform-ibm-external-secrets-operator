@@ -109,7 +109,7 @@ resource "helm_release" "kubernetes_secret" {
   chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
   version   = local.helm_raw_chart_version
   timeout   = 600
-  atomic    = true
+  atomic    = var.rollback_on_failure
   values = [
     <<-EOF
     resources:
@@ -149,7 +149,7 @@ resource "helm_release" "kubernetes_secret_chain_list" {
   chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
   version   = local.helm_raw_chart_version
   timeout   = 600
-  atomic    = true
+  atomic    = var.rollback_on_failure
   values = [
     <<-EOF
     resources:
@@ -192,7 +192,7 @@ resource "helm_release" "kubernetes_secret_user_pw" {
   chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
   version   = local.helm_raw_chart_version
   timeout   = 600
-  atomic    = true
+  atomic    = var.rollback_on_failure
   values = [
     <<-EOF
     resources:
@@ -237,7 +237,7 @@ resource "helm_release" "kubernetes_secret_certificate" {
   chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
   version   = local.helm_raw_chart_version
   timeout   = 600
-  atomic    = true
+  atomic    = var.rollback_on_failure
   values = [
     <<-EOF
     resources:
@@ -275,7 +275,7 @@ resource "helm_release" "kubernetes_secret_kv_key" {
   chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
   version   = local.helm_raw_chart_version
   timeout   = 600
-  atomic    = true
+  atomic    = var.rollback_on_failure
   values = [
     <<-EOF
     resources:
@@ -316,7 +316,7 @@ resource "helm_release" "kubernetes_secret_kv_all" {
   chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
   version   = local.helm_raw_chart_version
   timeout   = 600
-  atomic    = true
+  atomic    = var.rollback_on_failure
   values = [
     <<-EOF
     resources:

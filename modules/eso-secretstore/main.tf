@@ -28,7 +28,7 @@ resource "helm_release" "external_secret_store_apikey" {
   chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
   version   = local.helm_raw_chart_version
   timeout   = 600
-  atomic    = true
+  atomic    = var.rollback_on_failure
   values = [
     <<-EOF
     resources:
@@ -59,7 +59,7 @@ resource "helm_release" "external_secret_store_tp" {
   chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
   version   = local.helm_raw_chart_version
   timeout   = 600
-  atomic    = true
+  atomic    = var.rollback_on_failure
   values = [
     <<-EOF
     resources:

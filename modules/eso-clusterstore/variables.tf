@@ -36,6 +36,12 @@ variable "clusterstore_helm_rls_name" {
   default     = "cluster-secret-store"
 }
 
+variable "rollback_on_failure" {
+  description = "Flag to automatically rollback the helm chart on installation failure."
+  type        = bool
+  default     = true
+}
+
 ##############################################################################
 # Authentication configuration for cluster secrets store that can be one of api_key or trusted_profile
 ##############################################################################
