@@ -225,3 +225,9 @@ variable "reloader_chart_version" {
   default     = "2.2.11" # registryUrl: stakater.github.io/stakater-charts
   nullable    = false
 }
+
+variable "rollback_on_failure" {
+  description = "Flag to automatically rollback the helm chart on installation failure."
+  type        = bool
+  default     = true
+}

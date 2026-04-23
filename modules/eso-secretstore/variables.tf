@@ -89,3 +89,9 @@ variable "sstore_helm_rls_name" {
   type        = string
   default     = "external-secret-store"
 }
+
+variable "rollback_on_failure" {
+  description = "Flag to automatically rollback the helm chart on installation failure."
+  type        = bool
+  default     = true
+}
