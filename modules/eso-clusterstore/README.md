@@ -62,6 +62,7 @@ No modules.
 | <a name="input_eso_authentication"></a> [eso\_authentication](#input\_eso\_authentication) | Authentication method, Possible values are api\_key or/and trusted\_profile. | `string` | `"trusted_profile"` | no |
 | <a name="input_eso_namespace"></a> [eso\_namespace](#input\_eso\_namespace) | Namespace where the ESO is deployed. It will be used to deploy the cluster secrets store | `string` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | Region where Secrets Manager is deployed. It will be used to build the regional URL to the service | `string` | n/a | yes |
+| <a name="input_rollback_on_failure"></a> [rollback\_on\_failure](#input\_rollback\_on\_failure) | Flag to automatically rollback the helm chart on installation failure. | `bool` | `true` | no |
 | <a name="input_service_endpoints"></a> [service\_endpoints](#input\_service\_endpoints) | The service endpoint type to communicate with the provided secrets manager instance. Possible values are `public` or `private`. This also will set the iam endpoint for containerAuth when enabling Trusted Profile/CR based authentication. | `string` | `"public"` | no |
 
 ### Outputs
