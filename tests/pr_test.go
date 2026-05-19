@@ -2,7 +2,8 @@
 package test
 
 import (
-	"bytes"
+	"context"
+"bytes"
 	"fmt"
 	"log"
 	"os"
@@ -287,7 +288,7 @@ func TestRunDefaultExample(t *testing.T) {
 					for secretName, secretNamespace := range secretsMap {
 						ocOptions := k8s.NewKubectlOptions("", clusterConfigPath, secretNamespace)
 						log.Printf("Testing secret name %s namespace %s\n", secretName, secretNamespace)
-						_, err := k8s.GetSecretE(t, ocOptions, secretName)
+						_, err := k8s.GetSecretContextE(context.Background(), t, ocOptions, secretName)
 						assert.Nil(t, err, "Error retrieving secret "+secretName+" in namespace "+secretNamespace)
 					}
 				}
@@ -404,7 +405,7 @@ func TestReloaderOperational(t *testing.T) {
 						}
 
 						// Get the reloader pods
-						reloaderPods, err := k8s.ListPodsE(t, k8s.NewKubectlOptions("", clusterConfigPath, esoNamespace), metav1.ListOptions{
+						reloaderPods, err := k8s.ListPodsContextE(context.Background(), t, k8s.NewKubectlOptions("", clusterConfigPath, esoNamespace), metav1.ListOptions{
 							LabelSelector: "provider=stakater,group=com.stakater.platform",
 						})
 						if assert.Nil(t, err, "Error getting reloader pods") {
@@ -434,25 +435,25 @@ func TestReloaderOperational(t *testing.T) {
 					// configure Terratest with cluster config
 					ocOptions := k8s.NewKubectlOptions("", clusterConfigPath, namespace)
 					// deploy sample app
-					applyError := k8s.KubectlApplyE(t, ocOptions, sampleApp)
+					applyError := k8s.KubectlApplyContextE(context.Background(), t, ocOptions, sampleApp)
 					if assert.Nil(t, applyError, "Error applying sample app") {
 						// confirm app is running
-						k8s.WaitUntilDeploymentAvailable(t, ocOptions, deploymentName, 20, sleepBetweenRetries)
-						k8s.WaitUntilSecretAvailable(t, ocOptions, secretName, 20, sleepBetweenRetries)
+						k8s.WaitUntilDeploymentAvailableContext(context.Background(), t, ocOptions, deploymentName, 20, sleepBetweenRetries)
+						k8s.WaitUntilSecretAvailableContext(context.Background(), t, ocOptions, secretName, 20, sleepBetweenRetries)
 						// Check that the secret value is correct
 						// Get pod name from deployment
 						pods, err := GetPodNamesFromDeployment(t, ocOptions, deploymentName)
 						if assert.Nil(t, err, "Error getting pod names") {
-							initialPod := k8s.GetPod(t, ocOptions, pods[0])
-							k8s.WaitUntilPodAvailable(t, ocOptions, initialPod.Name, 20, sleepBetweenRetries)
-							logs := k8s.GetPodLogs(t, ocOptions, initialPod, containerName)
+							initialPod := k8s.GetPodContext(context.Background(), t, ocOptions, pods[0])
+							k8s.WaitUntilPodAvailableContext(context.Background(), t, ocOptions, initialPod.Name, 20, sleepBetweenRetries)
+							logs := k8s.GetPodLogsContext(context.Background(), t, ocOptions, initialPod, containerName)
 							if assert.Contains(t, logs, secretValue, "Initial Secret value not found in logs") {
 								t.Log("Initial secret value found in logs")
 								t.Log(logs)
 							}
 
 							// update secret with updated secret
-							applyError = k8s.KubectlApplyE(t, ocOptions, updatedSecret)
+							applyError = k8s.KubectlApplyContextE(context.Background(), t, ocOptions, updatedSecret)
 							if assert.Nil(t, applyError, "Error applying updated secret") {
 								// Set a timeout duration
 								timeout := 20 * time.Second
@@ -496,11 +497,11 @@ func TestReloaderOperational(t *testing.T) {
 									}
 								}
 								if !failed {
-									k8s.WaitUntilDeploymentAvailable(t, ocOptions, deploymentName, 20, sleepBetweenRetries)
-									newPod := k8s.GetPod(t, ocOptions, newPodName)
-									k8s.WaitUntilPodAvailable(t, ocOptions, newPod.Name, 20, sleepBetweenRetries)
+									k8s.WaitUntilDeploymentAvailableContext(context.Background(), t, ocOptions, deploymentName, 20, sleepBetweenRetries)
+									newPod := k8s.GetPodContext(context.Background(), t, ocOptions, newPodName)
+									k8s.WaitUntilPodAvailableContext(context.Background(), t, ocOptions, newPod.Name, 20, sleepBetweenRetries)
 									// confirm app restarted and picked up new secret by checking logs
-									newLogs := k8s.GetPodLogs(t, ocOptions, newPod, containerName)
+									newLogs := k8s.GetPodLogsContext(context.Background(), t, ocOptions, newPod, containerName)
 									if assert.Contains(t, newLogs, updatedSecretValue, "Updated Secret value not found in logs") {
 										t.Log("Updated secret value found in logs")
 										t.Log(newLogs)
@@ -518,7 +519,7 @@ func TestReloaderOperational(t *testing.T) {
 
 func GetPodNamesFromDeployment(t *testing.T, options *k8s.KubectlOptions, deploymentName string) ([]string, error) {
 	// Get the deployment object
-	deployment, err := k8s.GetDeploymentE(t, options, deploymentName)
+	deployment, err := k8s.GetDeploymentContextE(context.Background(), t, options, deploymentName)
 	if err != nil {
 		return nil, err
 	}
@@ -527,7 +528,7 @@ func GetPodNamesFromDeployment(t *testing.T, options *k8s.KubectlOptions, deploy
 	labelSelector := metav1.FormatLabelSelector(deployment.Spec.Selector)
 
 	// List Pods using label selector
-	pods, err := k8s.ListPodsE(t, options, metav1.ListOptions{LabelSelector: labelSelector})
+	pods, err := k8s.ListPodsContextE(context.Background(), t, options, metav1.ListOptions{LabelSelector: labelSelector})
 	if err != nil {
 		return nil, err
 	}
