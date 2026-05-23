@@ -312,6 +312,7 @@ resource "ibm_iam_service_policy" "secret_puller_policy" {
 module "external_secrets_operator" {
   source        = "../../"
   eso_namespace = local.eso_namespace
+  concurrent    = 4
   depends_on = [
     kubernetes_namespace_v1.apikey_namespace
   ]
