@@ -1,312 +1,240 @@
-##############################################################################
-# External Secrets Sync Module
-#
-# Module for deploying External Secret Operator (ESO) and use it to create and synchronize Kubernetes secrets into clusters based on Secrets-Manager secrets.
-##############################################################################
+############################################################################################################
+# EXTERNAL SECRETS CONFIGURATIONS
+############################################################################################################
 
-
-# creating namespace to deploy ESO in RedHat ServiceMesh
-module "eso_namespace" {
-  count   = var.eso_namespace != null ? 1 : 0
-  source  = "terraform-ibm-modules/namespace/ibm"
-  version = "2.0.1"
-  namespaces = [
-    {
-      name = var.eso_namespace
-      metadata = {
-        name = var.eso_namespace
-        labels = {
-        }
-        annotations = {
-          "istio-injection" = var.eso_enroll_in_servicemesh == true ? "enabled" : null
-        }
-      }
-    }
-  ]
+variable "eso_namespace" {
+  description = "Namespace to create and be used to install ESO components including helm releases."
+  type        = string
+  default     = null
 }
 
-# loading existing eso namespace
-data "kubernetes_namespace_v1" "existing_eso_namespace" {
-  count = var.existing_eso_namespace != null ? 1 : 0
-  metadata {
-    name = var.existing_eso_namespace
+variable "existing_eso_namespace" {
+  description = "Existing Namespace to be used to install ESO components including helm releases."
+  type        = string
+  default     = null
+}
+
+# ESO deployment cluster nodes configuration
+variable "eso_cluster_nodes_configuration" {
+  description = "Configuration to use to customise ESO deployment on specific cluster nodes. Setting appropriate values will result in customising ESO helm release. Default value is null to keep ESO standard deployment."
+  type = object({
+    nodeSelector = object({
+      label = string
+      value = string
+    })
+    tolerations = object({
+      key      = string
+      operator = string
+      value    = string
+      effect   = string
+    })
+  })
+  default = null
+}
+
+# ESO deployment cluster pods configuration
+variable "eso_pod_configuration" {
+  description = "Configuration to use to customise ESO deployment on specific pods. Setting appropriate values will result in customising ESO helm release. Default value is {} to keep ESO standard deployment. Ignore the key if not required."
+  type = object({
+    annotations = optional(object({
+      # The annotations for external secret controller pods.
+      external_secrets = optional(map(string), {})
+      # The annotations for external secret cert controller pods.
+      external_secrets_cert_controller = optional(map(string), {})
+      # The annotations for external secret controller pods.
+      external_secrets_webhook = optional(map(string), {})
+    }), {})
+
+    labels = optional(object({
+      # The labels for external secret controller pods.
+      external_secrets = optional(map(string), {})
+      # The labels for external secret cert controller pods.
+      external_secrets_cert_controller = optional(map(string), {})
+      # The labels for external secret controller pods.
+      external_secrets_webhook = optional(map(string), {})
+    }), {})
+  })
+
+  default = {}
+}
+
+# ESO
+variable "eso_enroll_in_servicemesh" {
+  description = "Flag to enroll ESO into istio servicemesh"
+  type        = bool
+  default     = false
+}
+
+# external secrets image and helm charts references
+
+variable "eso_image" {
+  type        = string
+  description = "The External Secrets Operator image in the format of `[registry-url]/[namespace]/[image]`."
+  default     = "ghcr.io/external-secrets/external-secrets"
+  nullable    = false
+}
+
+variable "eso_image_version" {
+  type        = string
+  description = "The version or digest for the external secrets image to deploy. If changing the value, ensure it is compatible with the chart version set in eso_chart_version."
+  default     = "v2.5.0-ubi@sha256:1ae00d86ec7b763b7c5b26692a06bc1811da41606169b3872b2731e73403376d" # datasource: ghcr.io/external-secrets/external-secrets
+  nullable    = false
+  validation {
+    condition     = can(regex("(^v\\d+\\.\\d+.\\d+(\\-\\w+)?(\\@sha256\\:\\w+){0,1})$", var.eso_image_version))
+    error_message = "The value of the external secrets image version must match classic version or the tag and sha256 image digest format"
   }
 }
 
-locals {
-  # namespace to use for eso. If both eso_namespace and existing_eso_namespace are not null, eso_namespace takes the precedence
-  eso_namespace = var.eso_namespace != null ? var.eso_namespace : data.kubernetes_namespace_v1.existing_eso_namespace[0].metadata[0].name
+variable "eso_chart_location" {
+  type        = string
+  description = "The location of the External Secrets Operator Helm chart."
+  default     = "https://charts.external-secrets.io"
+  nullable    = false
 }
 
-locals {
-  eso_helm_release_values_cri = <<-EOF
-installCRDs: true
-securityContext:
-  allowPrivilegeEscalation: false
-  capabilities:
-    drop:
-      - "ALL"
-  enabled: true
-  readOnlyRootFilesystem: true
-  runAsNonRoot: true
-  runAsUser: 1000
-  seccompProfile:
-    type: "RuntimeDefault"
-podAnnotations:
-%{for key, value in var.eso_pod_configuration.annotations.external_secrets}    "${key}": "${value}" %{endfor}
-%{if var.eso_enroll_in_servicemesh == true}
-  sidecar.istio.io/inject: "true"
-  sidecar.istio.io/rewriteAppHTTPProbers: "true"
-%{endif}
-podLabels:
-%{if var.eso_enroll_in_servicemesh == true}    app: external-secrets-operator %{endif}
-%{for key, value in var.eso_pod_configuration.labels.external_secrets}    "${key}": "${value}" %{endfor}
-%{if var.eso_enroll_in_servicemesh == true}
-extraEnv:
-- name: KUBERNETES_SERVICE_HOST
-  value: kubernetes.default.svc.cluster.local
-%{endif}
-extraVolumes:
-- name: sa-token
-  projected:
-      defaultMode: 0644
-      sources:
-      - serviceAccountToken:
-          path: sa-token
-          expirationSeconds: 3600
-          audience: iam
-extraVolumeMounts:
-- mountPath: /var/run/secrets/tokens
-  name: sa-token
-webhook:
-  securityContext:
-    allowPrivilegeEscalation: false
-    capabilities:
-      drop:
-        - "ALL"
-    enabled: true
-    readOnlyRootFilesystem: true
-    runAsNonRoot: true
-    runAsUser: 1000
-    seccompProfile:
-      type: "RuntimeDefault"
-  podAnnotations:
-    %{for key, value in var.eso_pod_configuration.annotations.external_secrets_webhook}    "${key}": "${value}" %{endfor}
-    %{if var.eso_enroll_in_servicemesh == true}
-    sidecar.istio.io/inject: "true"
-    sidecar.istio.io/rewriteAppHTTPProbers: "true"
-    %{endif}
-  podLabels:
-    %{if var.eso_enroll_in_servicemesh == true}    app: external-secrets-operator %{endif}
-    %{for key, value in var.eso_pod_configuration.labels.external_secrets_webhook}    "${key}": "${value}" %{endfor}
-  %{if var.eso_enroll_in_servicemesh == true}
-  extraEnv:
-  - name: KUBERNETES_SERVICE_HOST
-    value: kubernetes.default.svc.cluster.local
-  %{endif}
-  extraVolumes:
-  - name: sa-token
-    projected:
-      defaultMode: 0644
-      sources:
-      - serviceAccountToken:
-          path: sa-token
-          expirationSeconds: 3600
-          audience: iam
-  extraVolumeMounts:
-  - mountPath: /var/run/secrets/tokens
-    name: sa-token
-certController:
-  securityContext:
-    allowPrivilegeEscalation: false
-    capabilities:
-      drop:
-        - "ALL"
-    enabled: true
-    readOnlyRootFilesystem: true
-    runAsNonRoot: true
-    runAsUser: 1000
-    seccompProfile:
-      type: "RuntimeDefault"
-  podAnnotations:
-    %{for key, value in var.eso_pod_configuration.annotations.external_secrets_cert_controller}    "${key}": "${value}" %{endfor}
-    %{if var.eso_enroll_in_servicemesh == true}
-    sidecar.istio.io/inject: "true"
-    sidecar.istio.io/rewriteAppHTTPProbers: "true"
-    %{endif}
-  podLabels:
-    %{if var.eso_enroll_in_servicemesh == true}    app: external-secrets-operator %{endif}
-    %{for key, value in var.eso_pod_configuration.labels.external_secrets_cert_controller}    "${key}": "${value}" %{endfor}
-  %{if var.eso_enroll_in_servicemesh == true}
-  extraEnv:
-  - name: KUBERNETES_SERVICE_HOST
-    value: kubernetes.default.svc.cluster.local
-  %{endif}
-EOF
-
-  eso_helm_release_values_workerselector = var.eso_cluster_nodes_configuration == null ? "" : <<-EOF
-nodeSelector: { ${var.eso_cluster_nodes_configuration.nodeSelector.label}: ${var.eso_cluster_nodes_configuration.nodeSelector.value} }
-tolerations:
-- key: ${var.eso_cluster_nodes_configuration.tolerations.key}
-  operator: ${var.eso_cluster_nodes_configuration.tolerations.operator}
-  value: ${var.eso_cluster_nodes_configuration.tolerations.value}
-  effect: ${var.eso_cluster_nodes_configuration.tolerations.effect}
-webhook:
-  nodeSelector: { ${var.eso_cluster_nodes_configuration.nodeSelector.label}: ${var.eso_cluster_nodes_configuration.nodeSelector.value} }
-  tolerations:
-  - key: ${var.eso_cluster_nodes_configuration.tolerations.key}
-    operator: ${var.eso_cluster_nodes_configuration.tolerations.operator}
-    value: ${var.eso_cluster_nodes_configuration.tolerations.value}
-    effect: ${var.eso_cluster_nodes_configuration.tolerations.effect}
-certController:
-  nodeSelector: { ${var.eso_cluster_nodes_configuration.nodeSelector.label}: ${var.eso_cluster_nodes_configuration.nodeSelector.value} }
-  tolerations:
-  - key: ${var.eso_cluster_nodes_configuration.tolerations.key}
-    operator: ${var.eso_cluster_nodes_configuration.tolerations.operator}
-    value: ${var.eso_cluster_nodes_configuration.tolerations.value}
-    effect: ${var.eso_cluster_nodes_configuration.tolerations.effect}
-EOF
+variable "eso_chart_version" {
+  type        = string
+  description = "The version of the External Secrets Operator Helm chart. Ensure that the chart version is compatible with the image version specified in eso_image_version."
+  default     = "2.5.0" # registryUrl: charts.external-secrets.io
+  nullable    = false
 }
 
-resource "helm_release" "external_secrets_operator" {
-  depends_on = [module.eso_namespace, data.kubernetes_namespace_v1.existing_eso_namespace]
-
-  name       = "external-secrets"
-  namespace  = local.eso_namespace
-  chart      = "external-secrets"
-  version    = var.eso_chart_version
-  wait       = true
-  atomic     = var.rollback_on_failure
-  repository = var.eso_chart_location
-
-  set = [{
-    name  = "image.repository"
-    type  = "string"
-    value = var.eso_image
-    },
-    {
-      name  = "image.tag"
-      type  = "string"
-      value = var.eso_image_version
-    },
-    {
-      name  = "webhook.image.repository"
-      type  = "string"
-      value = var.eso_image
-    },
-    {
-      name  = "webhook.image.tag"
-      type  = "string"
-      value = var.eso_image_version
-    },
-    {
-      name  = "certController.image.repository"
-      type  = "string"
-      value = var.eso_image
-    },
-    {
-      name  = "certController.image.tag"
-      type  = "string"
-      value = var.eso_image_version
-  }]
-
-  # The following mounts are needed for the CRI based authentication with Trusted Profiles
-  values = [local.eso_helm_release_values_cri, local.eso_helm_release_values_workerselector]
+variable "concurrent_reconciles" {
+  type        = number
+  description = "The number of concurrent reconciles the External Secrets Operator controller can do."
+  default     = 1
+  nullable    = false
 }
 
-locals {
-  reloader_namespaces_to_ignore = var.reloader_namespaces_to_ignore != null ? [{
-    name  = "reloader.namespacesToIgnore"
-    value = var.reloader_namespaces_to_ignore
-  }] : []
-  reloader_resources_to_ignore = var.reloader_resources_to_ignore != null ? [{
-    name  = "reloader.resourcesToIgnore"
-    value = var.reloader_resources_to_ignore
-  }] : []
-  reloader_is_openshift = var.reloader_is_openshift ? [{
-    name  = "reloader.deployment.securityContext.runAsUser"
-    value = "null"
-  }] : []
-  reloader_log_format = var.reloader_log_format == "json" ? [{
-    name  = "reloader.logFormat"
-    value = var.reloader_log_format
-  }] : []
+############################################################################################################
+# RELOADER CONFIGURATIONS
+############################################################################################################
+
+# Reloader variables full documentation https://github.com/stakater/Reloader/tree/master#helm-charts
+variable "reloader_deployed" {
+  description = "Whether to deploy reloader or not https://github.com/stakater/Reloader"
+  type        = bool
+  default     = true
+}
+variable "reloader_reload_strategy" {
+  description = "The reload strategy to use for reloader. Possible values are `env-vars` or `annotations`. Default value is `annotations`"
+  type        = string
+  default     = "annotations"
+  validation {
+    condition     = contains(["env-vars", "annotations"], var.reloader_reload_strategy)
+    error_message = "The specified reloader_reload_strategy is not a valid selection! Valid values are `env-vars` or `annotations`"
+  }
+}
+variable "reloader_namespaces_to_ignore" {
+  description = "List of comma separated namespaces to ignore for reloader. If multiple are provided they are combined with the AND operator"
+  type        = string
+  default     = null
+}
+variable "reloader_resources_to_ignore" {
+  description = "List of comma separated resources to ignore for reloader. If multiple are provided they are combined with the AND operator"
+  type        = string
+  default     = null
+}
+variable "reloader_namespaces_selector" {
+  description = "List of comma separated label selectors, if multiple are provided they are combined with the AND operator"
+  type        = string
+  default     = null
+}
+variable "reloader_resource_label_selector" {
+  description = "List of comma separated label selectors, if multiple are provided they are combined with the AND operator"
+  type        = string
+  default     = null
+}
+variable "reloader_ignore_secrets" {
+  description = "Whether to ignore secret changes or not"
+  type        = bool
+  default     = false
+}
+variable "reloader_ignore_configmaps" {
+  description = "Whether to ignore configmap changes or not"
+  type        = bool
+  default     = false
+}
+variable "reloader_is_openshift" {
+  description = "Enable OpenShift DeploymentConfigs"
+  type        = bool
+  default     = true
+}
+variable "reloader_is_argo_rollouts" {
+  description = "Enable Argo Rollouts"
+  type        = bool
+  default     = false
+}
+variable "reloader_reload_on_create" {
+  description = "Enable reload on create events"
+  type        = bool
+  default     = true
+
+}
+variable "reloader_sync_after_restart" {
+  description = "Enable sync after Reloader restarts for Add events, works only when reloadOnCreate is true"
+  type        = bool
+  default     = true
+
+}
+variable "reloader_pod_monitor_metrics" {
+  description = "Enable to scrape Reloader's Prometheus metrics"
+  type        = bool
+  default     = false
 }
 
-resource "helm_release" "pod_reloader" {
-  depends_on = [module.eso_namespace, data.kubernetes_namespace_v1.existing_eso_namespace]
-  count      = var.reloader_deployed == true ? 1 : 0
-  name       = "reloader"
-  chart      = "reloader"
-  namespace  = local.eso_namespace
-  repository = var.reloader_chart_location
-  version    = var.reloader_chart_version
-  wait       = true
-  atomic     = var.rollback_on_failure
+variable "reloader_log_format" {
+  description = "The log format to use for reloader. Possible values are `json` or `text`. Default value is `json`"
+  type        = string
+  default     = "text"
+  validation {
+    condition     = contains(["json", "text"], var.reloader_log_format)
+    error_message = "The specified reloader_log_format is not a valid selection! Valid values are `json` or `text`"
+  }
+}
+variable "reloader_custom_values" {
+  description = "String containing custom values to be used for reloader helm chart. See https://github.com/stakater/Reloader/blob/master/deployments/kubernetes/chart/reloader/values.yaml"
+  type        = string
+  default     = null
+}
 
-  set = concat([
-    {
-      name  = "image.repository"
-      type  = "string"
-      value = var.reloader_image
-    },
-    {
-      name  = "image.tag"
-      type  = "string"
-      value = var.reloader_image_version
-    },
-    # Set reload strategy
-    {
-      name  = "reloader.reloadStrategy"
-      type  = "string"
-      value = var.reloader_reload_strategy
-    },
-    # Set watchGlobally based on conditions
-    {
-      name  = "reloader.watchGlobally"
-      value = var.reloader_namespaces_selector == null && var.reloader_resource_label_selector == null ? true : false
-    },
-    # Set ignoreSecrets and ignoreConfigMaps
-    {
-      name  = "reloader.ignoreSecrets"
-      value = var.reloader_ignore_secrets
-    },
-    {
-      name  = "reloader.ignoreConfigMaps"
-      value = var.reloader_ignore_configmaps
-    },
-    # Set OpenShift and Argo Rollouts options
-    {
-      name  = "reloader.isOpenshift"
-      value = var.reloader_is_openshift
-    },
-    {
-      name  = "reloader.podMonitor.enabled"
-      value = var.reloader_pod_monitor_metrics
-    },
-    {
-      name  = "reloader.isArgoRollouts"
-      value = var.reloader_is_argo_rollouts
-    },
-    # Set reloadOnCreate and syncAfterRestart options
-    {
-      name  = "reloader.reloadOnCreate"
-      value = var.reloader_reload_on_create
-    },
-    {
-      name  = "reloader.syncAfterRestart"
-      value = var.reloader_sync_after_restart
-    }
-    ],
-    # Set namespaces to ignore
-    local.reloader_namespaces_to_ignore,
-    # Set resources to ignore
-    local.reloader_resources_to_ignore,
-    # Set runAsUser to null if isOpenShift is true
-    local.reloader_is_openshift,
-    local.reloader_log_format
-  )
+# reloader image and helm charts references
 
-  # Set the values attribute conditionally
-  values = var.reloader_custom_values != null ? [var.reloader_custom_values] : []
+variable "reloader_image" {
+  type        = string
+  description = "The reloader image repository in the format of `[registry-url]/[namespace]/[image]`."
+  default     = "ghcr.io/stakater/reloader"
+  nullable    = false
+
+}
+
+variable "reloader_image_version" {
+  type        = string
+  description = "The version or digest for the reloader image to deploy. If changing the value, ensure it is compatible with the chart version set in reloader_chart_version."
+  default     = "v1.4.16-ubi@sha256:784e3148677f2e8d46325450496a98689ac56a11f7995143cb2405c5caf764f7" # datasource: ghcr.io/stakater/reloader
+  nullable    = false
+  validation {
+    condition     = can(regex("(^v\\d+\\.\\d+.\\d+(\\-\\w+)?(\\@sha256\\:\\w+){0,1})$", var.reloader_image_version))
+    error_message = "The value of the reloader image version must match classic version or the tag and sha256 image digest format"
+  }
+}
+
+variable "reloader_chart_location" {
+  type        = string
+  description = "The location of the Reloader Helm chart."
+  default     = "https://stakater.github.io/stakater-charts"
+  nullable    = false
+}
+
+variable "reloader_chart_version" {
+  type        = string
+  description = "The version of the Reloader Helm chart. Ensure that the chart version is compatible with the image version specified in reloader_image_version."
+  default     = "2.2.11" # registryUrl: stakater.github.io/stakater-charts
+  nullable    = false
+}
+
+variable "rollback_on_failure" {
+  description = "Flag to automatically rollback the helm chart on installation failure."
+  type        = bool
+  default     = true
 }
