@@ -208,6 +208,10 @@ resource "helm_release" "external_secrets_operator" {
       name  = "certController.image.tag"
       type  = "string"
       value = var.eso_image_version
+    },
+    {
+      name  = "concurrent"
+      value = var.concurrent_reconciles
   }]
 
   # The following mounts are needed for the CRI based authentication with Trusted Profiles
