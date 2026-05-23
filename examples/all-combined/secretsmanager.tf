@@ -4,10 +4,10 @@
 
 locals {
   # setting the secrets manager resource id to use
-  sm_guid = var.existing_sm_instance_guid == null ? ibm_resource_instance.secrets_manager[0].guid : var.existing_sm_instance_guid
+  sm_guid = var.existing_sm_instance_guid == null ? module.secrets_manager[0].secrets_manager_guid : var.existing_sm_instance_guid
 
   # if service_endpoints is not private the crn for SM is not needed because of VPE creation is not needed
-  sm_crn = var.existing_sm_instance_crn == null ? (var.service_endpoints == "private" ? ibm_resource_instance.secrets_manager[0].crn : "") : var.existing_sm_instance_crn
+  sm_crn = var.existing_sm_instance_crn == null ? (var.service_endpoints == "private" ? module.secrets_manager[0].secrets_manager_crn : "") : var.existing_sm_instance_crn
 
 
   sm_region = var.existing_sm_instance_region == null ? var.region : var.existing_sm_instance_region
@@ -18,19 +18,18 @@ locals {
 # Secrets-Manager and IAM configuration
 ########################################
 
-# IAM user policy, Secret Manager instance, Service ID for IAM engine, IAM service ID policies, associated Service ID API key stored in a secret object in account level secret-group and IAM engine configuration
-resource "ibm_resource_instance" "secrets_manager" {
-  count             = var.existing_sm_instance_guid == null ? 1 : 0
-  name              = "${var.prefix}-sm"
-  service           = "secrets-manager"
-  plan              = var.sm_service_plan
-  location          = local.sm_region
-  tags              = var.resource_tags
-  resource_group_id = module.resource_group.resource_group_id
-  timeouts {
-    create = "30m" # Extending provisioning time to 30 minutes
-  }
-  provider = ibm.ibm-sm
+
+module "secrets_manager" {
+
+  count                = var.existing_sm_instance_guid == null ? 1 : 0
+  source               = "terraform-ibm-modules/secrets-manager/ibm"
+  version              = "2.15.5"
+  secrets_manager_name = "${var.prefix}-sm"
+  sm_service_plan      = var.sm_service_plan
+  region               = local.sm_region
+  resource_tags        = var.resource_tags
+  resource_group_id    = module.resource_group.resource_group_id
+  allowed_network      = "public-and-private"
 }
 
 # create secrets group for secrets

@@ -260,7 +260,7 @@ module "vpes" {
     }
   ]
   service_endpoints = "private"
-  depends_on        = [ibm_resource_instance.secrets_manager]
+  depends_on        = [module.secrets_manager]
 }
 
 ##################################################################
