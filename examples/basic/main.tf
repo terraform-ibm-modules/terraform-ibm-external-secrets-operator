@@ -261,7 +261,7 @@ resource "ibm_resource_instance" "secrets_manager" {
   resource_group_id = module.resource_group.resource_group_id
   service_endpoints = "public-and-private"
   parameters = {
-    "allowed_network" = "public"
+    "allowed_network" = "public-and-private"
   }
   timeouts {
     create = "30m" # Extending provisioning time to 30 minutes
