@@ -93,7 +93,7 @@ module "dynamic_serviceid_apikey1" {
   serviceid_id              = ibm_iam_service_id.secret_puller.id
   secrets_manager_guid      = local.sm_guid
   secret_group_id           = module.secrets_manager_group_acct.secret_group_id
-  depends_on                = [ibm_iam_service_policy.secret_puller_policy, ibm_iam_service_id.secret_puller]
+  depends_on                = [module.secrets_manager, ibm_iam_service_policy.secret_puller_policy, ibm_iam_service_id.secret_puller]
   providers = {
     ibm = ibm.ibm-sm
   }
