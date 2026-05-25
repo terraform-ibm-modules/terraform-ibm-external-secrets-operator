@@ -13,9 +13,9 @@ locals {
   secret_group_name            = "${var.prefix}-sm-secret-group"                        #checkov:skip=CKV_SECRET_6
   es_kubernetes_namespaces     = ["${var.prefix}-tp-test-1", "${var.prefix}-tp-test-2"] # namespace to create the externalsecrets resources for secrets sync
 
-  sm_guid = var.existing_sm_instance_guid == null ? ibm_resource_instance.secrets_manager[0].guid : var.existing_sm_instance_guid
+  sm_guid = var.existing_sm_instance_guid == null ? module.secrets_manager[0].secrets_manager_guid : var.existing_sm_instance_guid
   # if service_endpoints is not private the crn for SM is not needed because of VPE creation is not needed
-  sm_crn = var.existing_sm_instance_crn == null ? (var.service_endpoints == "private" ? ibm_resource_instance.secrets_manager[0].crn : "") : var.existing_sm_instance_crn
+  sm_crn = var.existing_sm_instance_crn == null ? (var.service_endpoints == "private" ? module.secrets_manager[0].secrets_manager_crn : "") : var.existing_sm_instance_crn
 
   sm_region = var.existing_sm_instance_region == null ? var.region : var.existing_sm_instance_region
 
@@ -25,16 +25,16 @@ locals {
 ## Create prerequisite.  Secrets Manager,  Secret Group and a Trusted Profile
 ##############################################################################
 
-resource "ibm_resource_instance" "secrets_manager" {
-  count             = var.existing_sm_instance_guid == null ? 1 : 0
-  name              = local.secret_manager_instance_name
-  service           = "secrets-manager"
-  plan              = local.sm_service_plan
-  location          = local.sm_region
-  resource_group_id = module.resource_group.resource_group_id
-  timeouts {
-    create = "20m" # Extending provisioning time to 20 minutes
-  }
+module "secrets_manager" {
+
+  count                = var.existing_sm_instance_guid == null ? 1 : 0
+  source               = "terraform-ibm-modules/secrets-manager/ibm"
+  version              = "2.15.5"
+  secrets_manager_name = local.secret_manager_instance_name
+  sm_service_plan      = local.sm_service_plan
+  region               = local.sm_region
+  resource_group_id    = module.resource_group.resource_group_id
+  allowed_network      = "public-and-private"
 }
 
 ## Secret Group for organizing secrets
