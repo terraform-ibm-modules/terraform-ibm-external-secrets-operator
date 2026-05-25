@@ -51,27 +51,18 @@ variable "cidr_bases" {
 variable "acl_rules_list" {
   description = "List of rules that are to be attached to the Network ACL"
   type = list(object({
-    name        = string
-    action      = string
-    source      = string
-    destination = string
-    direction   = string
-    icmp = optional(object({
-      code = number
-      type = number
-    }))
-    tcp = optional(object({
-      port_max        = number
-      port_min        = number
-      source_port_max = number
-      source_port_min = number
-    }))
-    udp = optional(object({
-      port_max        = number
-      port_min        = number
-      source_port_max = number
-      source_port_min = number
-    }))
+    name            = string
+    action          = string
+    source          = string
+    destination     = string
+    direction       = string
+    protocol        = optional(string)
+    port_min        = optional(number)
+    port_max        = optional(number)
+    source_port_min = optional(number)
+    source_port_max = optional(number)
+    type            = optional(number)
+    code            = optional(number)
   }))
   default = [
     {
@@ -108,12 +99,11 @@ variable "acl_rules_list" {
       action      = "allow"
       destination = "0.0.0.0/0"
       direction   = "inbound"
-      tcp = {
-        source_port_min = 443
-        source_port_max = 443
-        port_min        = 1
-        port_max        = 65535
-      }
+      protocol        = "tcp"
+      source_port_min = 443
+      source_port_max = 443
+      port_min        = 1
+      port_max        = 65535
     },
     {
       name        = "allow-all-https-outbound"
@@ -121,12 +111,11 @@ variable "acl_rules_list" {
       action      = "allow"
       destination = "0.0.0.0/0"
       direction   = "outbound"
-      tcp = {
-        source_port_min = 1
-        source_port_max = 65535
-        port_min        = 443
-        port_max        = 443
-      }
+      protocol        = "tcp"
+      source_port_min = 1
+      source_port_max = 65535
+      port_min        = 443
+      port_max        = 443
     },
     {
       name        = "deny-all-outbound"
