@@ -94,11 +94,11 @@ variable "acl_rules_list" {
       direction   = "outbound"
     },
     {
-      name        = "allow-all-https-inbound"
-      source      = "0.0.0.0/0"
-      action      = "allow"
-      destination = "0.0.0.0/0"
-      direction   = "inbound"
+      name            = "allow-all-https-inbound"
+      source          = "0.0.0.0/0"
+      action          = "allow"
+      destination     = "0.0.0.0/0"
+      direction       = "inbound"
       protocol        = "tcp"
       source_port_min = 443
       source_port_max = 443
@@ -106,11 +106,11 @@ variable "acl_rules_list" {
       port_max        = 65535
     },
     {
-      name        = "allow-all-https-outbound"
-      source      = "0.0.0.0/0"
-      action      = "allow"
-      destination = "0.0.0.0/0"
-      direction   = "outbound"
+      name            = "allow-all-https-outbound"
+      source          = "0.0.0.0/0"
+      action          = "allow"
+      destination     = "0.0.0.0/0"
+      direction       = "outbound"
       protocol        = "tcp"
       source_port_min = 1
       source_port_max = 65535
