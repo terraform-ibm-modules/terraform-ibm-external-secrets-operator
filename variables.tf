@@ -99,6 +99,13 @@ variable "eso_chart_version" {
   nullable    = false
 }
 
+variable "concurrent_reconciles" {
+  type        = number
+  description = "The number of concurrent reconciles the External Secrets Operator controller can do. [Learn more](https://external-secrets.io/v2.5.0/api/controller-options)."
+  default     = 1
+  nullable    = false
+}
+
 ############################################################################################################
 # RELOADER CONFIGURATIONS
 ############################################################################################################
