@@ -5,7 +5,7 @@
 ##############################################################################
 
 
-# creating namespace to deploy ESO into RedHat ServiceMesh
+# creating namespace to deploy ESO in RedHat ServiceMesh
 module "eso_namespace" {
   count   = var.eso_namespace != null ? 1 : 0
   source  = "terraform-ibm-modules/namespace/ibm"
@@ -176,6 +176,7 @@ resource "helm_release" "external_secrets_operator" {
   chart      = "external-secrets"
   version    = var.eso_chart_version
   wait       = true
+  atomic     = var.rollback_on_failure
   repository = var.eso_chart_location
 
   set = [{
@@ -241,6 +242,7 @@ resource "helm_release" "pod_reloader" {
   repository = var.reloader_chart_location
   version    = var.reloader_chart_version
   wait       = true
+  atomic     = var.rollback_on_failure
 
   set = concat([
     {

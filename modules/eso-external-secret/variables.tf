@@ -28,6 +28,7 @@ variable "es_refresh_interval" {
     error_message = "The refresh interval must be a value between 1 and 99s(seconds)/m(minutes)/h(hours)."
   }
 }
+
 variable "eso_store_name" {
   description = "ESO store name to use when creating the externalsecret. Cannot be null and it is mandatory"
   type        = string
@@ -155,6 +156,12 @@ variable "reloader_watching" {
 # check for its status before switching to false
 variable "sm_certificate_bundle" {
   description = "Flag to enable if the public/intermediate certificate is bundled. If enabled public key is managed as bundled with intermediate and private key, otherwise the template considers the public key not bundled with intermediate certificate and private key"
+  type        = bool
+  default     = true
+}
+
+variable "rollback_on_failure" {
+  description = "Flag to automatically rollback the helm chart on installation failure."
   type        = bool
   default     = true
 }

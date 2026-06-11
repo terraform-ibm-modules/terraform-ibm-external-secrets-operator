@@ -9,25 +9,47 @@
 
 This module automates the installation and configuration of the [External Secrets Operator](https://external-secrets.io/) in a cluster.
 
-
 <!-- Below content is automatically populated via pre-commit hook -->
 <!-- BEGIN OVERVIEW HOOK -->
 ## Overview
-* [terraform-ibm-external-secrets-operator](#terraform-ibm-external-secrets-operator)
-* [Submodules](./modules)
-    * [eso-clusterstore](./modules/eso-clusterstore)
-    * [eso-external-secret](./modules/eso-external-secret)
-    * [eso-secretstore](./modules/eso-secretstore)
-    * [eso-trusted-profile](./modules/eso-trusted-profile)
-* [Examples](./examples)
-:information_source: Ctrl/Cmd+Click or right-click on the Schematics deploy button to open in a new tab
-    * <a href="./examples/all-combined">Example to deploy the External Secret Operator and to create a different set of resources in terms of secrets, secret groups, stores and auth configurations</a> <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=external-secrets-operator-all-combined-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples/all-combined"><img src="https://img.shields.io/badge/Deploy%20with IBM%20Cloud%20Schematics-0f62fe?logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
-    * <a href="./examples/all-combined/imagepull-apikey-secrets-manager">ImagePull API key Secrets Manager</a> <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=external-secrets-operator-imagepull-apikey-secrets-manager-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples/imagepull-apikey-secrets-manager"><img src="https://img.shields.io/badge/Deploy%20with IBM%20Cloud%20Schematics-0f62fe?logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
-    * <a href="./examples/basic">Basic Example</a> <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=external-secrets-operator-basic-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples/basic"><img src="https://img.shields.io/badge/Deploy%20with IBM%20Cloud%20Schematics-0f62fe?logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
-    * <a href="./examples/trusted-profiles-authentication">Example that uses trusted profiles (container authentication)</a> <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=external-secrets-operator-trusted-profiles-authentication-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples/trusted-profiles-authentication"><img src="https://img.shields.io/badge/Deploy%20with IBM%20Cloud%20Schematics-0f62fe?logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
-* [Deployable Architectures](./solutions)
-    * <a href="./solutions/fully-configurable">Cloud automation for External Secrets Operator (Fully configurable)</a>
-* [Contributing](#contributing)
+<ul>
+  <li><a href="#terraform-ibm-external-secrets-operator">terraform-ibm-external-secrets-operator</a></li>
+  <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/modules">Submodules</a>
+    <ul>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/modules/eso-clusterstore">eso-clusterstore</a></li>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/modules/eso-external-secret">eso-external-secret</a></li>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/modules/eso-secretstore">eso-secretstore</a></li>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/modules/eso-trusted-profile">eso-trusted-profile</a></li>
+    </ul>
+  </li>
+  <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples">Examples</a>
+    <ul>
+      <li>
+        <a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples/all-combined">Example to deploy the External Secret Operator and to create a different set of resources in terms of secrets, secret groups, stores and auth configurations</a>
+        <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=external-secrets-operator-all-combined-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples/all-combined"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
+      </li>
+      <li>
+        <a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples/all-combined/imagepull-apikey-secrets-manager">ImagePull API key Secrets Manager</a>
+        <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=external-secrets-operator-imagepull-apikey-secrets-manager-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples/imagepull-apikey-secrets-manager"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
+      </li>
+      <li>
+        <a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples/basic">Basic Example</a>
+        <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=external-secrets-operator-basic-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples/basic"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
+      </li>
+      <li>
+        <a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples/trusted-profiles-authentication">Example that uses trusted profiles (container authentication)</a>
+        <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=external-secrets-operator-trusted-profiles-authentication-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples/trusted-profiles-authentication"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
+      </li>
+    </ul>
+    ℹ️ Ctrl/Cmd+Click or right-click on the Schematics deploy button to open in a new tab.
+  </li>
+  <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/solutions">Deployable Architectures</a>
+    <ul>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/solutions/fully-configurable">Cloud automation for External Secrets Operator (Fully configurable)</a></li>
+    </ul>
+  </li>
+  <li><a href="#contributing">Contributing</a></li>
+</ul>
 <!-- END OVERVIEW HOOK -->
 
 <!-- Match this heading to the name of the root level module (the repo name) -->
@@ -124,7 +146,7 @@ The resulting helm release configuration, according to the `terraform plan` outp
 (...)
 # module.external_secrets_operator.helm_release.external_secrets_operator[0] will be created
   + resource "helm_release" "external_secrets_operator" {
-      + atomic                     = false
+      + atomic                     = true
       + chart                      = "external-secrets"
       + cleanup_on_fail            = false
       + create_namespace           = false
@@ -517,22 +539,22 @@ You need the following permissions to run this module.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_eso_chart_location"></a> [eso\_chart\_location](#input\_eso\_chart\_location) | The location of the External Secrets Operator Helm chart. | `string` | `"https://charts.external-secrets.io"` | no |
-| <a name="input_eso_chart_version"></a> [eso\_chart\_version](#input\_eso\_chart\_version) | The version of the External Secrets Operator Helm chart. Ensure that the chart version is compatible with the image version specified in eso\_image\_version. | `string` | `"2.0.1"` | no |
+| <a name="input_eso_chart_version"></a> [eso\_chart\_version](#input\_eso\_chart\_version) | The version of the External Secrets Operator Helm chart. Ensure that the chart version is compatible with the image version specified in eso\_image\_version. | `string` | `"2.5.0"` | no |
 | <a name="input_eso_cluster_nodes_configuration"></a> [eso\_cluster\_nodes\_configuration](#input\_eso\_cluster\_nodes\_configuration) | Configuration to use to customise ESO deployment on specific cluster nodes. Setting appropriate values will result in customising ESO helm release. Default value is null to keep ESO standard deployment. | <pre>object({<br/>    nodeSelector = object({<br/>      label = string<br/>      value = string<br/>    })<br/>    tolerations = object({<br/>      key      = string<br/>      operator = string<br/>      value    = string<br/>      effect   = string<br/>    })<br/>  })</pre> | `null` | no |
 | <a name="input_eso_enroll_in_servicemesh"></a> [eso\_enroll\_in\_servicemesh](#input\_eso\_enroll\_in\_servicemesh) | Flag to enroll ESO into istio servicemesh | `bool` | `false` | no |
 | <a name="input_eso_image"></a> [eso\_image](#input\_eso\_image) | The External Secrets Operator image in the format of `[registry-url]/[namespace]/[image]`. | `string` | `"ghcr.io/external-secrets/external-secrets"` | no |
-| <a name="input_eso_image_version"></a> [eso\_image\_version](#input\_eso\_image\_version) | The version or digest for the external secrets image to deploy. If changing the value, ensure it is compatible with the chart version set in eso\_chart\_version. | `string` | `"v2.0.1-ubi@sha256:16791f38ef5ed18e86fb362279086b4602efe9e9d5ac20c0ebe56b3e0a5bee1c"` | no |
+| <a name="input_eso_image_version"></a> [eso\_image\_version](#input\_eso\_image\_version) | The version or digest for the external secrets image to deploy. If changing the value, ensure it is compatible with the chart version set in eso\_chart\_version. | `string` | `"v2.5.0-ubi@sha256:1ae00d86ec7b763b7c5b26692a06bc1811da41606169b3872b2731e73403376d"` | no |
 | <a name="input_eso_namespace"></a> [eso\_namespace](#input\_eso\_namespace) | Namespace to create and be used to install ESO components including helm releases. | `string` | `null` | no |
 | <a name="input_eso_pod_configuration"></a> [eso\_pod\_configuration](#input\_eso\_pod\_configuration) | Configuration to use to customise ESO deployment on specific pods. Setting appropriate values will result in customising ESO helm release. Default value is {} to keep ESO standard deployment. Ignore the key if not required. | <pre>object({<br/>    annotations = optional(object({<br/>      # The annotations for external secret controller pods.<br/>      external_secrets = optional(map(string), {})<br/>      # The annotations for external secret cert controller pods.<br/>      external_secrets_cert_controller = optional(map(string), {})<br/>      # The annotations for external secret controller pods.<br/>      external_secrets_webhook = optional(map(string), {})<br/>    }), {})<br/><br/>    labels = optional(object({<br/>      # The labels for external secret controller pods.<br/>      external_secrets = optional(map(string), {})<br/>      # The labels for external secret cert controller pods.<br/>      external_secrets_cert_controller = optional(map(string), {})<br/>      # The labels for external secret controller pods.<br/>      external_secrets_webhook = optional(map(string), {})<br/>    }), {})<br/>  })</pre> | `{}` | no |
 | <a name="input_existing_eso_namespace"></a> [existing\_eso\_namespace](#input\_existing\_eso\_namespace) | Existing Namespace to be used to install ESO components including helm releases. | `string` | `null` | no |
 | <a name="input_reloader_chart_location"></a> [reloader\_chart\_location](#input\_reloader\_chart\_location) | The location of the Reloader Helm chart. | `string` | `"https://stakater.github.io/stakater-charts"` | no |
-| <a name="input_reloader_chart_version"></a> [reloader\_chart\_version](#input\_reloader\_chart\_version) | The version of the Reloader Helm chart. Ensure that the chart version is compatible with the image version specified in reloader\_image\_version. | `string` | `"2.2.8"` | no |
+| <a name="input_reloader_chart_version"></a> [reloader\_chart\_version](#input\_reloader\_chart\_version) | The version of the Reloader Helm chart. Ensure that the chart version is compatible with the image version specified in reloader\_image\_version. | `string` | `"2.2.11"` | no |
 | <a name="input_reloader_custom_values"></a> [reloader\_custom\_values](#input\_reloader\_custom\_values) | String containing custom values to be used for reloader helm chart. See https://github.com/stakater/Reloader/blob/master/deployments/kubernetes/chart/reloader/values.yaml | `string` | `null` | no |
 | <a name="input_reloader_deployed"></a> [reloader\_deployed](#input\_reloader\_deployed) | Whether to deploy reloader or not https://github.com/stakater/Reloader | `bool` | `true` | no |
 | <a name="input_reloader_ignore_configmaps"></a> [reloader\_ignore\_configmaps](#input\_reloader\_ignore\_configmaps) | Whether to ignore configmap changes or not | `bool` | `false` | no |
 | <a name="input_reloader_ignore_secrets"></a> [reloader\_ignore\_secrets](#input\_reloader\_ignore\_secrets) | Whether to ignore secret changes or not | `bool` | `false` | no |
 | <a name="input_reloader_image"></a> [reloader\_image](#input\_reloader\_image) | The reloader image repository in the format of `[registry-url]/[namespace]/[image]`. | `string` | `"ghcr.io/stakater/reloader"` | no |
-| <a name="input_reloader_image_version"></a> [reloader\_image\_version](#input\_reloader\_image\_version) | The version or digest for the reloader image to deploy. If changing the value, ensure it is compatible with the chart version set in reloader\_chart\_version. | `string` | `"v1.4.13-ubi@sha256:f3dbec957c0532eeec47d090d94a3abd11b7012480c7a23ea69ed066fb4e3c9b"` | no |
+| <a name="input_reloader_image_version"></a> [reloader\_image\_version](#input\_reloader\_image\_version) | The version or digest for the reloader image to deploy. If changing the value, ensure it is compatible with the chart version set in reloader\_chart\_version. | `string` | `"v1.4.16-ubi@sha256:784e3148677f2e8d46325450496a98689ac56a11f7995143cb2405c5caf764f7"` | no |
 | <a name="input_reloader_is_argo_rollouts"></a> [reloader\_is\_argo\_rollouts](#input\_reloader\_is\_argo\_rollouts) | Enable Argo Rollouts | `bool` | `false` | no |
 | <a name="input_reloader_is_openshift"></a> [reloader\_is\_openshift](#input\_reloader\_is\_openshift) | Enable OpenShift DeploymentConfigs | `bool` | `true` | no |
 | <a name="input_reloader_log_format"></a> [reloader\_log\_format](#input\_reloader\_log\_format) | The log format to use for reloader. Possible values are `json` or `text`. Default value is `json` | `string` | `"text"` | no |
@@ -544,6 +566,7 @@ You need the following permissions to run this module.
 | <a name="input_reloader_resource_label_selector"></a> [reloader\_resource\_label\_selector](#input\_reloader\_resource\_label\_selector) | List of comma separated label selectors, if multiple are provided they are combined with the AND operator | `string` | `null` | no |
 | <a name="input_reloader_resources_to_ignore"></a> [reloader\_resources\_to\_ignore](#input\_reloader\_resources\_to\_ignore) | List of comma separated resources to ignore for reloader. If multiple are provided they are combined with the AND operator | `string` | `null` | no |
 | <a name="input_reloader_sync_after_restart"></a> [reloader\_sync\_after\_restart](#input\_reloader\_sync\_after\_restart) | Enable sync after Reloader restarts for Add events, works only when reloadOnCreate is true | `bool` | `true` | no |
+| <a name="input_rollback_on_failure"></a> [rollback\_on\_failure](#input\_rollback\_on\_failure) | Flag to automatically rollback the helm chart on installation failure. | `bool` | `true` | no |
 
 ### Outputs
 
