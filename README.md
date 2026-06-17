@@ -14,38 +14,38 @@ This module automates the installation and configuration of the [External Secret
 ## Overview
 <ul>
   <li><a href="#terraform-ibm-external-secrets-operator">terraform-ibm-external-secrets-operator</a></li>
-  <li><a href="./modules">Submodules</a>
+  <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/modules">Submodules</a>
     <ul>
-      <li><a href="./modules/eso-clusterstore">eso-clusterstore</a></li>
-      <li><a href="./modules/eso-external-secret">eso-external-secret</a></li>
-      <li><a href="./modules/eso-secretstore">eso-secretstore</a></li>
-      <li><a href="./modules/eso-trusted-profile">eso-trusted-profile</a></li>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/modules/eso-clusterstore">eso-clusterstore</a></li>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/modules/eso-external-secret">eso-external-secret</a></li>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/modules/eso-secretstore">eso-secretstore</a></li>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/modules/eso-trusted-profile">eso-trusted-profile</a></li>
     </ul>
   </li>
-  <li><a href="./examples">Examples</a>
+  <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples">Examples</a>
     <ul>
       <li>
-        <a href="./examples/all-combined">Example to deploy the External Secret Operator and to create a different set of resources in terms of secrets, secret groups, stores and auth configurations</a>
+        <a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples/all-combined">Example to deploy the External Secret Operator and to create a different set of resources in terms of secrets, secret groups, stores and auth configurations</a>
         <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=external-secrets-operator-all-combined-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples/all-combined"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
       </li>
       <li>
-        <a href="./examples/all-combined/imagepull-apikey-secrets-manager">ImagePull API key Secrets Manager</a>
+        <a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples/all-combined/imagepull-apikey-secrets-manager">ImagePull API key Secrets Manager</a>
         <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=external-secrets-operator-imagepull-apikey-secrets-manager-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples/imagepull-apikey-secrets-manager"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
       </li>
       <li>
-        <a href="./examples/basic">Basic Example</a>
+        <a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples/basic">Basic Example</a>
         <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=external-secrets-operator-basic-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples/basic"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
       </li>
       <li>
-        <a href="./examples/trusted-profiles-authentication">Example that uses trusted profiles (container authentication)</a>
+        <a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples/trusted-profiles-authentication">Example that uses trusted profiles (container authentication)</a>
         <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=external-secrets-operator-trusted-profiles-authentication-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/examples/trusted-profiles-authentication"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
       </li>
     </ul>
     ℹ️ Ctrl/Cmd+Click or right-click on the Schematics deploy button to open in a new tab.
   </li>
-  <li><a href="./solutions">Deployable Architectures</a>
+  <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/solutions">Deployable Architectures</a>
     <ul>
-      <li><a href="./solutions/fully-configurable">Cloud automation for External Secrets Operator (Fully configurable)</a></li>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/tree/main/solutions/fully-configurable">Cloud automation for External Secrets Operator (Fully configurable)</a></li>
     </ul>
   </li>
   <li><a href="#contributing">Contributing</a></li>
