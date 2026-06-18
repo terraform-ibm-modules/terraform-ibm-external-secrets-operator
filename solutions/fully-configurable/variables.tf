@@ -184,6 +184,13 @@ variable "eso_chart_version" {
   nullable    = false
 }
 
+variable "eso_image_pull_secrets" {
+  type        = list(string)
+  description = "The list of imagePullSecrets that will be added to every deployment."
+  default     = []
+  nullable    = false
+}
+
 # ESO
 variable "eso_enroll_in_servicemesh" {
   description = "Flag to enroll the External Secrets Operator into RedHat Service Mesh adding the istio-injection annotation to the ESO namespace and to ESO pods. Default to false."
@@ -323,6 +330,13 @@ variable "reloader_chart_version" {
   type        = string
   description = "The version of the Reloader Helm chart. Ensure that the chart version is compatible with the image version specified in reloader_image_version."
   default     = "2.2.11" # registryUrl: stakater.github.io/stakater-charts
+  nullable    = false
+}
+
+variable "reloader_image_pull_secrets" {
+  type        = list(string)
+  description = "The list of imagePullSecrets that will be added to every deployment."
+  default     = []
   nullable    = false
 }
 

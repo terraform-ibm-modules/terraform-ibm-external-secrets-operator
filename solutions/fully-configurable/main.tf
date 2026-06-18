@@ -53,6 +53,7 @@ module "external_secrets_operator" {
   eso_image_version               = var.eso_image_version
   eso_chart_location              = var.eso_chart_location
   eso_chart_version               = var.eso_chart_version
+  eso_image_pull_secrets          = var.eso_image_pull_secrets
   # reloader configuration
   reloader_deployed                = var.reloader_deployed
   reloader_reload_strategy         = var.reloader_reload_strategy
@@ -73,6 +74,7 @@ module "external_secrets_operator" {
   reloader_image_version           = var.reloader_image_version
   reloader_chart_location          = var.reloader_chart_location
   reloader_chart_version           = var.reloader_chart_version
+  reloader_image_pull_secrets      = var.reloader_image_pull_secrets
 }
 
 ##################################################################
