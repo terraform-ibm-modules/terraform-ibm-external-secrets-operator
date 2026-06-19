@@ -186,7 +186,7 @@ variable "eso_chart_version" {
 
 variable "eso_image_pull_secrets" {
   type        = list(string)
-  description = "The list of imagePullSecrets that will be added to every deployment."
+  description = "The list of global imagePullSecrets that will be added to every ESO deployments. The referenced secrets must already exist in the target Kubernetes namespace before deployment. This module does not create or manage imagePullSecret resources; it only configures existing secrets for use by the deployments."
   default     = []
   nullable    = false
 }
@@ -335,7 +335,7 @@ variable "reloader_chart_version" {
 
 variable "reloader_image_pull_secrets" {
   type        = list(string)
-  description = "The list of imagePullSecrets that will be added to every deployment."
+  description = "The list of global imagePullSecrets that will be added to every reloader deployments. The referenced secrets must already exist in the target Kubernetes namespace before deployment. This module does not create or manage imagePullSecret resources; it only configures existing secrets for use by the deployments."
   default     = []
   nullable    = false
 }
