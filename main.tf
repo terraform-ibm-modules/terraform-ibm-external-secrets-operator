@@ -215,7 +215,15 @@ resource "helm_release" "external_secrets_operator" {
   }]
 
   # The following mounts are needed for the CRI based authentication with Trusted Profiles
-  values = [local.eso_helm_release_values_cri, local.eso_helm_release_values_workerselector]
+  values = [local.eso_helm_release_values_cri, local.eso_helm_release_values_workerselector, length(var.eso_image_pull_secrets) > 0 ? yamlencode({
+    global = {
+      imagePullSecrets = [
+        for secret in var.eso_image_pull_secrets :
+        {
+          name = secret
+        }
+      ]
+  } }) : ""]
 }
 
 locals {
@@ -312,5 +320,13 @@ resource "helm_release" "pod_reloader" {
   )
 
   # Set the values attribute conditionally
-  values = var.reloader_custom_values != null ? [var.reloader_custom_values] : []
+  values = [var.reloader_custom_values != null ? var.reloader_custom_values : "", length(var.reloader_image_pull_secrets) > 0 ? yamlencode({
+    global = {
+      imagePullSecrets = [
+        for secret in var.reloader_image_pull_secrets :
+        {
+          name = secret
+        }
+      ]
+  } }) : ""]
 }

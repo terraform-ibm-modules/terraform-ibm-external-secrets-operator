@@ -106,6 +106,13 @@ variable "concurrent_reconciles" {
   nullable    = false
 }
 
+variable "eso_image_pull_secrets" {
+  type        = list(string)
+  description = "The list of global imagePullSecrets that will be added to every ESO deployments. The referenced secrets must already exist in the target Kubernetes namespace before deployment. This module does not create or manage imagePullSecret resources; it only configures existing secrets for use by the deployments."
+  default     = []
+  nullable    = false
+}
+
 ############################################################################################################
 # RELOADER CONFIGURATIONS
 ############################################################################################################
@@ -236,5 +243,12 @@ variable "reloader_chart_version" {
 variable "rollback_on_failure" {
   description = "Flag to automatically rollback the helm chart on installation failure."
   type        = bool
-  default     = true
+  default     = false
+}
+
+variable "reloader_image_pull_secrets" {
+  type        = list(string)
+  description = "The list of global imagePullSecrets that will be added to every reloader deployments. The referenced secrets must already exist in the target Kubernetes namespace before deployment. This module does not create or manage imagePullSecret resources; it only configures existing secrets for use by the deployments."
+  default     = []
+  nullable    = false
 }

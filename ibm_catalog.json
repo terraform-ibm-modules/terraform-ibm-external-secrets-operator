@@ -175,6 +175,17 @@
               "key": "eso_enroll_in_servicemesh"
             },
             {
+              "key": "eso_image_pull_secrets",
+              "custom_config": {
+                "type": "array",
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "type": "string"
+                }
+              }
+            },
+            {
               "key": "reloader_deployed"
             },
             {
@@ -263,6 +274,17 @@
             },
             {
               "key": "reloader_chart_version"
+            },
+            {
+              "key": "reloader_image_pull_secrets",
+              "custom_config": {
+                "type": "array",
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "type": "string"
+                }
+              }
             },
             {
               "key": "eso_secretsstores_configuration",
