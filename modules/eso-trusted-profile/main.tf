@@ -56,7 +56,7 @@ moved {
 # manager instance, if no secrets group id or one secrets group id is provided to restrict the access to the Secrets Manager instance
 resource "ibm_iam_trusted_profile_policy" "policy" {
   count       = length(var.secret_groups_id) <= 1 ? 1 : 0
-  profile_id  = ibm_iam_trusted_profile.trusted_profile.id
+  iam_id      = ibm_iam_trusted_profile.trusted_profile.id
   description = length(var.secret_groups_id) == 0 ? "IAM Trusted Profile Policy to access the secrets in the target secret groups and secrets manager instance and not restricted to any secrets group" : "IAM Trusted Profile Policy to access the secrets in the target secret group and secrets manager instance"
   roles       = ["SecretsReader"]
   resources {
@@ -71,7 +71,7 @@ resource "ibm_iam_trusted_profile_policy" "policy" {
 # manager instance, if two or more secrets groups id are provided to restrict the access to the Secrets Manager instance
 resource "ibm_iam_trusted_profile_policy" "policy_multiple_secrets_groups" {
   count       = length(var.secret_groups_id) > 1 ? length(var.secret_groups_id) : 0
-  profile_id  = ibm_iam_trusted_profile.trusted_profile.id
+  iam_id      = ibm_iam_trusted_profile.trusted_profile.id
   description = "IAM Trusted Profile Policy to access the secrets in the target secrets group ${var.secret_groups_id[count.index]} and secrets manager instance"
   roles       = ["SecretsReader"]
   resources {
