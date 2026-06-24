@@ -172,10 +172,28 @@ variable "sm_certificate_bundle" {
 }
 
 variable "sm_service_credentials_mappings" {
-  description = "Map of Kubernetes secret key to ESO template expression. If empty, the complete service credential JSON is stored using es_kubernetes_secret_data_key."
-  type        = map(string)
-  default     = {}
-  nullable    = false
+  description = <<-EOT
+Map of Kubernetes secret keys to External Secrets Operator (ESO) template expressions.
+
+When specified, each map key becomes a key in the generated Kubernetes Secret and the corresponding value is evaluated as an ESO template expression against the service credential JSON.
+
+If the map is empty, the complete service credential JSON is stored using the value provided in `es_kubernetes_secret_data_key`.
+
+Example:
+
+sm_service_credentials_mappings = {
+  username = "(.credentials | fromJson).connection.rediss.authentication.username"
+  password = "(.credentials | fromJson).connection.rediss.authentication.password"
+  host     = "((.credentials | fromJson).connection.rediss.hosts | first).hostname"
+  cert     = "(.credentials | fromJson).connection.cli.certificate.certificate_base64 | b64dec"
+}
+
+Note: Values must be valid ESO template expressions. Invalid expressions will cause ExternalSecret reconciliation failures.
+EOT
+
+  type     = map(string)
+  default  = {}
+  nullable = false
 }
 
 variable "rollback_on_failure" {
