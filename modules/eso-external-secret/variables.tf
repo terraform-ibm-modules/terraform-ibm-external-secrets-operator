@@ -182,10 +182,8 @@ If the map is empty, the complete service credential JSON is stored using the va
 Example:
 
 sm_service_credentials_mappings = {
-  username = "(.credentials | fromJson).connection.rediss.authentication.username"
-  password = "(.credentials | fromJson).connection.rediss.authentication.password"
+  user = "(.credentials | fromJson).connection.rediss.authentication.username"
   host     = "((.credentials | fromJson).connection.rediss.hosts | first).hostname"
-  cert     = "(.credentials | fromJson).connection.cli.certificate.certificate_base64 | b64dec"
 }
 
 Note: Values must be valid ESO template expressions. Invalid expressions will cause ExternalSecret reconciliation failures.
