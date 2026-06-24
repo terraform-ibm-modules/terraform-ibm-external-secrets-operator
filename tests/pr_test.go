@@ -269,6 +269,7 @@ func TestRunDefaultExample(t *testing.T) {
 				options.Prefix + "-arbitrary-arb-tp-multisg-2": "tpns-multisg",
 				options.Prefix + "-arbitrary-arb-tp-nosg":      "tpns-nosg",
 				options.Prefix + "-arbitrary-arb-cstore-tp":    "eso-cstore-tp-namespace",
+				"service-credential-test-secret":               "service-credential-test-ns", // pragma: allowlist secret
 			}
 
 			log.Printf("secretsMap %s", secretsMap)
