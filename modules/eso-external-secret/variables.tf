@@ -187,6 +187,8 @@ sm_service_credentials_mappings = {
 }
 
 Note: Values must be valid ESO template expressions. Invalid expressions will cause ExternalSecret reconciliation failures.
+
+Learn more here: https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/blob/main/modules/eso-external-secret/README.md#service-credentials-mappings
 EOT
 
   type     = map(string)
