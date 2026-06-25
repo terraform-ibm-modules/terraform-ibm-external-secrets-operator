@@ -4,11 +4,12 @@
 
 # Create MySQL database instance using the IBM ICD MySQL module
 module "mysql_db" {
-  source            = "terraform-ibm-modules/icd-mysql/ibm"
-  version           = "2.10.1"
-  name              = "${var.prefix}-mysql-db"
-  region            = var.region
-  resource_group_id = module.resource_group.resource_group_id
+  source              = "terraform-ibm-modules/icd-mysql/ibm"
+  version             = "2.10.1"
+  name                = "${var.prefix}-mysql-db"
+  region              = var.region
+  deletion_protection = false
+  resource_group_id   = module.resource_group.resource_group_id
 }
 
 # Create secret group for service credentials
