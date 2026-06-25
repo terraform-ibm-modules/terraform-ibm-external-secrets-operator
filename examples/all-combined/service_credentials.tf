@@ -2,26 +2,13 @@
 # Service Credentials Secret Configuration
 ##################################################################
 
-# Create Redis database instance
-resource "ibm_database" "redis_instance" {
-  name              = "${var.prefix}-redis-db"
-  plan              = "standard"
-  location          = var.region
-  service           = "databases-for-redis"
+# Create MySQL database instance using the IBM ICD MySQL module
+module "mysql_db" {
+  source            = "terraform-ibm-modules/icd-mysql/ibm"
+  version           = "2.10.1"
+  name              = "${var.prefix}-mysql-db"
+  region            = var.region
   resource_group_id = module.resource_group.resource_group_id
-  service_endpoints = "public"
-
-  group {
-    group_id = "member"
-    memory {
-      allocation_mb = 8192
-    }
-    disk {
-      allocation_mb = 20480
-    }
-  }
-
-  tags = var.resource_tags
 }
 
 # Create secret group for service credentials
@@ -37,34 +24,34 @@ module "service_credentials_secret_group" {
   }
 }
 
-# Create IAM authorization policy between Secrets Manager and Redis
-resource "ibm_iam_authorization_policy" "sm_redis_policy" {
+# Create IAM authorization policy between Secrets Manager and MySQL
+resource "ibm_iam_authorization_policy" "sm_mysql_policy" {
   source_service_name         = "secrets-manager"
   source_resource_instance_id = local.sm_guid
-  target_service_name         = "databases-for-redis"
-  target_resource_instance_id = ibm_database.redis_instance.guid
+  target_service_name         = "databases-for-mysql"
+  target_resource_instance_id = module.mysql_db.guid
   roles                       = ["Key Manager"]
 }
 
 # Wait for authorization policy to propagate
 resource "time_sleep" "wait_for_authorization" {
-  depends_on      = [ibm_iam_authorization_policy.sm_redis_policy]
+  depends_on      = [ibm_iam_authorization_policy.sm_mysql_policy]
   create_duration = "30s"
 }
 
 # Create service credentials secret in Secrets Manager
-resource "ibm_sm_service_credentials_secret" "redis_service_credentials" {
+resource "ibm_sm_service_credentials_secret" "mysql_service_credentials" {
   depends_on      = [time_sleep.wait_for_authorization]
   instance_id     = local.sm_guid
   region          = local.sm_region
-  name            = "${var.prefix}-redis-service-credentials"
-  description     = "Service credentials for Redis database"
+  name            = "${var.prefix}-mysql-service-credentials"
+  description     = "Service credentials for MySQL database"
   secret_group_id = module.service_credentials_secret_group.secret_group_id
   ttl             = "7776000" # 90 days
 
   source_service {
     instance {
-      crn = ibm_database.redis_instance.id
+      crn = module.mysql_db.crn
     }
     role {
       crn = "crn:v1:bluemix:public:iam::::serviceRole:Manager"
@@ -135,7 +122,7 @@ module "eso_service_creds_secretstore" {
 module "external_secret_service_credentials" {
   depends_on = [
     module.eso_service_creds_secretstore,
-    ibm_sm_service_credentials_secret.redis_service_credentials
+    ibm_sm_service_credentials_secret.mysql_service_credentials
   ]
   source                    = "../../modules/eso-external-secret"
   eso_store_scope           = "namespace"
@@ -143,13 +130,13 @@ module "external_secret_service_credentials" {
   es_kubernetes_secret_name = "service-credential-test-secret"
   es_kubernetes_secret_type = "opaque"
   sm_secret_type            = "service_credentials"
-  sm_secret_id              = ibm_sm_service_credentials_secret.redis_service_credentials.secret_id
+  sm_secret_id              = ibm_sm_service_credentials_secret.mysql_service_credentials.secret_id
   eso_store_name            = "service-creds-store"
   es_refresh_interval       = "5m"
   es_helm_rls_name          = "sc-helm"
 
   sm_service_credentials_mappings = {
-    username = "(.credentials | fromJson).connection.rediss.authentication.username"
-    host     = "((.credentials | fromJson).connection.rediss.hosts | first).hostname"
+    username = "(.credentials | fromJson).connection.mysql.authentication.username"
+    host     = "((.credentials | fromJson).connection.mysql.hosts | first).hostname"
   }
 }
