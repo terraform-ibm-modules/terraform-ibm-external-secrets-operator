@@ -46,10 +46,21 @@ variable "es_kubernetes_secret_type" {
     condition     = (local.is_kv && var.es_kubernetes_secret_type != "opaque") ? false : true
     error_message = "For key-value secrets-manager secrets types es_kubernetes_secret_type cannot be different than opaque - found ${var.es_kubernetes_secret_type}"
   }
+
   validation {
-    condition     = var.es_kubernetes_secret_data_key == null && (var.es_kubernetes_secret_type == "opaque" && (var.sm_secret_type == "arbitrary" || var.sm_secret_type == "iam_credentials")) ? false : true # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
-    error_message = "A value for 'es_kubernetes_secret_data_key' must be passed when 'es_kubernetes_secret_type = opaque' and 'sm_secret_type' is either 'arbitrary' or 'iam_credentials'"
+    condition = (
+      var.es_kubernetes_secret_type != "opaque" ||
+      !contains(["arbitrary", "iam_credentials", "service_credentials"], var.sm_secret_type) ||
+      var.es_kubernetes_secret_data_key != null ||
+      (
+        var.sm_secret_type == "service_credentials" &&
+        length(var.sm_service_credentials_mappings) > 0
+      )
+    )
+
+    error_message = "A value for 'es_kubernetes_secret_data_key' must be passed when 'es_kubernetes_secret_type = opaque' and 'sm_secret_type' is 'arbitrary', 'iam_credentials' or 'service_credentials' without mappings."
   }
+
   validation {
     condition     = (local.is_dockerjsonconfig_chain == true && (var.es_kubernetes_secret_type != "dockerconfigjson" || (var.sm_secret_type != "iam_credentials" && var.sm_secret_type != "trusted_profile"))) ? false : true
     error_message = "If the externalsecret is expected to generate a dockerjsonconfig secrets chain the only supported value for es_kubernetes_secret_type is dockerconfigjson and for sm_secret_type is iam_credentials or trusted_profile"
@@ -57,18 +68,18 @@ variable "es_kubernetes_secret_type" {
 }
 
 variable "es_kubernetes_secret_data_key" {
-  description = "Data key to be used in Kubernetes Opaque secret. Only needed when 'es_kubernetes_secret_type' is configured as `opaque` and sm_secret_type is set to either 'arbitrary' or 'iam_credentials'"
+  description = "Data key to be used in Kubernetes Opaque secret. Only needed when 'es_kubernetes_secret_type' is configured as `opaque` and sm_secret_type is set to either 'arbitrary', 'iam_credentials' or 'service_credentials'"
   type        = string
   default     = null
 }
 
 variable "sm_secret_type" {
-  description = "Secrets-manager secret type to be used as source data by ESO. Valid input types are 'iam_credentials', 'username_password', 'trusted_profile', 'arbitrary', 'imported_cert', 'public_cert', 'private_cert', 'kv'"
+  description = "Secrets-manager secret type to be used as source data by ESO. Valid input types are 'iam_credentials', 'username_password', 'trusted_profile', 'arbitrary', 'service_credentials', 'imported_cert', 'public_cert', 'private_cert', 'kv'"
   type        = string
   validation {
-    condition = can(regex("^iam_credentials$|^username_password$|^trusted_profile$|^arbitrary$|^imported_cert$|^public_cert$|^private_cert|^kv$|$^$", var.sm_secret_type))
+    condition = can(regex("^iam_credentials$|^username_password$|^trusted_profile$|^arbitrary$|^service_credentials$|^imported_cert$|^public_cert$|^private_cert$|^kv$|$^$", var.sm_secret_type))
     # If it is empty, no secret will be created
-    error_message = "The sm_secret_type value must be one of the following: iam_credentials, username_password, trusted_profile, arbitrary, imported_cert, public_cert, private_cert, kv or leave it empty."
+    error_message = "The sm_secret_type value must be one of the following: iam_credentials, username_password, trusted_profile, arbitrary, service_credentials, imported_cert, public_cert, private_cert, kv or leave it empty."
   }
   validation {
     condition     = (can(regex("^kv$", var.sm_secret_type)) && var.sm_kv_keyid != null && var.sm_kv_keypath != null) ? false : true
@@ -158,6 +169,31 @@ variable "sm_certificate_bundle" {
   description = "Flag to enable if the public/intermediate certificate is bundled. If enabled public key is managed as bundled with intermediate and private key, otherwise the template considers the public key not bundled with intermediate certificate and private key"
   type        = bool
   default     = true
+}
+
+variable "sm_service_credentials_mappings" {
+  description = <<-EOT
+Map of Kubernetes secret keys to External Secrets Operator (ESO) template expressions.
+
+When specified, each map key becomes a key in the generated Kubernetes Secret and the corresponding value is evaluated as an ESO template expression against the service credential JSON.
+
+If the map is empty, the complete service credential JSON is stored using the value provided in `es_kubernetes_secret_data_key`.
+
+Example:
+
+sm_service_credentials_mappings = {
+  user = "(.credentials | fromJson).connection.rediss.authentication.username"
+  host     = "((.credentials | fromJson).connection.rediss.hosts | first).hostname"
+}
+
+Note: Values must be valid ESO template expressions. Invalid expressions will cause ExternalSecret reconciliation failures.
+
+Learn more here: https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/blob/main/modules/eso-external-secret/README.md#service-credentials-mappings
+EOT
+
+  type     = map(string)
+  default  = {}
+  nullable = false
 }
 
 variable "rollback_on_failure" {
