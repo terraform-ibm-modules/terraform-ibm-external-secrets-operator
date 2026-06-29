@@ -347,3 +347,51 @@ resource "helm_release" "kubernetes_secret_kv_all" {
     EOF
   ]
 }
+
+resource "helm_release" "kubernetes_secret_service_credentials" {
+  count     = var.sm_secret_type == "service_credentials" ? 1 : 0
+  name      = local.helm_secret_name
+  namespace = local.es_helm_rls_namespace
+  chart     = "${path.module}/../../chart/${local.helm_raw_chart_name}"
+  version   = local.helm_raw_chart_version
+  timeout   = 600
+  atomic    = var.rollback_on_failure
+
+  values = [
+    <<-EOF
+    resources:
+      - apiVersion: external-secrets.io/v1
+        kind: ExternalSecret
+        metadata:
+          name: "${var.es_kubernetes_secret_name}"
+          namespace: "${var.es_kubernetes_namespace}"
+        spec:
+          refreshInterval: ${var.es_refresh_interval}
+          secretStoreRef:
+            name: "${var.eso_store_name}"
+            kind: "${local.secret_store_ref_kind}"
+
+          target:
+            name: "${var.es_kubernetes_secret_name}"
+            template:
+              engineVersion: v2
+              type: "${local.es_kubernetes_secret_type}"
+              metadata:
+                annotations:
+                  ${local.reloader_annotation}
+              data:
+%{if length(var.sm_service_credentials_mappings) == 0}
+                ${var.es_kubernetes_secret_data_key}: '{{ .credentials }}'
+%{else}
+%{for k, v in var.sm_service_credentials_mappings~}
+                ${k}: '{{ ${v} }}'
+%{endfor~}
+%{endif}
+
+          data:
+          - secretKey: credentials
+            remoteRef:
+              key: "service_credentials/${var.sm_secret_id}"
+    EOF
+  ]
+}

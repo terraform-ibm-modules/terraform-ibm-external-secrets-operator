@@ -47,6 +47,7 @@ No modules.
 | [helm_release.kubernetes_secret_chain_list](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.kubernetes_secret_kv_all](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.kubernetes_secret_kv_key](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [helm_release.kubernetes_secret_service_credentials](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.kubernetes_secret_user_pw](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 
 ### Inputs
@@ -59,7 +60,7 @@ No modules.
 | <a name="input_es_helm_rls_name"></a> [es\_helm\_rls\_name](#input\_es\_helm\_rls\_name) | Name to use for the helm release for externalsecrets resource. Must be unique in the namespace | `string` | n/a | yes |
 | <a name="input_es_helm_rls_namespace"></a> [es\_helm\_rls\_namespace](#input\_es\_helm\_rls\_namespace) | Namespace to deploy the helm release for the externalsecret. Default if null is the externalsecret namespace | `string` | `null` | no |
 | <a name="input_es_kubernetes_namespace"></a> [es\_kubernetes\_namespace](#input\_es\_kubernetes\_namespace) | Namespace to use to generate the externalsecret | `string` | n/a | yes |
-| <a name="input_es_kubernetes_secret_data_key"></a> [es\_kubernetes\_secret\_data\_key](#input\_es\_kubernetes\_secret\_data\_key) | Data key to be used in Kubernetes Opaque secret. Only needed when 'es\_kubernetes\_secret\_type' is configured as `opaque` and sm\_secret\_type is set to either 'arbitrary' or 'iam\_credentials' | `string` | `null` | no |
+| <a name="input_es_kubernetes_secret_data_key"></a> [es\_kubernetes\_secret\_data\_key](#input\_es\_kubernetes\_secret\_data\_key) | Data key to be used in Kubernetes Opaque secret. Only needed when 'es\_kubernetes\_secret\_type' is configured as `opaque` and sm\_secret\_type is set to either 'arbitrary', 'iam\_credentials' or 'service\_credentials' | `string` | `null` | no |
 | <a name="input_es_kubernetes_secret_name"></a> [es\_kubernetes\_secret\_name](#input\_es\_kubernetes\_secret\_name) | Name of the secret to use for the kubernetes secret object | `string` | n/a | yes |
 | <a name="input_es_kubernetes_secret_type"></a> [es\_kubernetes\_secret\_type](#input\_es\_kubernetes\_secret\_type) | Secret type/format to be installed in the Kubernetes/Openshift cluster by ESO. Valid inputs are `opaque` `dockerconfigjson` and `tls` | `string` | n/a | yes |
 | <a name="input_es_refresh_interval"></a> [es\_refresh\_interval](#input\_es\_refresh\_interval) | Specify interval for es secret synchronization. See recommendations for specifying/customizing refresh interval in this IBM Cloud article > https://cloud.ibm.com/docs/secrets-manager?topic=secrets-manager-tutorial-kubernetes-secrets#kubernetes-secrets-best-practices | `string` | `"1h"` | no |
@@ -72,9 +73,57 @@ No modules.
 | <a name="input_sm_kv_keyid"></a> [sm\_kv\_keyid](#input\_sm\_kv\_keyid) | Secrets-Manager key value (kv) keyid | `string` | `null` | no |
 | <a name="input_sm_kv_keypath"></a> [sm\_kv\_keypath](#input\_sm\_kv\_keypath) | Secrets-Manager key value (kv) keypath | `string` | `null` | no |
 | <a name="input_sm_secret_id"></a> [sm\_secret\_id](#input\_sm\_secret\_id) | Secrets-Manager secret ID where source data will be synchronized with Kubernetes secret. It can be null only in the case of a dockerjsonconfig secrets chain | `string` | n/a | yes |
-| <a name="input_sm_secret_type"></a> [sm\_secret\_type](#input\_sm\_secret\_type) | Secrets-manager secret type to be used as source data by ESO. Valid input types are 'iam\_credentials', 'username\_password', 'trusted\_profile', 'arbitrary', 'imported\_cert', 'public\_cert', 'private\_cert', 'kv' | `string` | n/a | yes |
+| <a name="input_sm_secret_type"></a> [sm\_secret\_type](#input\_sm\_secret\_type) | Secrets-manager secret type to be used as source data by ESO. Valid input types are 'iam\_credentials', 'username\_password', 'trusted\_profile', 'arbitrary', 'service\_credentials', 'imported\_cert', 'public\_cert', 'private\_cert', 'kv' | `string` | n/a | yes |
+| <a name="input_sm_service_credentials_mappings"></a> [sm\_service\_credentials\_mappings](#input\_sm\_service\_credentials\_mappings) | Map of Kubernetes secret keys to External Secrets Operator (ESO) template expressions.<br/><br/>When specified, each map key becomes a key in the generated Kubernetes Secret and the corresponding value is evaluated as an ESO template expression against the service credential JSON.<br/><br/>If the map is empty, the complete service credential JSON is stored using the value provided in `es_kubernetes_secret_data_key`.<br/><br/>Example:<br/><br/>sm\_service\_credentials\_mappings = {<br/>  user = "(.credentials \| fromJson).connection.rediss.authentication.username"<br/>  host     = "((.credentials \| fromJson).connection.rediss.hosts \| first).hostname"<br/>}<br/><br/>Note: Values must be valid ESO template expressions. Invalid expressions will cause ExternalSecret reconciliation failures.<br/><br/>Learn more here: https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/blob/main/modules/eso-external-secret/README.md#service-credentials-mappings | `map(string)` | `{}` | no |
 
 ### Outputs
 
 No outputs.
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+
+## Complex Inputs
+
+### Service Credentials Mappings
+
+The `sm_service_credentials_mappings` variable allows you to extract specific fields from service credentials JSON and map them to individual keys in the generated Kubernetes Secret.
+
+**Important:** The ESO template expressions you provide must be syntactically correct and accurately reference the structure of your service credentials JSON. The External Secrets Operator will use these expressions to extract values from the credentials. If the expressions are invalid or reference non-existent paths, the ExternalSecret resource will fail to reconcile.
+
+**How it works:**
+- Each key in the map becomes a key in the Kubernetes Secret
+- Each value is an ESO template expression that extracts data from the service credentials JSON
+- The expressions use [jq](https://jqlang.github.io/jq/) syntax for JSON parsing
+
+**Example:**
+
+For a Redis service credential with this structure:
+```json
+{
+  "connection": {
+    "rediss": {
+      "authentication": {
+        "username": "admin"
+      },
+      "hosts": [
+        {
+          "hostname": "redis.example.com"
+        }
+      ]
+    }
+  }
+}
+```
+
+You would configure:
+```hcl
+sm_service_credentials_mappings = {
+  username = "(.credentials | fromJson).connection.rediss.authentication.username"
+  host     = "((.credentials | fromJson).connection.rediss.hosts | first).hostname"
+}
+```
+
+This creates a Kubernetes Secret with two keys:
+- `username` containing "admin"
+- `host` containing "redis.example.com"
+
+**Note:** If you leave the map empty (`{}`), the entire service credentials JSON will be stored as a single value in the Kubernetes Secret using the key specified in `es_kubernetes_secret_data_key`.
