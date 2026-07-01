@@ -5,14 +5,14 @@ locals {
 # parsing cluster crn to collect the cluster ID and the region it is deployed into
 module "crn_parser_cluster" {
   source  = "terraform-ibm-modules/common-utilities/ibm//modules/crn-parser"
-  version = "1.5.0"
+  version = "1.9.0"
   crn     = var.existing_cluster_crn
 }
 
 # parsing secrets manager crn to collect the secrets manager ID and its region
 module "crn_parser_sm" {
   source  = "terraform-ibm-modules/common-utilities/ibm//modules/crn-parser"
-  version = "1.5.0"
+  version = "1.9.0"
   crn     = var.existing_secrets_manager_crn
 }
 
@@ -247,7 +247,7 @@ module "cluster_secrets_store_namespace" {
     } if cluster_secrets_store.create_namespace == true
   })
   source  = "terraform-ibm-modules/namespace/ibm"
-  version = "2.0.1"
+  version = "2.0.2"
   namespaces = [
     {
       name = each.value.namespace
@@ -506,7 +506,7 @@ module "secrets_store_namespace" {
     } if secrets_store.create_namespace == true
   })
   source  = "terraform-ibm-modules/namespace/ibm"
-  version = "2.0.1"
+  version = "2.0.2"
   namespaces = [
     {
       name = each.value.namespace
