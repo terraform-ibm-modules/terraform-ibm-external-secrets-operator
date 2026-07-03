@@ -81,10 +81,10 @@ module "external_secrets_operator" {
 # ESO Cluster secrets stores management
 ##################################################################
 
-# for each element of cluster_secrets_stores going to create
+# for each element of cluster_secrets_stores going to create
 # 1. service secrets groups (the secrets groups to contain the secrets read by the ESO) to create if any
 # 2. account secrets group (the secrets group to store the secrets used by the ESO to connect to the secrets manager and pull the secrets values) to create if any
-# 3. the trusted profile to create if any
+# 3. the trusted profile to create if any
 # 4. the service id to read the secrets from the secrets manager if any
 
 locals {
