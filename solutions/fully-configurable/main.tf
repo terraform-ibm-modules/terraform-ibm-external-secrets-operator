@@ -5,14 +5,14 @@ locals {
 # parsing cluster crn to collect the cluster ID and the region it is deployed into
 module "crn_parser_cluster" {
   source  = "terraform-ibm-modules/common-utilities/ibm//modules/crn-parser"
-  version = "1.4.2"
+  version = "1.9.0"
   crn     = var.existing_cluster_crn
 }
 
 # parsing secrets manager crn to collect the secrets manager ID and its region
 module "crn_parser_sm" {
   source  = "terraform-ibm-modules/common-utilities/ibm//modules/crn-parser"
-  version = "1.4.2"
+  version = "1.9.0"
   crn     = var.existing_secrets_manager_crn
 }
 
@@ -53,6 +53,7 @@ module "external_secrets_operator" {
   eso_image_version               = var.eso_image_version
   eso_chart_location              = var.eso_chart_location
   eso_chart_version               = var.eso_chart_version
+  eso_image_pull_secrets          = var.eso_image_pull_secrets
   # reloader configuration
   reloader_deployed                = var.reloader_deployed
   reloader_reload_strategy         = var.reloader_reload_strategy
@@ -73,6 +74,7 @@ module "external_secrets_operator" {
   reloader_image_version           = var.reloader_image_version
   reloader_chart_location          = var.reloader_chart_location
   reloader_chart_version           = var.reloader_chart_version
+  reloader_image_pull_secrets      = var.reloader_image_pull_secrets
 }
 
 ##################################################################
@@ -107,7 +109,7 @@ module "cluster_secrets_stores_service_secrets_groups" {
     for idx, element in local.cluster_secrets_stores_service_secrets_groups_list : element.key => element
   })
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.4.6"
+  version                  = "1.5.3"
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = each.value.name        # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
@@ -167,7 +169,7 @@ module "cluster_secrets_stores_account_secrets_groups" {
     } if(cluster_secrets_store.existing_account_secrets_group_id == null || cluster_secrets_store.existing_account_secrets_group_id == "") && cluster_secrets_store.account_secrets_group_name != null
   })
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.4.6"
+  version                  = "1.5.3"
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = each.value.name        # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
@@ -245,7 +247,7 @@ module "cluster_secrets_store_namespace" {
     } if cluster_secrets_store.create_namespace == true
   })
   source  = "terraform-ibm-modules/namespace/ibm"
-  version = "2.0.1"
+  version = "2.0.2"
   namespaces = [
     {
       name = each.value.namespace
@@ -322,7 +324,7 @@ module "cluster_secrets_store_account_serviceid_apikey" {
     }
   })
   source  = "terraform-ibm-modules/iam-serviceid-apikey-secrets-manager/ibm"
-  version = "1.3.0"
+  version = "1.4.0"
   region  = local.sm_region
   #tfsec:ignore:general-secrets-no-plaintext-exposure
   sm_iam_secret_name        = try("${local.prefix}-${each.key}-${each.value.accountServiceID}-apikey", "${each.key}-${each.value.accountServiceID}-apikey")
@@ -389,7 +391,7 @@ module "secrets_stores_service_secrets_groups" {
     for idx, element in local.secrets_stores_service_secrets_groups_list : element.key => element
   })
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.4.6"
+  version                  = "1.5.3"
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = each.value.name        # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
@@ -449,7 +451,7 @@ module "secrets_stores_account_secrets_groups" {
     } if(secrets_store.existing_account_secrets_group_id == null || secrets_store.existing_account_secrets_group_id == "") && secrets_store.account_secrets_group_name != null
   })
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.4.6"
+  version                  = "1.5.3"
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = each.value.name        # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
@@ -504,7 +506,7 @@ module "secrets_store_namespace" {
     } if secrets_store.create_namespace == true
   })
   source  = "terraform-ibm-modules/namespace/ibm"
-  version = "2.0.1"
+  version = "2.0.2"
   namespaces = [
     {
       name = each.value.namespace
@@ -581,7 +583,7 @@ module "secrets_store_account_serviceid_apikey" {
     }
   })
   source  = "terraform-ibm-modules/iam-serviceid-apikey-secrets-manager/ibm"
-  version = "1.3.0"
+  version = "1.4.0"
   region  = local.sm_region
   #tfsec:ignore:general-secrets-no-plaintext-exposure
   sm_iam_secret_name        = try("${local.prefix}-${each.key}-${each.value.accountServiceID}-apikey", "${each.key}-${each.value.accountServiceID}-apikey")

@@ -3,6 +3,7 @@ package test
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -137,17 +138,17 @@ func TestMain(m *testing.M) {
 		"existing_cis_instance_name":              cisName,
 		"existing_cis_instance_resource_group_id": rgId,
 		// imported certificate and public certificate creation management
-		"existing_sm_instance_crn":                    smCRN,
-		"existing_sm_instance_guid":                   smGuid,
-		"existing_sm_instance_region":                 smRegion,
-		"imported_certificate_sm_region":              impCertificateSmRegion,
-		"imported_certificate_sm_id":                  impCertificateSmGuid,
-		"imported_certificate_intermediate_secret_id": impCertIntermediateSecretID,
-		"imported_certificate_public_secret_id":       impCertPublicSecretID,
-		"imported_certificate_private_secret_id":      impCertPrivateSecretID,
-		"acme_letsencrypt_private_key_secret_id":      acmeLEPrivateKeySecretId,
-		"acme_letsencrypt_private_key_sm_id":          acmeLEPrivateKeySmGuid,
-		"acme_letsencrypt_private_key_sm_region":      acmeLEPrivateKeySmRegion,
+		"existing_sm_instance_crn":       smCRN,
+		"existing_sm_instance_guid":      smGuid,
+		"existing_sm_instance_region":    smRegion,
+		"imported_certificate_sm_region": impCertificateSmRegion,
+		"imported_certificate_sm_id":     impCertificateSmGuid,
+		// "imported_certificate_intermediate_secret_id": impCertIntermediateSecretID, // this line is commented because either intermediate certificate is not added properly in secrets manager or provider is not parsing new lines correctly, it is temporary and will be reverted soon
+		"imported_certificate_public_secret_id":  impCertPublicSecretID,
+		"imported_certificate_private_secret_id": impCertPrivateSecretID,
+		"acme_letsencrypt_private_key_secret_id": acmeLEPrivateKeySecretId,
+		"acme_letsencrypt_private_key_sm_id":     acmeLEPrivateKeySmGuid,
+		"acme_letsencrypt_private_key_sm_region": acmeLEPrivateKeySmRegion,
 		// setting skip_iam_authorization_policy to true because using the existing secrets manager instance and the policy already exists
 		"skip_iam_authorization_policy": true,
 		"service_endpoints":             "public",
@@ -268,6 +269,7 @@ func TestRunDefaultExample(t *testing.T) {
 				options.Prefix + "-arbitrary-arb-tp-multisg-2": "tpns-multisg",
 				options.Prefix + "-arbitrary-arb-tp-nosg":      "tpns-nosg",
 				options.Prefix + "-arbitrary-arb-cstore-tp":    "eso-cstore-tp-namespace",
+				"service-credential-test-secret":               "service-credential-test-ns", // pragma: allowlist secret
 			}
 
 			log.Printf("secretsMap %s", secretsMap)
@@ -287,7 +289,7 @@ func TestRunDefaultExample(t *testing.T) {
 					for secretName, secretNamespace := range secretsMap {
 						ocOptions := k8s.NewKubectlOptions("", clusterConfigPath, secretNamespace)
 						log.Printf("Testing secret name %s namespace %s\n", secretName, secretNamespace)
-						_, err := k8s.GetSecretE(t, ocOptions, secretName)
+						_, err := k8s.GetSecretContextE(t, context.Background(), ocOptions, secretName)
 						assert.Nil(t, err, "Error retrieving secret "+secretName+" in namespace "+secretNamespace)
 					}
 				}
@@ -404,7 +406,7 @@ func TestReloaderOperational(t *testing.T) {
 						}
 
 						// Get the reloader pods
-						reloaderPods, err := k8s.ListPodsE(t, k8s.NewKubectlOptions("", clusterConfigPath, esoNamespace), metav1.ListOptions{
+						reloaderPods, err := k8s.ListPodsContextE(t, context.Background(), k8s.NewKubectlOptions("", clusterConfigPath, esoNamespace), metav1.ListOptions{
 							LabelSelector: "provider=stakater,group=com.stakater.platform",
 						})
 						if assert.Nil(t, err, "Error getting reloader pods") {
@@ -434,25 +436,25 @@ func TestReloaderOperational(t *testing.T) {
 					// configure Terratest with cluster config
 					ocOptions := k8s.NewKubectlOptions("", clusterConfigPath, namespace)
 					// deploy sample app
-					applyError := k8s.KubectlApplyE(t, ocOptions, sampleApp)
+					applyError := k8s.KubectlApplyContextE(t, context.Background(), ocOptions, sampleApp)
 					if assert.Nil(t, applyError, "Error applying sample app") {
 						// confirm app is running
-						k8s.WaitUntilDeploymentAvailable(t, ocOptions, deploymentName, 20, sleepBetweenRetries)
-						k8s.WaitUntilSecretAvailable(t, ocOptions, secretName, 20, sleepBetweenRetries)
+						k8s.WaitUntilDeploymentAvailableContext(t, context.Background(), ocOptions, deploymentName, 20, sleepBetweenRetries)
+						k8s.WaitUntilSecretAvailableContext(t, context.Background(), ocOptions, secretName, 20, sleepBetweenRetries)
 						// Check that the secret value is correct
 						// Get pod name from deployment
 						pods, err := GetPodNamesFromDeployment(t, ocOptions, deploymentName)
 						if assert.Nil(t, err, "Error getting pod names") {
-							initialPod := k8s.GetPod(t, ocOptions, pods[0])
-							k8s.WaitUntilPodAvailable(t, ocOptions, initialPod.Name, 20, sleepBetweenRetries)
-							logs := k8s.GetPodLogs(t, ocOptions, initialPod, containerName)
+							initialPod := k8s.GetPodContext(t, context.Background(), ocOptions, pods[0])
+							k8s.WaitUntilPodAvailableContext(t, context.Background(), ocOptions, initialPod.Name, 20, sleepBetweenRetries)
+							logs := k8s.GetPodLogsContext(t, context.Background(), ocOptions, initialPod, containerName)
 							if assert.Contains(t, logs, secretValue, "Initial Secret value not found in logs") {
 								t.Log("Initial secret value found in logs")
 								t.Log(logs)
 							}
 
 							// update secret with updated secret
-							applyError = k8s.KubectlApplyE(t, ocOptions, updatedSecret)
+							applyError = k8s.KubectlApplyContextE(t, context.Background(), ocOptions, updatedSecret)
 							if assert.Nil(t, applyError, "Error applying updated secret") {
 								// Set a timeout duration
 								timeout := 20 * time.Second
@@ -496,11 +498,11 @@ func TestReloaderOperational(t *testing.T) {
 									}
 								}
 								if !failed {
-									k8s.WaitUntilDeploymentAvailable(t, ocOptions, deploymentName, 20, sleepBetweenRetries)
-									newPod := k8s.GetPod(t, ocOptions, newPodName)
-									k8s.WaitUntilPodAvailable(t, ocOptions, newPod.Name, 20, sleepBetweenRetries)
+									k8s.WaitUntilDeploymentAvailableContext(t, context.Background(), ocOptions, deploymentName, 20, sleepBetweenRetries)
+									newPod := k8s.GetPodContext(t, context.Background(), ocOptions, newPodName)
+									k8s.WaitUntilPodAvailableContext(t, context.Background(), ocOptions, newPod.Name, 20, sleepBetweenRetries)
 									// confirm app restarted and picked up new secret by checking logs
-									newLogs := k8s.GetPodLogs(t, ocOptions, newPod, containerName)
+									newLogs := k8s.GetPodLogsContext(t, context.Background(), ocOptions, newPod, containerName)
 									if assert.Contains(t, newLogs, updatedSecretValue, "Updated Secret value not found in logs") {
 										t.Log("Updated secret value found in logs")
 										t.Log(newLogs)
@@ -518,7 +520,7 @@ func TestReloaderOperational(t *testing.T) {
 
 func GetPodNamesFromDeployment(t *testing.T, options *k8s.KubectlOptions, deploymentName string) ([]string, error) {
 	// Get the deployment object
-	deployment, err := k8s.GetDeploymentE(t, options, deploymentName)
+	deployment, err := k8s.GetDeploymentContextE(t, context.Background(), options, deploymentName)
 	if err != nil {
 		return nil, err
 	}
@@ -527,7 +529,7 @@ func GetPodNamesFromDeployment(t *testing.T, options *k8s.KubectlOptions, deploy
 	labelSelector := metav1.FormatLabelSelector(deployment.Spec.Selector)
 
 	// List Pods using label selector
-	pods, err := k8s.ListPodsE(t, options, metav1.ListOptions{LabelSelector: labelSelector})
+	pods, err := k8s.ListPodsContextE(t, context.Background(), options, metav1.ListOptions{LabelSelector: labelSelector})
 	if err != nil {
 		return nil, err
 	}

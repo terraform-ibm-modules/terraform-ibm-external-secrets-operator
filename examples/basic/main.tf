@@ -4,7 +4,7 @@
 
 locals {
 
-  sm_guid = var.existing_sm_instance_guid == null ? ibm_resource_instance.secrets_manager[0].guid : var.existing_sm_instance_guid
+  sm_guid = var.existing_sm_instance_guid == null ? module.secrets_manager[0].secrets_manager_guid : var.existing_sm_instance_guid
 
 
   sm_region           = var.existing_sm_instance_region == null ? var.region : var.existing_sm_instance_region
@@ -18,7 +18,7 @@ locals {
 
 module "resource_group" {
   source  = "terraform-ibm-modules/resource-group/ibm"
-  version = "1.4.8"
+  version = "1.6.1"
   # if an existing resource group is not set (null) create a new one using prefix
   resource_group_name          = var.resource_group == null ? "${var.prefix}-resource-group" : null
   existing_resource_group_name = var.resource_group
@@ -91,7 +91,7 @@ module "zone_subnet_addrs" {
 
 module "vpc" {
   source                      = "terraform-ibm-modules/vpc/ibm"
-  version                     = "1.5.4"
+  version                     = "1.7.0"
   vpc_name                    = "${var.prefix}-vpc"
   resource_group_id           = module.resource_group.resource_group_id
   locations                   = []
@@ -103,12 +103,12 @@ module "vpc" {
   create_gateway              = true
   public_gateway_name_prefix  = "${var.prefix}-pw"
   number_of_addresses         = 16
-  auto_assign_address_prefix  = false
+  auto_assign_address_prefix  = true
 }
 
 module "subnet_prefix" {
   source   = "terraform-ibm-modules/vpc/ibm//modules/vpc-address-prefix"
-  version  = "1.5.4"
+  version  = "1.7.0"
   count    = length(local.subnet_prefix)
   name     = "${var.prefix}-z-${local.subnet_prefix[count.index].label}-${split("-", local.subnet_prefix[count.index].zone)[2]}"
   location = local.subnet_prefix[count.index].zone
@@ -120,7 +120,7 @@ module "subnet_prefix" {
 module "subnets" {
   depends_on                 = [module.subnet_prefix]
   source                     = "terraform-ibm-modules/vpc/ibm//modules/subnet"
-  version                    = "1.5.4"
+  version                    = "1.7.0"
   count                      = length(local.subnet_prefix)
   location                   = local.subnet_prefix[count.index].zone
   vpc_id                     = module.vpc.vpc.vpc_id
@@ -132,7 +132,7 @@ module "subnets" {
 
 module "public_gateways" {
   source            = "terraform-ibm-modules/vpc/ibm//modules/public-gateway"
-  version           = "1.5.4"
+  version           = "1.7.0"
   count             = length(var.zones)
   vpc_id            = module.vpc.vpc.vpc_id
   location          = "${var.region}-${var.zones[count.index]}"
@@ -142,7 +142,7 @@ module "public_gateways" {
 
 module "security_group" {
   source                = "terraform-ibm-modules/vpc/ibm//modules/security-group"
-  version               = "1.5.4"
+  version               = "1.7.0"
   depends_on            = [module.vpc]
   create_security_group = false
   resource_group_id     = module.resource_group.resource_group_id
@@ -188,7 +188,7 @@ locals {
 
 module "network_acl" {
   source            = "terraform-ibm-modules/vpc/ibm//modules/network-acl"
-  version           = "1.5.4"
+  version           = "1.7.0"
   name              = "${var.prefix}-vpc-acl"
   vpc_id            = module.vpc.vpc.vpc_id
   resource_group_id = module.resource_group.resource_group_id
@@ -198,7 +198,7 @@ module "network_acl" {
 # OCP CLUSTER creation
 module "ocp_base" {
   source               = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  version              = "3.81.4"
+  version              = "3.90.0"
   cluster_name         = "${var.prefix}-vpc"
   resource_group_id    = module.resource_group.resource_group_id
   region               = var.region
@@ -206,7 +206,7 @@ module "ocp_base" {
   vpc_id               = module.vpc.vpc.vpc_id
   vpc_subnets          = local.subnets
   worker_pools         = local.ocp_worker_pools
-  tags                 = []
+  resource_tags        = []
   use_existing_cos     = false
   # outbound required by cluster proxy
   disable_outbound_traffic_protection = true
@@ -220,6 +220,7 @@ module "ocp_base" {
 data "ibm_container_cluster_config" "cluster_config" {
   cluster_name_id   = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
+  config_dir        = "${path.module}/kubeconfig"
 }
 
 # Wait time to allow cluster refreshes components after provisioning
@@ -249,25 +250,25 @@ resource "kubernetes_namespace_v1" "apikey_namespace" {
 # Secrets-Manager and IAM configuration
 ########################################
 
-# IAM user policy, Secret Manager instance, Service ID for IAM engine, IAM service ID policies, associated Service ID API key stored in a secret object in account level secret-group and IAM engine configuration
-resource "ibm_resource_instance" "secrets_manager" {
-  count             = var.existing_sm_instance_guid == null ? 1 : 0
-  name              = "${var.prefix}-sm"
-  service           = "secrets-manager"
-  plan              = var.sm_service_plan
-  location          = local.sm_region
-  tags              = var.resource_tags
-  resource_group_id = module.resource_group.resource_group_id
-  timeouts {
-    create = "30m" # Extending provisioning time to 30 minutes
-  }
-  provider = ibm.ibm-sm
+
+module "secrets_manager" {
+
+  count                = var.existing_sm_instance_guid == null ? 1 : 0
+  source               = "terraform-ibm-modules/secrets-manager/ibm"
+  version              = "2.15.8"
+  secrets_manager_name = "${var.prefix}-sm"
+  sm_service_plan      = var.sm_service_plan
+  region               = local.sm_region
+  resource_tags        = var.resource_tags
+  resource_group_id    = module.resource_group.resource_group_id
+  allowed_network      = "public-and-private"
 }
+
 
 # Additional Secrets-Manager Secret-Group for SERVICE level secrets
 module "secrets_manager_group_acct" {
   source               = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version              = "1.4.6"
+  version              = "1.5.3"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   #tfsec:ignore:general-secrets-no-plaintext-exposure
@@ -316,7 +317,7 @@ module "external_secrets_operator" {
 ## Create dynamic Service ID API key and add to secret manager
 module "dynamic_serviceid_apikey1" {
   source  = "terraform-ibm-modules/iam-serviceid-apikey-secrets-manager/ibm"
-  version = "1.3.0"
+  version = "1.4.0"
   region  = local.sm_region
   #tfsec:ignore:general-secrets-no-plaintext-exposure
   sm_iam_secret_name        = "${var.prefix}-${var.sm_iam_secret_name}"
@@ -324,7 +325,7 @@ module "dynamic_serviceid_apikey1" {
   serviceid_id              = ibm_iam_service_id.secret_puller.id
   secrets_manager_guid      = local.sm_guid
   secret_group_id           = module.secrets_manager_group_acct.secret_group_id
-  depends_on                = [ibm_iam_service_policy.secret_puller_policy, ibm_iam_service_id.secret_puller]
+  depends_on                = [module.secrets_manager, ibm_iam_service_policy.secret_puller_policy, ibm_iam_service_id.secret_puller]
   providers = {
     ibm = ibm.ibm-sm
   }
@@ -370,7 +371,7 @@ locals {
 # Create username_password secret and store in secret manager
 module "sm_userpass_secret" {
   source               = "terraform-ibm-modules/secrets-manager-secret/ibm"
-  version              = "1.9.14"
+  version              = "1.10.1"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   secret_group_id      = module.secrets_manager_group_acct.secret_group_id

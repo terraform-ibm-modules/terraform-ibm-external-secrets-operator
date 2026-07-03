@@ -1,6 +1,6 @@
 module "resource_group" {
   source  = "terraform-ibm-modules/resource-group/ibm"
-  version = "1.4.8"
+  version = "1.6.1"
   # if an existing resource group is not set (null) create a new one using prefix
   resource_group_name          = var.resource_group == null ? "${var.prefix}-resource-group" : null
   existing_resource_group_name = var.resource_group
@@ -13,9 +13,9 @@ locals {
   secret_group_name            = "${var.prefix}-sm-secret-group"                        #checkov:skip=CKV_SECRET_6
   es_kubernetes_namespaces     = ["${var.prefix}-tp-test-1", "${var.prefix}-tp-test-2"] # namespace to create the externalsecrets resources for secrets sync
 
-  sm_guid = var.existing_sm_instance_guid == null ? ibm_resource_instance.secrets_manager[0].guid : var.existing_sm_instance_guid
+  sm_guid = var.existing_sm_instance_guid == null ? module.secrets_manager[0].secrets_manager_guid : var.existing_sm_instance_guid
   # if service_endpoints is not private the crn for SM is not needed because of VPE creation is not needed
-  sm_crn = var.existing_sm_instance_crn == null ? (var.service_endpoints == "private" ? ibm_resource_instance.secrets_manager[0].crn : "") : var.existing_sm_instance_crn
+  sm_crn = var.existing_sm_instance_crn == null ? (var.service_endpoints == "private" ? module.secrets_manager[0].secrets_manager_crn : "") : var.existing_sm_instance_crn
 
   sm_region = var.existing_sm_instance_region == null ? var.region : var.existing_sm_instance_region
 
@@ -25,23 +25,23 @@ locals {
 ## Create prerequisite.  Secrets Manager,  Secret Group and a Trusted Profile
 ##############################################################################
 
-resource "ibm_resource_instance" "secrets_manager" {
-  count             = var.existing_sm_instance_guid == null ? 1 : 0
-  name              = local.secret_manager_instance_name
-  service           = "secrets-manager"
-  plan              = local.sm_service_plan
-  location          = local.sm_region
-  resource_group_id = module.resource_group.resource_group_id
-  timeouts {
-    create = "20m" # Extending provisioning time to 20 minutes
-  }
+module "secrets_manager" {
+
+  count                = var.existing_sm_instance_guid == null ? 1 : 0
+  source               = "terraform-ibm-modules/secrets-manager/ibm"
+  version              = "2.15.8"
+  secrets_manager_name = local.secret_manager_instance_name
+  sm_service_plan      = local.sm_service_plan
+  region               = local.sm_region
+  resource_group_id    = module.resource_group.resource_group_id
+  allowed_network      = "public-and-private"
 }
 
 ## Secret Group for organizing secrets
 
 module "secrets_manager_groups" {
   source               = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version              = "1.4.6"
+  version              = "1.5.3"
   count                = length(kubernetes_namespace_v1.examples)
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
@@ -71,7 +71,7 @@ resource "kubernetes_namespace_v1" "examples" {
 module "sm_arbitrary_secrets" {
   count                = length(kubernetes_namespace_v1.examples)
   source               = "terraform-ibm-modules/secrets-manager-secret/ibm"
-  version              = "1.9.14"
+  version              = "1.10.1"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   secret_group_id      = module.secrets_manager_groups[count.index].secret_group_id
@@ -166,7 +166,7 @@ module "external_secrets" {
 
 module "vpes" {
   source   = "terraform-ibm-modules/vpe-gateway/ibm"
-  version  = "5.0.4"
+  version  = "5.3.4"
   count    = var.service_endpoints == "private" ? 1 : 0
   region   = var.region
   prefix   = "vpe"
