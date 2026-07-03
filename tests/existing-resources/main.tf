@@ -192,7 +192,7 @@ module "ocp_base" {
   vpc_id               = module.vpc.vpc.vpc_id
   vpc_subnets          = local.subnets
   worker_pools         = local.ocp_worker_pools
-  tags                 = []
+  resource_tags        = []
   use_existing_cos     = false
   # outbound required by cluster proxy
   disable_outbound_traffic_protection = true
