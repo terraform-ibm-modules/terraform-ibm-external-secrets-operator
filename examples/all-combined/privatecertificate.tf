@@ -12,15 +12,19 @@ locals {
 
 # private certificate engine
 module "secrets_manager_private_secret_engine" {
-  source                    = "terraform-ibm-modules/secrets-manager-private-cert-engine/ibm"
-  version                   = "1.14.2"
-  secrets_manager_guid      = local.sm_guid
-  region                    = local.sm_region
-  root_ca_name              = var.pvt_ca_name != null ? var.pvt_ca_name : "pvt-${var.prefix}-project-root-ca"
-  root_ca_common_name       = local.pvt_root_ca_common_name
-  root_ca_max_ttl           = var.pvt_ca_max_ttl
-  intermediate_ca_name      = "pvt-${var.prefix}-project-intermediate-ca"
-  certificate_template_name = local.pvt_certificate_template_name
+  source               = "terraform-ibm-modules/secrets-manager-private-cert-engine/ibm"
+  version              = "2.0.3"
+  secrets_manager_guid = local.sm_guid
+  region               = local.sm_region
+  root_ca_name         = var.pvt_ca_name != null ? var.pvt_ca_name : "pvt-${var.prefix}-project-root-ca"
+  root_ca_common_name  = local.pvt_root_ca_common_name
+  root_ca_max_ttl      = var.pvt_ca_max_ttl
+  intermediate_ca_name = "pvt-${var.prefix}-project-intermediate-ca"
+  certificate_templates = [
+    {
+      name = local.pvt_certificate_template_name
+    }
+  ]
   providers = {
     ibm = ibm.ibm-sm
   }
@@ -30,7 +34,7 @@ module "secrets_manager_private_secret_engine" {
 module "secrets_manager_private_certificate" {
   depends_on             = [module.secrets_manager_private_secret_engine]
   source                 = "terraform-ibm-modules/secrets-manager-private-cert/ibm"
-  version                = "1.12.2"
+  version                = "1.12.4"
   cert_name              = "${var.prefix}-sm-private-cert"
   cert_description       = "Private certificate for ${local.pvt_cert_common_name}"
   cert_secrets_group_id  = module.secrets_manager_group.secret_group_id
