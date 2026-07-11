@@ -198,7 +198,7 @@ module "network_acl" {
 # OCP CLUSTER creation
 module "ocp_base" {
   source               = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  version              = "3.90.2"
+  version              = "3.90.3"
   cluster_name         = "${var.prefix}-vpc"
   resource_group_id    = module.resource_group.resource_group_id
   region               = var.region
@@ -268,7 +268,7 @@ module "secrets_manager" {
 # Additional Secrets-Manager Secret-Group for SERVICE level secrets
 module "secrets_manager_group_acct" {
   source               = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version              = "1.5.3"
+  version              = "1.5.4"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   #tfsec:ignore:general-secrets-no-plaintext-exposure

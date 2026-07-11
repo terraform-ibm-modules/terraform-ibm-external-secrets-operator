@@ -15,7 +15,7 @@ module "mysql_db" {
 # Create secret group for service credentials
 module "service_credentials_secret_group" {
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.5.3"
+  version                  = "1.5.4"
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = "${var.prefix}-service-creds-secret-group"

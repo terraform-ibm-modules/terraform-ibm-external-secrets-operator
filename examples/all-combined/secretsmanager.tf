@@ -35,7 +35,7 @@ module "secrets_manager" {
 # create secrets group for secrets
 module "secrets_manager_group" {
   source                   = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version                  = "1.5.3"
+  version                  = "1.5.4"
   region                   = local.sm_region
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = "${var.prefix}-secret-group"                   #checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
@@ -48,7 +48,7 @@ module "secrets_manager_group" {
 # additional secrets manager secret group for service level secrets
 module "secrets_manager_group_acct" {
   source               = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version              = "1.5.3"
+  version              = "1.5.4"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   #tfsec:ignore:general-secrets-no-plaintext-exposure
