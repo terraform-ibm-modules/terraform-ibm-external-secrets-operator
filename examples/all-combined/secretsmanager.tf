@@ -23,7 +23,7 @@ module "secrets_manager" {
 
   count                = var.existing_sm_instance_guid == null ? 1 : 0
   source               = "terraform-ibm-modules/secrets-manager/ibm"
-  version              = "2.15.11"
+  version              = "2.15.12"
   secrets_manager_name = "${var.prefix}-sm"
   sm_service_plan      = var.sm_service_plan
   region               = local.sm_region
