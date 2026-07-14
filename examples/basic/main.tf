@@ -198,7 +198,7 @@ module "network_acl" {
 # OCP CLUSTER creation
 module "ocp_base" {
   source               = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  version              = "3.90.3"
+  version              = "3.90.4"
   cluster_name         = "${var.prefix}-vpc"
   resource_group_id    = module.resource_group.resource_group_id
   region               = var.region
@@ -255,7 +255,7 @@ module "secrets_manager" {
 
   count                = var.existing_sm_instance_guid == null ? 1 : 0
   source               = "terraform-ibm-modules/secrets-manager/ibm"
-  version              = "2.15.11"
+  version              = "2.15.12"
   secrets_manager_name = "${var.prefix}-sm"
   sm_service_plan      = var.sm_service_plan
   region               = local.sm_region
