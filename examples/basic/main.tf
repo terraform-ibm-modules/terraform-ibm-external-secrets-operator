@@ -255,7 +255,7 @@ module "secrets_manager" {
 
   count                = var.existing_sm_instance_guid == null ? 1 : 0
   source               = "terraform-ibm-modules/secrets-manager/ibm"
-  version              = "2.15.12"
+  version              = "2.15.13"
   secrets_manager_name = "${var.prefix}-sm"
   sm_service_plan      = var.sm_service_plan
   region               = local.sm_region
@@ -268,7 +268,7 @@ module "secrets_manager" {
 # Additional Secrets-Manager Secret-Group for SERVICE level secrets
 module "secrets_manager_group_acct" {
   source               = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version              = "1.5.4"
+  version              = "1.5.5"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   #tfsec:ignore:general-secrets-no-plaintext-exposure
