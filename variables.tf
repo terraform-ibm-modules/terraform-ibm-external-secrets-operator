@@ -77,7 +77,7 @@ variable "eso_image" {
 variable "eso_image_version" {
   type        = string
   description = "The version or digest for the external secrets image to deploy. If changing the value, ensure it is compatible with the chart version set in eso_chart_version."
-  default     = "v2.8.0-ubi@sha256:fbb7aa3fc6a5e3ad267a4f5c0b0b6b5c6c40ebfed69fa926a12b34ca3cdbb657" # datasource: ghcr.io/external-secrets/external-secrets
+  default     = "v2.9.0-ubi@sha256:951eefb47273853f38926acea64b4168980071ac68338d9a4698dd3655a0521f" # datasource: ghcr.io/external-secrets/external-secrets
   nullable    = false
   validation {
     condition     = can(regex("(^v\\d+\\.\\d+.\\d+(\\-\\w+)?(\\@sha256\\:\\w+){0,1})$", var.eso_image_version))
@@ -218,7 +218,7 @@ variable "reloader_image" {
 variable "reloader_image_version" {
   type        = string
   description = "The version or digest for the reloader image to deploy. If changing the value, ensure it is compatible with the chart version set in reloader_chart_version."
-  default     = "v1.4.20-ubi@sha256:71b8feea661db15429ee97ca33a0010e44193d289f3624171e8f11f8da17d49f" # datasource: ghcr.io/stakater/reloader
+  default     = "v1.4.21-ubi@sha256:cba26acd6531623cc695ba70c881b0e8c15f2b9e33f59da8a566765054cf1788" # datasource: ghcr.io/stakater/reloader
   nullable    = false
   validation {
     condition     = can(regex("(^v\\d+\\.\\d+.\\d+(\\-\\w+)?(\\@sha256\\:\\w+){0,1})$", var.reloader_image_version))
@@ -236,7 +236,7 @@ variable "reloader_chart_location" {
 variable "reloader_chart_version" {
   type        = string
   description = "The version of the Reloader Helm chart. Ensure that the chart version is compatible with the image version specified in reloader_image_version."
-  default     = "2.2.14" # registryUrl: stakater.github.io/stakater-charts
+  default     = "2.2.15" # registryUrl: stakater.github.io/stakater-charts
   nullable    = false
 }
 
