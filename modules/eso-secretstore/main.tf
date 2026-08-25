@@ -2,7 +2,7 @@ locals {
   helm_raw_chart_name    = "raw"
   helm_raw_chart_version = "0.2.5"
   # endpoints definition according to endpoints to use are private or public (var.service_endpoints)
-  iam_endpoint      = "${var.service_endpoints == "private" ? "private." : ""}iam.cloud.ibm.com"
+  iam_endpoint      = var.custom_iam_endpoint != null && var.custom_iam_endpoint != "" ? var.custom_iam_endpoint : "${var.service_endpoints == "private" ? "private." : ""}iam.cloud.ibm.com"
   regional_endpoint = var.service_endpoints == "private" ? "private.${var.region}" : var.region
 }
 

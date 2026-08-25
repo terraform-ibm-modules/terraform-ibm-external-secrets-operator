@@ -391,3 +391,13 @@ variable "service_endpoints" {
   description = "The service endpoint type to communicate with the provided secrets manager instance. Possible values are `public` or `private`. This also will set the iam endpoint for containerAuth when enabling Trusted Profile/CR based authentication."
   default     = "private"
 }
+
+variable "custom_iam_endpoint" {
+  type        = string
+  default     = null
+  description = "Custom IAM endpoint hostname to override the default IAM endpoint. Default to null to have the module to computing the IAM endpoint according to the value of var.service_endpoints."
+  validation {
+    condition     = var.custom_iam_endpoint == null || can(regex("^[a-zA-Z0-9]([a-zA-Z0-9\\-\\.]*[a-zA-Z0-9])$", var.custom_iam_endpoint))
+    error_message = "custom_iam_endpoint must be a valid hostname without a protocol prefix (e.g. `private.eu-de.iam.cloud.ibm.com`, not `https://...`)."
+  }
+}
