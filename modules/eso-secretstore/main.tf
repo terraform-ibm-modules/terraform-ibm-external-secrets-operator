@@ -1,8 +1,8 @@
 locals {
   helm_raw_chart_name    = "raw"
   helm_raw_chart_version = "0.2.5"
-  # IAM endpoint: regional private (private.<region>.iam.cloud.ibm.com) if use_regional_iam_endpoint=true, else global with optional "private." prefix.
-  iam_endpoint      = var.use_regional_iam_endpoint ? "private.${var.region}.iam.cloud.ibm.com" : "${var.service_endpoints == "private" ? "private." : ""}iam.cloud.ibm.com"
+  # IAM endpoint: regional private (private.<region>.iam.cloud.ibm.com) if enable_iam_regional_private_endpoint=true, else global with optional "private." prefix.
+  iam_endpoint      = var.enable_iam_regional_private_endpoint ? "private.${var.region}.iam.cloud.ibm.com" : "${var.service_endpoints == "private" ? "private." : ""}iam.cloud.ibm.com"
   regional_endpoint = var.service_endpoints == "private" ? "private.${var.region}" : var.region
 }
 

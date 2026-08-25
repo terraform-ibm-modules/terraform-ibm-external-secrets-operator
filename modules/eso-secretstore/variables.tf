@@ -15,13 +15,13 @@ variable "service_endpoints" {
   }
 }
 
-variable "use_regional_iam_endpoint" {
+variable "enable_iam_regional_private_endpoint" {
   type        = bool
   description = "Set to `true` to use the private regional IAM endpoint instead of the global IAM endpoint (`https://iam.cloud.ibm.com`) when authenticating. Can only be set to `true` when `service_endpoints` is `private`."
   default     = false
   validation {
-    condition     = var.use_regional_iam_endpoint == true ? var.service_endpoints == "private" : true
-    error_message = "use_regional_iam_endpoint can only be set to true when service_endpoints is set to `private`."
+    condition     = var.enable_iam_regional_private_endpoint == true ? var.service_endpoints == "private" : true
+    error_message = "enable_iam_regional_private_endpoint can only be set to true when service_endpoints is set to `private`."
   }
 }
 

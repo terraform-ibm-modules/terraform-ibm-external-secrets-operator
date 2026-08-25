@@ -53,6 +53,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_enable_iam_regional_private_endpoint"></a> [enable\_iam\_regional\_private\_endpoint](#input\_enable\_iam\_regional\_private\_endpoint) | Set to `true` to use the private regional IAM endpoint instead of the global IAM endpoint (`https://iam.cloud.ibm.com`) when authenticating. Can only be set to `true` when `service_endpoints` is `private`. | `bool` | `false` | no |
 | <a name="input_eso_authentication"></a> [eso\_authentication](#input\_eso\_authentication) | Authentication method, Possible values are api\_key or/and trusted\_profile. | `string` | `"trusted_profile"` | no |
 | <a name="input_region"></a> [region](#input\_region) | Region where Secrets Manager is deployed. It will be used to build the regional URL to the service | `string` | n/a | yes |
 | <a name="input_rollback_on_failure"></a> [rollback\_on\_failure](#input\_rollback\_on\_failure) | Flag to automatically rollback the helm chart on installation failure. | `bool` | `true` | no |
@@ -64,7 +65,6 @@ No modules.
 | <a name="input_sstore_secrets_manager_guid"></a> [sstore\_secrets\_manager\_guid](#input\_sstore\_secrets\_manager\_guid) | Secrets manager instance GUID for secrets store where secrets will be stored or fetched from | `string` | n/a | yes |
 | <a name="input_sstore_store_name"></a> [sstore\_store\_name](#input\_sstore\_store\_name) | Name of the SecretStore to create | `string` | n/a | yes |
 | <a name="input_sstore_trusted_profile_name"></a> [sstore\_trusted\_profile\_name](#input\_sstore\_trusted\_profile\_name) | The name of the trusted profile to use for the secrets store. This allows ESO to use CRI based authentication to access secrets manager. The trusted profile must be created in advance | `string` | `null` | no |
-| <a name="input_use_regional_iam_endpoint"></a> [use\_regional\_iam\_endpoint](#input\_use\_regional\_iam\_endpoint) | Set to `true` to use the private regional IAM endpoint instead of the global IAM endpoint (`https://iam.cloud.ibm.com`) when authenticating. Can only be set to `true` when `service_endpoints` is `private`. | `bool` | `false` | no |
 
 ### Outputs
 
