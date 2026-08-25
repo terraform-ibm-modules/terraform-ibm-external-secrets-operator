@@ -64,6 +64,7 @@ No modules.
 | <a name="input_sstore_secrets_manager_guid"></a> [sstore\_secrets\_manager\_guid](#input\_sstore\_secrets\_manager\_guid) | Secrets manager instance GUID for secrets store where secrets will be stored or fetched from | `string` | n/a | yes |
 | <a name="input_sstore_store_name"></a> [sstore\_store\_name](#input\_sstore\_store\_name) | Name of the SecretStore to create | `string` | n/a | yes |
 | <a name="input_sstore_trusted_profile_name"></a> [sstore\_trusted\_profile\_name](#input\_sstore\_trusted\_profile\_name) | The name of the trusted profile to use for the secrets store. This allows ESO to use CRI based authentication to access secrets manager. The trusted profile must be created in advance | `string` | `null` | no |
+| <a name="input_use_regional_iam_endpoint"></a> [use\_regional\_iam\_endpoint](#input\_use\_regional\_iam\_endpoint) | Set to `true` to use the private regional IAM endpoint instead of the global IAM endpoint (`https://iam.cloud.ibm.com`) when authenticating. Can only be set to `true` when `service_endpoints` is `private`. | `bool` | `false` | no |
 
 ### Outputs
 

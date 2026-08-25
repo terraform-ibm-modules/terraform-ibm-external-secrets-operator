@@ -64,6 +64,7 @@ No modules.
 | <a name="input_region"></a> [region](#input\_region) | Region where Secrets Manager is deployed. It will be used to build the regional URL to the service | `string` | n/a | yes |
 | <a name="input_rollback_on_failure"></a> [rollback\_on\_failure](#input\_rollback\_on\_failure) | Flag to automatically rollback the helm chart on installation failure. | `bool` | `true` | no |
 | <a name="input_service_endpoints"></a> [service\_endpoints](#input\_service\_endpoints) | The service endpoint type to communicate with the provided secrets manager instance. Possible values are `public` or `private`. This also will set the iam endpoint for containerAuth when enabling Trusted Profile/CR based authentication. | `string` | `"public"` | no |
+| <a name="input_use_regional_iam_endpoint"></a> [use\_regional\_iam\_endpoint](#input\_use\_regional\_iam\_endpoint) | Set to `true` to use the private regional IAM endpoint instead of the global IAM endpoint (`https://iam.cloud.ibm.com`) when authenticating. Can only be set to `true` when `service_endpoints` is `private`. | `bool` | `false` | no |
 
 ### Outputs
 

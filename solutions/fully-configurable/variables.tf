@@ -391,3 +391,13 @@ variable "service_endpoints" {
   description = "The service endpoint type to communicate with the provided secrets manager instance. Possible values are `public` or `private`. This also will set the iam endpoint for containerAuth when enabling Trusted Profile/CR based authentication."
   default     = "private"
 }
+
+variable "use_regional_iam_endpoint" {
+  type        = bool
+  description = "Set to `true` to use the private regional IAM endpoint instead of the global IAM endpoint (`https://<private>.iam.cloud.ibm.com`) when authenticating. Can only be set to `true` when `service_endpoints` is `private`."
+  default     = false
+  validation {
+    condition     = var.use_regional_iam_endpoint == true ? var.service_endpoints == "private" : true
+    error_message = "use_regional_iam_endpoint can only be set to true when service_endpoints is set to `private`."
+  }
+}

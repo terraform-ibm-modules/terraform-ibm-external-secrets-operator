@@ -310,6 +310,9 @@
                   "value": "private"
                 }
               ]
+            },
+            {
+              "key": "use_regional_iam_endpoint"
             }
           ],
           "architecture": {

@@ -640,6 +640,7 @@ module "eso_clustersecretsstore" {
   clusterstore_secrets_manager_guid = local.sm_guid
   eso_namespace                     = each.value.namespace
   service_endpoints                 = var.service_endpoints
+  use_regional_iam_endpoint         = var.use_regional_iam_endpoint
   clusterstore_trusted_profile_name = each.value.trusted_profile_name != null && each.value.trusted_profile_name != "" ? each.value.trusted_profile_name : null
   depends_on = [
     module.external_secrets_operator, module.cluster_secrets_store_namespace
@@ -667,6 +668,7 @@ module "eso_secretsstore" {
   sstore_store_name           = each.value.name
   sstore_secret_apikey        = each.value.secret_apikey
   service_endpoints           = var.service_endpoints
+  use_regional_iam_endpoint   = var.use_regional_iam_endpoint
   sstore_helm_rls_name        = "${each.value.name}-helmrelease"
   sstore_trusted_profile_name = each.value.trusted_profile_name != null && each.value.trusted_profile_name != "" ? each.value.trusted_profile_name : null
   sstore_secret_name          = each.value.secret_apikey != null ? "${each.value.name}-auth-apikey" : null #checkov:skip=CKV_SECRET_6

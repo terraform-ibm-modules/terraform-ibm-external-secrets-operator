@@ -2,8 +2,8 @@ locals {
   helm_raw_chart_name    = "raw"
   helm_raw_chart_version = "0.2.5"
 
-  # endpoints definition according to endpoints to use are private or public (var.service_endpoints)
-  iam_endpoint                           = "${var.service_endpoints == "private" ? "private." : ""}iam.cloud.ibm.com"
+  # IAM endpoint: regional private (private.<region>.iam.cloud.ibm.com) if use_regional_iam_endpoint=true, else global with optional "private." prefix.
+  iam_endpoint                           = var.use_regional_iam_endpoint ? "private.${var.region}.iam.cloud.ibm.com" : "${var.service_endpoints == "private" ? "private." : ""}iam.cloud.ibm.com"
   regional_endpoint                      = var.service_endpoints == "private" ? "private.${var.region}" : var.region
   cluster_store_secrets_manager_endpoint = "${var.clusterstore_secrets_manager_guid}.${local.regional_endpoint}.secrets-manager.appdomain.cloud"
 }
