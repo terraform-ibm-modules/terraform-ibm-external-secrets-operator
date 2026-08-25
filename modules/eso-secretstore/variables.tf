@@ -18,7 +18,11 @@ variable "service_endpoints" {
 variable "custom_iam_endpoint" {
   type        = string
   default     = null
-  description = "Custom IAM endpoint hostname (without https://) for regions requiring region-specific IAM endpoints (e.g., `<region>.iam.cloud.ibm.com` or `private.<region>.iam.cloud.ibm.com`). This overrides the default global IAM endpoint."
+  description = "Custom IAM endpoint hostname to override the default IAM endpoint. Default to null to have the module to computing the IAM endpoint according to the value of var.service_endpoints."
+  validation {
+    condition     = var.custom_iam_endpoint == null || can(regex("^[a-zA-Z0-9]([a-zA-Z0-9\\-\\.]*[a-zA-Z0-9])$", var.custom_iam_endpoint))
+    error_message = "custom_iam_endpoint must be a valid hostname without a protocol prefix (e.g. `private.eu-de.iam.cloud.ibm.com`, not `https://...`)."
+  }
 }
 
 ##############################################################################

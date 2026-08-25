@@ -53,7 +53,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_custom_iam_endpoint"></a> [custom\_iam\_endpoint](#input\_custom\_iam\_endpoint) | Custom IAM endpoint hostname (without https://) for regions requiring region-specific IAM endpoints (e.g., `<region>.iam.cloud.ibm.com` or `private.<region>.iam.cloud.ibm.com`). This overrides the default global IAM endpoint. | `string` | `null` | no |
+| <a name="input_custom_iam_endpoint"></a> [custom\_iam\_endpoint](#input\_custom\_iam\_endpoint) | Custom IAM endpoint hostname to override the default IAM endpoint. Default to null to have the module to computing the IAM endpoint according to the value of var.service\_endpoints. | `string` | `null` | no |
 | <a name="input_eso_authentication"></a> [eso\_authentication](#input\_eso\_authentication) | Authentication method, Possible values are api\_key or/and trusted\_profile. | `string` | `"trusted_profile"` | no |
 | <a name="input_region"></a> [region](#input\_region) | Region where Secrets Manager is deployed. It will be used to build the regional URL to the service | `string` | n/a | yes |
 | <a name="input_rollback_on_failure"></a> [rollback\_on\_failure](#input\_rollback\_on\_failure) | Flag to automatically rollback the helm chart on installation failure. | `bool` | `true` | no |
