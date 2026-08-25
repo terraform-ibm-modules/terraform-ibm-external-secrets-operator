@@ -312,7 +312,7 @@
               ]
             },
             {
-              "key": "enable_iam_regional_private_endpoint"
+              "key": "custom_iam_endpoint"
             }
           ],
           "architecture": {

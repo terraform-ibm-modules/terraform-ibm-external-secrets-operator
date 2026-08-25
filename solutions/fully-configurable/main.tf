@@ -630,18 +630,18 @@ module "eso_clustersecretsstore" {
       "namespace" : cluster_secrets_store.namespace
     }
   })
-  source                               = "../../modules/eso-clusterstore"
-  eso_authentication                   = each.value.authentication
-  clusterstore_secret_apikey           = each.value.secret_apikey
-  region                               = local.sm_region
-  clusterstore_helm_rls_name           = "${each.value.name}-helmrelease"
-  clusterstore_secret_name             = each.value.secret_apikey != null ? "${each.value.name}-auth-apikey" : null #checkov:skip=CKV_SECRET_6
-  clusterstore_name                    = each.value.name
-  clusterstore_secrets_manager_guid    = local.sm_guid
-  eso_namespace                        = each.value.namespace
-  service_endpoints                    = var.service_endpoints
-  enable_iam_regional_private_endpoint = var.enable_iam_regional_private_endpoint
-  clusterstore_trusted_profile_name    = each.value.trusted_profile_name != null && each.value.trusted_profile_name != "" ? each.value.trusted_profile_name : null
+  source                            = "../../modules/eso-clusterstore"
+  eso_authentication                = each.value.authentication
+  clusterstore_secret_apikey        = each.value.secret_apikey
+  region                            = local.sm_region
+  clusterstore_helm_rls_name        = "${each.value.name}-helmrelease"
+  clusterstore_secret_name          = each.value.secret_apikey != null ? "${each.value.name}-auth-apikey" : null #checkov:skip=CKV_SECRET_6
+  clusterstore_name                 = each.value.name
+  clusterstore_secrets_manager_guid = local.sm_guid
+  eso_namespace                     = each.value.namespace
+  service_endpoints                 = var.service_endpoints
+  custom_iam_endpoint               = var.custom_iam_endpoint
+  clusterstore_trusted_profile_name = each.value.trusted_profile_name != null && each.value.trusted_profile_name != "" ? each.value.trusted_profile_name : null
   depends_on = [
     module.external_secrets_operator, module.cluster_secrets_store_namespace
   ]
@@ -659,17 +659,17 @@ module "eso_secretsstore" {
       "namespace" : secrets_store.namespace
     }
   })
-  depends_on                           = [module.external_secrets_operator, module.secrets_store_namespace]
-  source                               = "../../modules/eso-secretstore"
-  eso_authentication                   = each.value.authentication
-  region                               = local.sm_region
-  sstore_namespace                     = each.value.namespace
-  sstore_secrets_manager_guid          = local.sm_guid
-  sstore_store_name                    = each.value.name
-  sstore_secret_apikey                 = each.value.secret_apikey
-  service_endpoints                    = var.service_endpoints
-  enable_iam_regional_private_endpoint = var.enable_iam_regional_private_endpoint
-  sstore_helm_rls_name                 = "${each.value.name}-helmrelease"
-  sstore_trusted_profile_name          = each.value.trusted_profile_name != null && each.value.trusted_profile_name != "" ? each.value.trusted_profile_name : null
-  sstore_secret_name                   = each.value.secret_apikey != null ? "${each.value.name}-auth-apikey" : null #checkov:skip=CKV_SECRET_6
+  depends_on                  = [module.external_secrets_operator, module.secrets_store_namespace]
+  source                      = "../../modules/eso-secretstore"
+  eso_authentication          = each.value.authentication
+  region                      = local.sm_region
+  sstore_namespace            = each.value.namespace
+  sstore_secrets_manager_guid = local.sm_guid
+  sstore_store_name           = each.value.name
+  sstore_secret_apikey        = each.value.secret_apikey
+  service_endpoints           = var.service_endpoints
+  custom_iam_endpoint         = var.custom_iam_endpoint
+  sstore_helm_rls_name        = "${each.value.name}-helmrelease"
+  sstore_trusted_profile_name = each.value.trusted_profile_name != null && each.value.trusted_profile_name != "" ? each.value.trusted_profile_name : null
+  sstore_secret_name          = each.value.secret_apikey != null ? "${each.value.name}-auth-apikey" : null #checkov:skip=CKV_SECRET_6
 }
