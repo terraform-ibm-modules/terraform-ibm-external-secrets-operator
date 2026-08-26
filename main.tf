@@ -5,11 +5,11 @@
 ##############################################################################
 
 
-# creating namespace to deploy ESO into RedHat ServiceMesh
+# creating namespace to deploy ESO in RedHat ServiceMesh
 module "eso_namespace" {
   count   = var.eso_namespace != null ? 1 : 0
   source  = "terraform-ibm-modules/namespace/ibm"
-  version = "2.0.1"
+  version = "2.0.2"
   namespaces = [
     {
       name = var.eso_namespace
@@ -176,6 +176,7 @@ resource "helm_release" "external_secrets_operator" {
   chart      = "external-secrets"
   version    = var.eso_chart_version
   wait       = true
+  atomic     = var.rollback_on_failure
   repository = var.eso_chart_location
 
   set = [{
@@ -207,10 +208,22 @@ resource "helm_release" "external_secrets_operator" {
       name  = "certController.image.tag"
       type  = "string"
       value = var.eso_image_version
+    },
+    {
+      name  = "concurrent"
+      value = var.concurrent_reconciles
   }]
 
   # The following mounts are needed for the CRI based authentication with Trusted Profiles
-  values = [local.eso_helm_release_values_cri, local.eso_helm_release_values_workerselector]
+  values = [local.eso_helm_release_values_cri, local.eso_helm_release_values_workerselector, length(var.eso_image_pull_secrets) > 0 ? yamlencode({
+    global = {
+      imagePullSecrets = [
+        for secret in var.eso_image_pull_secrets :
+        {
+          name = secret
+        }
+      ]
+  } }) : ""]
 }
 
 locals {
@@ -241,6 +254,7 @@ resource "helm_release" "pod_reloader" {
   repository = var.reloader_chart_location
   version    = var.reloader_chart_version
   wait       = true
+  atomic     = var.rollback_on_failure
 
   set = concat([
     {
@@ -306,5 +320,13 @@ resource "helm_release" "pod_reloader" {
   )
 
   # Set the values attribute conditionally
-  values = var.reloader_custom_values != null ? [var.reloader_custom_values] : []
+  values = [var.reloader_custom_values != null ? var.reloader_custom_values : "", length(var.reloader_image_pull_secrets) > 0 ? yamlencode({
+    global = {
+      imagePullSecrets = [
+        for secret in var.reloader_image_pull_secrets :
+        {
+          name = secret
+        }
+      ]
+  } }) : ""]
 }

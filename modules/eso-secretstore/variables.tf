@@ -15,6 +15,16 @@ variable "service_endpoints" {
   }
 }
 
+variable "custom_iam_endpoint" {
+  type        = string
+  default     = null
+  description = "Custom IAM endpoint hostname to override the default IAM endpoint. Default to null to have the module to computing the IAM endpoint according to the value of var.service_endpoints."
+  validation {
+    condition     = var.custom_iam_endpoint == null || can(regex("^[a-zA-Z0-9]([a-zA-Z0-9\\-\\.]*[a-zA-Z0-9])$", var.custom_iam_endpoint))
+    error_message = "custom_iam_endpoint must be a valid hostname without a protocol prefix (e.g. `private.eu-de.iam.cloud.ibm.com`, not `https://...`)."
+  }
+}
+
 ##############################################################################
 # Authentication configuration for secretsstore that can be one of api_key or trusted_profile
 ##############################################################################
@@ -88,4 +98,10 @@ variable "sstore_helm_rls_name" {
   description = "Name of helm release for the secrets store"
   type        = string
   default     = "external-secret-store"
+}
+
+variable "rollback_on_failure" {
+  description = "Flag to automatically rollback the helm chart on installation failure."
+  type        = bool
+  default     = true
 }

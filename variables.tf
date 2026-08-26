@@ -77,7 +77,7 @@ variable "eso_image" {
 variable "eso_image_version" {
   type        = string
   description = "The version or digest for the external secrets image to deploy. If changing the value, ensure it is compatible with the chart version set in eso_chart_version."
-  default     = "v2.0.1-ubi@sha256:16791f38ef5ed18e86fb362279086b4602efe9e9d5ac20c0ebe56b3e0a5bee1c" # datasource: ghcr.io/external-secrets/external-secrets
+  default     = "v2.9.0-ubi@sha256:951eefb47273853f38926acea64b4168980071ac68338d9a4698dd3655a0521f" # datasource: ghcr.io/external-secrets/external-secrets
   nullable    = false
   validation {
     condition     = can(regex("(^v\\d+\\.\\d+.\\d+(\\-\\w+)?(\\@sha256\\:\\w+){0,1})$", var.eso_image_version))
@@ -95,7 +95,21 @@ variable "eso_chart_location" {
 variable "eso_chart_version" {
   type        = string
   description = "The version of the External Secrets Operator Helm chart. Ensure that the chart version is compatible with the image version specified in eso_image_version."
-  default     = "2.0.1" # registryUrl: charts.external-secrets.io
+  default     = "2.9.0" # registryUrl: charts.external-secrets.io
+  nullable    = false
+}
+
+variable "concurrent_reconciles" {
+  type        = number
+  description = "The number of concurrent reconciles the External Secrets Operator controller can do. [Learn more](https://external-secrets.io/v2.5.0/api/controller-options)."
+  default     = 1
+  nullable    = false
+}
+
+variable "eso_image_pull_secrets" {
+  type        = list(string)
+  description = "The list of global imagePullSecrets that will be added to every ESO deployments. The referenced secrets must already exist in the target Kubernetes namespace before deployment. This module does not create or manage imagePullSecret resources; it only configures existing secrets for use by the deployments."
+  default     = []
   nullable    = false
 }
 
@@ -204,7 +218,7 @@ variable "reloader_image" {
 variable "reloader_image_version" {
   type        = string
   description = "The version or digest for the reloader image to deploy. If changing the value, ensure it is compatible with the chart version set in reloader_chart_version."
-  default     = "v1.4.13-ubi@sha256:f3dbec957c0532eeec47d090d94a3abd11b7012480c7a23ea69ed066fb4e3c9b" # datasource: ghcr.io/stakater/reloader
+  default     = "v1.4.21-ubi@sha256:cba26acd6531623cc695ba70c881b0e8c15f2b9e33f59da8a566765054cf1788" # datasource: ghcr.io/stakater/reloader
   nullable    = false
   validation {
     condition     = can(regex("(^v\\d+\\.\\d+.\\d+(\\-\\w+)?(\\@sha256\\:\\w+){0,1})$", var.reloader_image_version))
@@ -222,6 +236,19 @@ variable "reloader_chart_location" {
 variable "reloader_chart_version" {
   type        = string
   description = "The version of the Reloader Helm chart. Ensure that the chart version is compatible with the image version specified in reloader_image_version."
-  default     = "2.2.8" # registryUrl: stakater.github.io/stakater-charts
+  default     = "2.2.16" # registryUrl: stakater.github.io/stakater-charts
+  nullable    = false
+}
+
+variable "rollback_on_failure" {
+  description = "Flag to automatically rollback the helm chart on installation failure."
+  type        = bool
+  default     = false
+}
+
+variable "reloader_image_pull_secrets" {
+  type        = list(string)
+  description = "The list of global imagePullSecrets that will be added to every reloader deployments. The referenced secrets must already exist in the target Kubernetes namespace before deployment. This module does not create or manage imagePullSecret resources; it only configures existing secrets for use by the deployments."
+  default     = []
   nullable    = false
 }

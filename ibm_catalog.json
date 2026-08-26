@@ -175,6 +175,17 @@
               "key": "eso_enroll_in_servicemesh"
             },
             {
+              "key": "eso_image_pull_secrets",
+              "custom_config": {
+                "type": "array",
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "type": "string"
+                }
+              }
+            },
+            {
               "key": "reloader_deployed"
             },
             {
@@ -265,6 +276,17 @@
               "key": "reloader_chart_version"
             },
             {
+              "key": "reloader_image_pull_secrets",
+              "custom_config": {
+                "type": "array",
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "type": "string"
+                }
+              }
+            },
+            {
               "key": "eso_secretsstores_configuration",
               "type": "string",
               "custom_config": {
@@ -288,6 +310,9 @@
                   "value": "private"
                 }
               ]
+            },
+            {
+              "key": "custom_iam_endpoint"
             }
           ],
           "architecture": {
@@ -301,7 +326,7 @@
               {
                 "diagram": {
                   "caption": "External Secrets Operator architecture on IBM Cloud OpenShift cluster",
-                  "url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/main/reference-architectures/reference-architectures/eso.svg",
+                  "url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/refs/heads/main/reference-architectures/eso.svg",
                   "type": "image/svg+xml"
                 },
                 "description": "This architecture supports deploying External Secrets Operator on IBM Cloud OpenShift cluster."
