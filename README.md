@@ -139,6 +139,7 @@ module "external_secrets_operator" {
 ```
 
 will make the External Secret Operator to run on clusters nodes labeled with `dedicated: edge`.
+
 The resulting helm release configuration, according to the `terraform plan` output would be like
 
 ```bash
