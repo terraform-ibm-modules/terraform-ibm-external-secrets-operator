@@ -199,7 +199,7 @@ var ignoreUpdates = []string{
 	"module.external_secrets_trusted_profiles[0].ibm_iam_trusted_profile.trusted_profile",
 	"module.external_secrets_trusted_profiles[1].ibm_iam_trusted_profile.trusted_profile",
 	// temporary ignoring updates because the provider always shows it to be updated
-	// https://github.ibm.com/GoldenEye/issues/issues/20219
+	// https://github.com/terraform-ibm-modules/terraform-ibm-external-secrets-operator/issues/305
 	"ibm_sm_imported_certificate.secrets_manager_imported_certificate[0]",
 }
 
