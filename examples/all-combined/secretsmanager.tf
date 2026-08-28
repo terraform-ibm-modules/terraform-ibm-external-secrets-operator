@@ -23,7 +23,7 @@ module "secrets_manager" {
 
   count                = var.existing_sm_instance_guid == null ? 1 : 0
   source               = "terraform-ibm-modules/secrets-manager/ibm"
-  version              = "2.15.13"
+  version              = "2.15.14"
   secrets_manager_name = "${var.prefix}-sm"
   sm_service_plan      = var.sm_service_plan
   region               = local.sm_region
@@ -85,7 +85,7 @@ resource "ibm_iam_service_policy" "secret_puller_policy" {
 # create dynamic Service ID API key and add to secret manager
 module "dynamic_serviceid_apikey1" {
   source  = "terraform-ibm-modules/iam-serviceid-apikey-secrets-manager/ibm"
-  version = "1.4.0"
+  version = "1.5.0"
   region  = local.sm_region
   #tfsec:ignore:general-secrets-no-plaintext-exposure
   sm_iam_secret_name        = "${var.prefix}-${var.sm_iam_secret_name}"
