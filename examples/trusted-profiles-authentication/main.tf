@@ -29,7 +29,7 @@ module "secrets_manager" {
 
   count                = var.existing_sm_instance_guid == null ? 1 : 0
   source               = "terraform-ibm-modules/secrets-manager/ibm"
-  version              = "2.15.16"
+  version              = "2.15.17"
   secrets_manager_name = local.secret_manager_instance_name
   sm_service_plan      = local.sm_service_plan
   region               = local.sm_region
@@ -166,7 +166,7 @@ module "external_secrets" {
 
 module "vpes" {
   source   = "terraform-ibm-modules/vpe-gateway/ibm"
-  version  = "5.4.0"
+  version  = "5.4.1"
   count    = var.service_endpoints == "private" ? 1 : 0
   region   = var.region
   prefix   = "vpe"
