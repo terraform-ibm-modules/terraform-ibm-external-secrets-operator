@@ -29,7 +29,7 @@ module "secrets_manager" {
 
   count                = var.existing_sm_instance_guid == null ? 1 : 0
   source               = "terraform-ibm-modules/secrets-manager/ibm"
-  version              = "2.15.17"
+  version              = "2.15.19"
   secrets_manager_name = local.secret_manager_instance_name
   sm_service_plan      = local.sm_service_plan
   region               = local.sm_region
@@ -41,7 +41,7 @@ module "secrets_manager" {
 
 module "secrets_manager_groups" {
   source               = "terraform-ibm-modules/secrets-manager-secret-group/ibm"
-  version              = "1.5.5"
+  version              = "1.5.6"
   count                = length(kubernetes_namespace_v1.examples)
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
