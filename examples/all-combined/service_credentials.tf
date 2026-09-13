@@ -5,7 +5,7 @@
 # Create MySQL database instance using the IBM ICD MySQL module
 module "mysql_db" {
   source              = "terraform-ibm-modules/icd-mysql/ibm"
-  version             = "3.0.2"
+  version             = "3.0.3"
   name                = "${var.prefix}-mysql-db"
   region              = var.region
   deletion_protection = false
