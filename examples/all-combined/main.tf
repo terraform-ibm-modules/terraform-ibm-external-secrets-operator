@@ -232,7 +232,7 @@ data "ibm_cis" "cis_instance" {
 
 module "vpes" {
   source   = "terraform-ibm-modules/vpe-gateway/ibm"
-  version  = "5.4.1"
+  version  = "5.4.2"
   count    = var.service_endpoints == "private" ? 1 : 0
   region   = var.region
   prefix   = "vpe"
