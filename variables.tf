@@ -77,7 +77,7 @@ variable "eso_image" {
 variable "eso_image_version" {
   type        = string
   description = "The version or digest for the external secrets image to deploy. If changing the value, ensure it is compatible with the chart version set in eso_chart_version."
-  default     = "v2.10.0-ubi@sha256:6dc910fbf3f6d7010273e4896734aa975cca40bf01900f9adbb81bdf7dc578d4" # datasource: ghcr.io/external-secrets/external-secrets
+  default     = "v2.11.0-ubi@sha256:23b824991c6ac988c4755a220e2d83a7429a58360520813891da3e987b919703" # datasource: ghcr.io/external-secrets/external-secrets
   nullable    = false
   validation {
     condition     = can(regex("(^v\\d+\\.\\d+.\\d+(\\-\\w+)?(\\@sha256\\:\\w+){0,1})$", var.eso_image_version))
