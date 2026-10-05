@@ -18,7 +18,7 @@ module "eso_namespace" {
         labels = {
         }
         annotations = {
-          "istio-injection" = var.eso_enroll_in_servicemesh == true ? "enabled" : null
+          "istio-injection" = var.eso_enroll_in_servicemesh == true ? "enabled" : "disabled"
         }
       }
     }
