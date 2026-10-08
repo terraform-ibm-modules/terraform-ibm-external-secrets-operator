@@ -30,7 +30,7 @@ module "external_secret_usr_pass" {
 ### Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.0.0, <4.0.0 |
 
@@ -41,7 +41,7 @@ No modules.
 ### Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [helm_release.kubernetes_secret](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.kubernetes_secret_certificate](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.kubernetes_secret_chain_list](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
@@ -53,7 +53,7 @@ No modules.
 ### Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_es_container_registry"></a> [es\_container\_registry](#input\_es\_container\_registry) | The registry URL to be used in dockerconfigjson | `string` | `"us.icr.io"` | no |
 | <a name="input_es_container_registry_email"></a> [es\_container\_registry\_email](#input\_es\_container\_registry\_email) | Optional - Email to be used in dockerconfigjson | `string` | `null` | no |
 | <a name="input_es_container_registry_secrets_chain"></a> [es\_container\_registry\_secrets\_chain](#input\_es\_container\_registry\_secrets\_chain) | Structure to generate a chain of secrets into a single dockerjsonconfig secret for multiple registries authentication. | <pre>list(object({<br/>    es_container_registry       = string<br/>    sm_secret_id                = string # id of the secret storing the apikey that will be used for the secrets chain<br/>    es_container_registry_email = optional(string, null)<br/>    trusted_profile             = optional(string, null)<br/>  }))</pre> | `[]` | no |

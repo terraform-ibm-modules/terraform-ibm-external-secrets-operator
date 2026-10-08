@@ -32,7 +32,7 @@ module "eso_clusterstore" {
 ### Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.0.0, <4.0.0 |
 | <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | >= 3.0.1, <4.0.0 |
@@ -44,7 +44,7 @@ No modules.
 ### Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [helm_release.cluster_secret_store_apikey](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.cluster_secret_store_tp](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [kubernetes_secret_v1.eso_clusterstore_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret_v1) | resource |
@@ -52,7 +52,7 @@ No modules.
 ### Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_clusterstore_helm_rls_name"></a> [clusterstore\_helm\_rls\_name](#input\_clusterstore\_helm\_rls\_name) | Name of helm release for cluster secrets store | `string` | `"cluster-secret-store"` | no |
 | <a name="input_clusterstore_name"></a> [clusterstore\_name](#input\_clusterstore\_name) | Name of the ESO cluster secrets store to be used/created for cluster scope. | `string` | `"clustersecret-store"` | no |
 | <a name="input_clusterstore_secret_apikey"></a> [clusterstore\_secret\_apikey](#input\_clusterstore\_secret\_apikey) | APIkey to be configured in the clusterstore\_secret\_name secret in the ESO cluster secrets store. One between clusterstore\_secret\_apikey and clusterstore\_trusted\_profile\_name must be filled | `string` | `null` | no |
@@ -69,6 +69,6 @@ No modules.
 ### Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_helm_release_cluster_store"></a> [helm\_release\_cluster\_store](#output\_helm\_release\_cluster\_store) | ClusterSecretStore helm release. Returning the helm release for trusted profile or apikey authentication according to the authentication type |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
