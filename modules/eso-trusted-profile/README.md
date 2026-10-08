@@ -23,7 +23,7 @@ module "clusterstore_trusted_profile" {
 ### Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_ibm"></a> [ibm](#requirement\_ibm) | >= 1.51.0 |
 
@@ -34,7 +34,7 @@ No modules.
 ### Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [ibm_iam_trusted_profile.trusted_profile](https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/iam_trusted_profile) | resource |
 | [ibm_iam_trusted_profile_claim_rule.claim_rule](https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/iam_trusted_profile_claim_rule) | resource |
 | [ibm_iam_trusted_profile_policy.policy](https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/iam_trusted_profile_policy) | resource |
@@ -43,7 +43,7 @@ No modules.
 ### Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_secret_groups_id"></a> [secret\_groups\_id](#input\_secret\_groups\_id) | The list of secret groups to limit access to for the trusted profile to create. | `list(string)` | `[]` | no |
 | <a name="input_secrets_manager_guid"></a> [secrets\_manager\_guid](#input\_secrets\_manager\_guid) | Secrets manager instance GUID where secrets will be stored or fetched from and the trusted profile will allow access to. | `string` | n/a | yes |
 | <a name="input_tp_cluster_crn"></a> [tp\_cluster\_crn](#input\_tp\_cluster\_crn) | Target cluster CRN for the trusted profile. Used when creating trusted profile | `string` | n/a | yes |
@@ -54,7 +54,7 @@ No modules.
 ### Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_trusted_profile_id"></a> [trusted\_profile\_id](#output\_trusted\_profile\_id) | ID of the trusted profile |
 | <a name="output_trusted_profile_name"></a> [trusted\_profile\_name](#output\_trusted\_profile\_name) | Name of the trusted profile |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

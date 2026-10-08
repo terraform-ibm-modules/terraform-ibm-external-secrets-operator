@@ -515,7 +515,7 @@ You need the following permissions to run this module.
 ### Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.0.0, <4.0.0 |
 | <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | >= 3.0.1, < 4.0.0 |
@@ -523,13 +523,13 @@ You need the following permissions to run this module.
 ### Modules
 
 | Name | Source | Version |
-|------|--------|---------|
+| ---- | ------ | ------- |
 | <a name="module_eso_namespace"></a> [eso\_namespace](#module\_eso\_namespace) | terraform-ibm-modules/namespace/ibm | 2.0.2 |
 
 ### Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [helm_release.external_secrets_operator](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.pod_reloader](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [kubernetes_namespace_v1.existing_eso_namespace](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/data-sources/namespace_v1) | data source |
@@ -537,7 +537,7 @@ You need the following permissions to run this module.
 ### Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_concurrent_reconciles"></a> [concurrent\_reconciles](#input\_concurrent\_reconciles) | The number of concurrent reconciles the External Secrets Operator controller can do. [Learn more](https://external-secrets.io/v2.5.0/api/controller-options). | `number` | `1` | no |
 | <a name="input_eso_chart_location"></a> [eso\_chart\_location](#input\_eso\_chart\_location) | The location of the External Secrets Operator Helm chart. | `string` | `"https://charts.external-secrets.io"` | no |
 | <a name="input_eso_chart_version"></a> [eso\_chart\_version](#input\_eso\_chart\_version) | The version of the External Secrets Operator Helm chart. Ensure that the chart version is compatible with the image version specified in eso\_image\_version. | `string` | `"2.12.0"` | no |

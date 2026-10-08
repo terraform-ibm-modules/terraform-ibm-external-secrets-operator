@@ -32,7 +32,7 @@ module "eso_apikey_secretstore" {
 ### Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.0.0, <4.0.0 |
 | <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | >= 3.0.1, <4.0.0 |
@@ -44,7 +44,7 @@ No modules.
 ### Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [helm_release.external_secret_store_apikey](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.external_secret_store_tp](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [kubernetes_secret_v1.eso_secretsstore_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret_v1) | resource |
@@ -52,7 +52,7 @@ No modules.
 ### Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_custom_iam_endpoint"></a> [custom\_iam\_endpoint](#input\_custom\_iam\_endpoint) | Custom IAM endpoint hostname to override the default IAM endpoint. Default to null to have the module to computing the IAM endpoint according to the value of var.service\_endpoints. | `string` | `null` | no |
 | <a name="input_eso_authentication"></a> [eso\_authentication](#input\_eso\_authentication) | Authentication method, Possible values are api\_key or/and trusted\_profile. | `string` | `"trusted_profile"` | no |
 | <a name="input_region"></a> [region](#input\_region) | Region where Secrets Manager is deployed. It will be used to build the regional URL to the service | `string` | n/a | yes |
@@ -69,6 +69,6 @@ No modules.
 ### Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_helm_release_secret_store"></a> [helm\_release\_secret\_store](#output\_helm\_release\_secret\_store) | SecretStore helm release. Returning the helm release for trusted profile or apikey authentication according to the authentication type |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
