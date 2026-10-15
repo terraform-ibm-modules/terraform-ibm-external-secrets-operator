@@ -166,7 +166,7 @@ module "external_secrets" {
 
 module "vpes" {
   source   = "terraform-ibm-modules/vpe-gateway/ibm"
-  version  = "5.5.1"
+  version  = "5.6.0"
   count    = var.service_endpoints == "private" ? 1 : 0
   region   = var.region
   prefix   = "vpe"
