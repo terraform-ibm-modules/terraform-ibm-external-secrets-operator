@@ -114,6 +114,7 @@ module "cluster_secrets_stores_service_secrets_groups" {
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = each.value.name        # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
   secret_group_description = each.value.description #tfsec:ignore:general-secrets-no-plaintext-exposure
+  endpoint_type            = var.service_endpoints
   providers = {
     ibm = ibm.ibm-sm
   }
@@ -174,6 +175,7 @@ module "cluster_secrets_stores_account_secrets_groups" {
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = each.value.name        # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
   secret_group_description = each.value.description #tfsec:ignore:general-secrets-no-plaintext-exposure
+  endpoint_type            = var.service_endpoints
   providers = {
     ibm = ibm.ibm-sm
   }
@@ -396,6 +398,7 @@ module "secrets_stores_service_secrets_groups" {
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = each.value.name        # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
   secret_group_description = each.value.description #tfsec:ignore:general-secrets-no-plaintext-exposure
+  endpoint_type            = var.service_endpoints
   providers = {
     ibm = ibm.ibm-sm
   }
@@ -456,6 +459,7 @@ module "secrets_stores_account_secrets_groups" {
   secrets_manager_guid     = local.sm_guid
   secret_group_name        = each.value.name        # checkov:skip=CKV_SECRET_6: does not require high entropy string as is static value
   secret_group_description = each.value.description #tfsec:ignore:general-secrets-no-plaintext-exposure
+  endpoint_type            = var.service_endpoints
   providers = {
     ibm = ibm.ibm-sm
   }
