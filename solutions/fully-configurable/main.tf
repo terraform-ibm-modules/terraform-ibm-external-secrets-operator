@@ -334,6 +334,7 @@ module "cluster_secrets_store_account_serviceid_apikey" {
   serviceid_id              = each.value.accountServiceID
   secrets_manager_guid      = local.sm_guid
   secret_group_id           = each.value.secretGroupID
+  service_endpoints         = var.service_endpoints
   providers = {
     ibm = ibm.ibm-sm
   }
@@ -595,6 +596,7 @@ module "secrets_store_account_serviceid_apikey" {
   serviceid_id              = each.value.accountServiceID
   secrets_manager_guid      = local.sm_guid
   secret_group_id           = each.value.secretGroupID
+  service_endpoints         = var.service_endpoints
   providers = {
     ibm = ibm.ibm-sm
   }
