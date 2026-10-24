@@ -162,7 +162,7 @@ variable "eso_image" {
 variable "eso_image_version" {
   type        = string
   description = "The version or digest for the external secrets image to deploy. If changing the value, ensure it is compatible with the chart version set in eso_chart_version."
-  default     = "v2.13.0-ubi@sha256:aecb71f8db4361c623626f40bacee768ec50aa424763a8ba3da65362e3acab00" # datasource: ghcr.io/external-secrets/external-secrets
+  default     = "v2.14.0-ubi@sha256:94082e978e168d06d2f979d37947bc6bd299b9df3b43a0d6951246785e4c140a" # datasource: ghcr.io/external-secrets/external-secrets
   nullable    = false
   validation {
     condition     = can(regex("(^v\\d+\\.\\d+.\\d+(\\-\\w+)?(\\@sha256\\:\\w+){0,1})$", var.eso_image_version))
@@ -180,7 +180,7 @@ variable "eso_chart_location" {
 variable "eso_chart_version" {
   type        = string
   description = "The version of the External Secrets Operator Helm chart. Ensure that the chart version is compatible with the image version specified in eso_image_version."
-  default     = "2.13.0" # registryUrl: charts.external-secrets.io
+  default     = "2.14.0" # registryUrl: charts.external-secrets.io
   nullable    = false
 }
 
