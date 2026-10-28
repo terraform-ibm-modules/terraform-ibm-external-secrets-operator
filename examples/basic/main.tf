@@ -255,7 +255,7 @@ module "secrets_manager" {
 
   count                = var.existing_sm_instance_guid == null ? 1 : 0
   source               = "terraform-ibm-modules/secrets-manager/ibm"
-  version              = "3.1.0"
+  version              = "3.1.1"
   secrets_manager_name = "${var.prefix}-sm"
   sm_service_plan      = var.sm_service_plan
   region               = local.sm_region
@@ -371,7 +371,7 @@ locals {
 # Create username_password secret and store in secret manager
 module "sm_userpass_secret" {
   source               = "terraform-ibm-modules/secrets-manager-secret/ibm"
-  version              = "1.10.1"
+  version              = "1.11.0"
   region               = local.sm_region
   secrets_manager_guid = local.sm_guid
   secret_group_id      = module.secrets_manager_group_acct.secret_group_id
