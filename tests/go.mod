@@ -5,7 +5,7 @@ go 1.27.3
 require (
 	github.com/gruntwork-io/terratest v1.0.1
 	github.com/stretchr/testify v1.12.1
-	github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper v1.80.8
+	github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper v1.80.9
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/apimachinery v0.37.2
 )
